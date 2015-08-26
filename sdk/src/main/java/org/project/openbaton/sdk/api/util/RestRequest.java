@@ -98,7 +98,7 @@ public abstract class RestRequest {
             checkStatus(jsonResponse, HttpURLConnection.HTTP_CREATED);
             // return the response of the request
             String result = jsonResponse.getBody().toString();
-            log.debug("received: " + result);
+            //log.debug("received: " + result);
 
             return result;
         } catch (IOException e) {
@@ -162,8 +162,17 @@ public abstract class RestRequest {
 //            check response status
             checkStatus(jsonResponse, HttpURLConnection.HTTP_CREATED);
             // return the response of the request
-            String result = jsonResponse.getBody().toString();
+            //String result = jsonResponse.getBody().toString();
+            //log.debug("received2: " + result);
+
+
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonParser jp = new JsonParser();
+            JsonElement je = jp.parse(jsonResponse.getBody().toString());
+            String result = gson.toJson(je);
             log.debug("received: " + result);
+
+
             log.debug("Casting it into: " + object.getClass());
 //            return mapper.readValue(jsonResponse.getBody().toString(), object.getClass());
 
@@ -284,11 +293,15 @@ public abstract class RestRequest {
                 checkStatus(jsonResponse, httpStatus);
             }
             // return the response of the request
-            log.debug("result is: " + jsonResponse.getBody().toString());
+            //log.debug("result is: " + jsonResponse.getBody().toString());
+
+            //log.debug("result is: " + result);
+
             Class<?> aClass = Array.newInstance(type, 3).getClass();
-            log.debug("class is: " + aClass);
-            Object o = mapper.fromJson(jsonResponse.getBody().toString(), aClass);
-            log.debug("deserialized is: " + o);
+            //log.debug("class is: " + aClass);
+            Object[] o = (Object[]) mapper.fromJson(jsonResponse.getBody().toString(), aClass);
+            //log.debug("deserialized is: " + o);
+
             return o;
 
         } catch (UnirestException e) {
@@ -342,9 +355,17 @@ public abstract class RestRequest {
                 checkStatus(jsonResponse, httpStatus);
             }
             // return the response of the request
-            log.debug("result is: " + jsonResponse.getBody().toString());
+            //log.debug("result is: " + jsonResponse.getBody().toString());
+
+            //Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            //JsonParser jp = new JsonParser();
+            //JsonElement je = jp.parse(jsonResponse.getBody().toString());
+            //String result = gson.toJson(je);
+            //log.debug("result is: " + result);
+
             Class<?> aClass = Array.newInstance(type, 1).getClass();
-            log.debug("class is: " + aClass);
+            //log.debug("class is: " + aClass);
+
             return mapper.fromJson(jsonResponse.getBody().toString(), type);
 
         } catch (UnirestException e) {

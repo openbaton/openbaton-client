@@ -6,7 +6,9 @@ import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 import jline.console.completer.FileNameCompleter;
 import jline.console.completer.StringsCompleter;
+import org.project.openbaton.catalogue.nfvo.VimInstance;
 import org.project.openbaton.cli.model.Command;
+import org.project.openbaton.cli.util.PrintFormat;
 import org.project.openbaton.sdk.NFVORequestor;
 import org.project.openbaton.sdk.api.annotations.Help;
 import org.project.openbaton.sdk.api.util.AbstractRestAgent;
@@ -145,7 +147,12 @@ public class NFVOCommandLineInterface {
                     continue;
                 }else
                     try {
-                        System.out.println(executeCommand(line));
+                        //System.out.println(executeCommand(line));
+                        List<Object> o = (List<Object>) executeCommand(line);
+
+                        String result = PrintFormat.printFindAll(o);
+                        System.out.println(result);
+
                     }catch (Exception e){
                         e.printStackTrace();
                         log.error("Error while invoking command");
