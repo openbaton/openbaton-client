@@ -3,6 +3,10 @@ package org.project.openbaton.cli.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.project.openbaton.catalogue.nfvo.VimInstance;
+import org.project.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
+import org.project.openbaton.cli.model.PrintVimInstance;
+import org.project.openbaton.cli.model.PrintNetworkServiceDescriptor;
+import org.project.openbaton.cli.model.PrintNetworkServiceRecord;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -12,7 +16,7 @@ import java.util.List;
 /**
  * Created by tce on 25.08.15.
  */
-public class PrintFormat {
+public abstract class PrintFormat {
 
     private static List<String[]> rows = new LinkedList<String[]>();
 
@@ -26,26 +30,33 @@ public class PrintFormat {
         {
             //TODO
             return result;
-
         }else if(isCollection(obj))
         {
            object = (List<Object>) obj;
         }else
         {
            object.add((Object) obj);
-
         }
 
-        addRow("\n");
-        addRow("ID","TENANT","NAME");
-        addRow("-------------------------------------","--------------","--------------");
-        for (int i = 0; i < object.size(); i++) {
-            VimInstance vims = (VimInstance) object.get(i);
-            addRow(vims.getId(),vims.getTenant(),vims.getName());
-            addRow("-------------------------------------","--------------","--------------");
-        }
+        if(object.size() == 0)
+        {
+            result = "Empty List";
 
-        result = printer();
+        }else
+        {
+
+            if (PrintVimInstance.isVimInstance(object)) {
+                result = PrintVimInstance.printVimInstance(object);
+            }
+
+            if (PrintNetworkServiceDescriptor.isNetworkServiceDescriptor(object)) {
+                result = PrintNetworkServiceDescriptor.printNetworkServiceDescriptor(object);
+            }
+
+            if (PrintNetworkServiceRecord.isNetworkServiceRecord(object)) {
+                result = PrintNetworkServiceRecord.printNetworkServiceRecord(object);
+            }
+        }
 
         return result;
 
@@ -104,6 +115,9 @@ public class PrintFormat {
     public static boolean isCollection(Object ob) {
         return ob instanceof List;
     }
+
+
+
 
 
 
