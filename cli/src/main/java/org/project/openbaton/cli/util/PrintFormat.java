@@ -3,6 +3,8 @@ package org.project.openbaton.cli.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.project.openbaton.catalogue.nfvo.VimInstance;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,10 +16,25 @@ public class PrintFormat {
 
     private static List<String[]> rows = new LinkedList<String[]>();
 
-    public static String printFindAll( List<Object> object) {
+    public static String printResult(Object obj) {
 
+        List<Object> object= new ArrayList<Object>();
         rows.clear();
         String result = "";
+
+        if(obj == null)
+        {
+            //TODO
+            return result;
+
+        }else if(isCollection(obj))
+        {
+           object = (List<Object>) obj;
+        }else
+        {
+           object.add((Object) obj);
+
+        }
 
         addRow("\n");
         addRow("ID","TENANT","NAME");
@@ -82,6 +99,10 @@ public class PrintFormat {
         }
 
         return buf.toString();
+    }
+
+    public static boolean isCollection(Object ob) {
+        return ob instanceof List;
     }
 
 

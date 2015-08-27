@@ -148,9 +148,8 @@ public class NFVOCommandLineInterface {
                 }else
                     try {
                         //System.out.println(executeCommand(line));
-                        List<Object> o = (List<Object>) executeCommand(line);
 
-                        String result = PrintFormat.printFindAll(o);
+                        String result = PrintFormat.printResult(executeCommand(line));
                         System.out.println(result);
 
                     }catch (Exception e){
