@@ -14,17 +14,16 @@ public class PrintVirtualLink extends PrintFormat {
         return ob.get(0) instanceof VirtualLinkDescriptor;
     }
 
-    public static String printVirtualLink( List<Object> object)
-    {
-        String result="";
+    public static String printVirtualLink(List<Object> object) {
+        String result = "";
 
         addRow("\n");
-        addRow("ID","VENDOR","VERSION");
-        addRow("-------------------------------------","--------------","--------------");
+        addRow("ID", "VENDOR", "VERSION");
+        addRow("-------------------------------------", "--------------", "--------------");
         for (int i = 0; i < object.size(); i++) {
             VirtualLinkDescriptor virtualinkdescriptor = (VirtualLinkDescriptor) object.get(i);
-            addRow(virtualinkdescriptor.getId(), virtualinkdescriptor.getVendor(),virtualinkdescriptor.getDescriptor_version());
-            addRow("-------------------------------------","--------------","--------------","--------------");
+            addRow(virtualinkdescriptor.getId(), virtualinkdescriptor.getVendor(), virtualinkdescriptor.getDescriptor_version());
+            addRow("-------------------------------------", "--------------", "--------------", "--------------");
         }
 
         result = printer();

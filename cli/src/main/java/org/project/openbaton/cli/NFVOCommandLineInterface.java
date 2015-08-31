@@ -22,7 +22,6 @@ import java.util.*;
 
 /**
  * Created by lto on 14/07/15.
- *
  */
 public class NFVOCommandLineInterface {
 
@@ -33,7 +32,7 @@ public class NFVOCommandLineInterface {
     private static final String VERSION = "1";
 
     private final static LinkedHashMap<String, Command> commandList = new LinkedHashMap<>();
-    private final static LinkedHashMap<String, String> helpCommandList = new LinkedHashMap<String, String>(){{
+    private final static LinkedHashMap<String, String> helpCommandList = new LinkedHashMap<String, String>() {{
         put("help", "Print the usage");
         put("exit", "Exit the application");
         put("print properties", "print all the properties");
@@ -45,17 +44,17 @@ public class NFVOCommandLineInterface {
         System.out.println("Available commands are");
         String format = "%-80s%s%n";
         for (Object entry : helpCommandList.entrySet()) {
-            System.out.printf(format, ((Map.Entry)entry).getKey() + ":" ,((Map.Entry)entry).getValue());
+            System.out.printf(format, ((Map.Entry) entry).getKey() + ":", ((Map.Entry) entry).getValue());
         }
         System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
     }
 
-    private static void helpCommand(String command){
+    private static void helpCommand(String command) {
         Command cmd = commandList.get(command);
         System.out.println();
         System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
         System.out.print("Usage: " + command + " ");
-        for (Class c : cmd.getParams()){
+        for (Class c : cmd.getParams()) {
             System.out.print("<" + c.getSimpleName() + ">");
         }
         System.out.println();
@@ -87,27 +86,26 @@ public class NFVOCommandLineInterface {
         String line;
         PrintWriter out = new PrintWriter(reader.getOutput());
 
-        if(file.exists()){
+        if (file.exists()) {
             try {
                 log.trace("File exists");
                 properties.load(new FileInputStream(file));
-                log.trace("Properties are: " + properties);
-            } catch (IOException e) {
+                log.trace("Properties are: " + properties);            } catch (IOException e) {
                 log.warn("Error reading /etc/openbaton/cli.properties, trying with Environment Variables");
                 readEnvVars(properties);
             }
-        }else {
+        } else {
             log.warn("File [" + CONFIGURATION_FILE + "] not found, looking for Environment Variables");
             readEnvVars(properties);
         }
 
-        getProperty(reader, properties, "nfvo-usr","");
-        getProperty(reader, properties, "nfvo-pwd","");
-        getProperty(reader, properties, "nfvo-ip","127.0.0.1");
-        getProperty(reader, properties, "nfvo-port","8080");
-        getProperty(reader, properties, "nfvo-version",VERSION);
+        getProperty(reader, properties, "nfvo-usr", "");
+        getProperty(reader, properties, "nfvo-pwd", "");
+        getProperty(reader, properties, "nfvo-ip", "127.0.0.1");
+        getProperty(reader, properties, "nfvo-port", "8080");
+        getProperty(reader, properties, "nfvo-version", VERSION);
 
-        NFVORequestor nfvo = new NFVORequestor(properties.getProperty("nfvo-usr"), properties.getProperty("nfvo-pwd"), properties.getProperty("nfvo-ip"),properties.getProperty("nfvo-port"),properties.getProperty("nfvo-version"));
+        NFVORequestor nfvo = new NFVORequestor(properties.getProperty("nfvo-usr"), properties.getProperty("nfvo-pwd"), properties.getProperty("nfvo-ip"), properties.getProperty("nfvo-port"), properties.getProperty("nfvo-version"));
 
         fillCommands(nfvo);
 
@@ -127,24 +125,19 @@ public class NFVOCommandLineInterface {
                 line = line.trim();
                 if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit")) {
                     exit(0);
-                }else
-                if (line.equalsIgnoreCase("cls")) {
+                } else if (line.equalsIgnoreCase("cls")) {
                     reader.clearScreen();
-                }else
-                if (line.equalsIgnoreCase("help")) {
+                } else if (line.equalsIgnoreCase("help")) {
                     usage();
-                }else
-                if (line.startsWith("help ")) {
+                } else if (line.startsWith("help ")) {
                     StringTokenizer st = new StringTokenizer(line, " ");
                     st.nextToken();
                     helpCommand(st.nextToken());
-                }else
-                if (line.equalsIgnoreCase("print properties")) {
+                } else if (line.equalsIgnoreCase("print properties")) {
                     log.info("" + properties.toString());
-                }else
-                if (line.equalsIgnoreCase("")) {
+                } else if (line.equalsIgnoreCase("")) {
                     continue;
-                }else
+                } else
                     try {
                         //System.out.println(executeCommand(line));
 
@@ -152,7 +145,7 @@ public class NFVOCommandLineInterface {
                         String result = PrintFormat.printResult(executeCommand(line));
                         System.out.println(result);
 
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                         log.error("Error while invoking command");
                     }
@@ -163,11 +156,11 @@ public class NFVOCommandLineInterface {
     }
 
     private static void getProperty(ConsoleReader reader, Properties properties, String property, String defaultProperty) {
-        if (properties.get(property) == null){
-            log.warn(property+" property was not found neither in the file [" + CONFIGURATION_FILE + "] nor in Environment Variables");
+        if (properties.get(property) == null) {
+            log.warn(property + " property was not found neither in the file [" + CONFIGURATION_FILE + "] nor in Environment Variables");
             try {
                 String insertedProperty = reader.readLine(property + "[" + defaultProperty + "]: ");
-                if (insertedProperty == null || insertedProperty.equals("")){
+                if (insertedProperty == null || insertedProperty.equals("")) {
                     insertedProperty = defaultProperty;
                 }
                 properties.put(property, insertedProperty);
@@ -183,46 +176,46 @@ public class NFVOCommandLineInterface {
         StringBuffer sb = new StringBuffer();
         StringTokenizer st = new StringTokenizer(line);
         sb.append(st.nextToken());
-        log.debug(sb.toString());
+        log.trace(sb.toString());
         String commandString = sb.toString();
         Command command = commandList.get(commandString);
-        if (command == null){
+        if (command == null) {
             return "Command: " + commandString + " not found!";
         }
-        log.debug("invoking method: " + command.getMethod().getName() + " with parameters: " + command.getParams());
+        log.trace("invoking method: " + command.getMethod().getName() + " with parameters: " + command.getParams());
         List<Object> params = new LinkedList<>();
-        for (Type t : command.getParams()){
-            log.debug("type is: " + t.getClass().getName());
-            if (t.equals(String.class)){ //for instance an id
+        for (Type t : command.getParams()) {
+            log.trace("type is: " + t.getClass().getName());
+            if (t.equals(String.class)) { //for instance an id
                 params.add(st.nextToken());
-            }else {// for instance waiting for an obj so passing a file
+            } else {// for instance waiting for an obj so passing a file
                 String pathname = st.nextToken();
-                log.debug("the path is: " + pathname);
+                log.trace("the path is: " + pathname);
                 File f = new File(pathname);
                 Gson gson = new Gson();
                 FileInputStream fileInputStream = new FileInputStream(f);
                 String file = getString(fileInputStream);
-                log.debug(file);
-                log.debug("waiting for an object of type " + command.getClazz().getName());
+                log.trace(file);
+                log.trace("waiting for an object of type " + command.getClazz().getName());
                 Object casted = command.getClazz().cast(gson.fromJson(file, command.getClazz()));
-                log.debug("Parameter added is: " + casted);
+                log.trace("Parameter added is: " + casted);
                 params.add(casted);
             }
         }
-        String parameters ="";
-        for (Object type : params){
+        String parameters = "";
+        for (Object type : params) {
             parameters += type.getClass().getSimpleName() + " ";
         }
-        log.debug("invoking method: " + command.getMethod().getName() + " with parameters: " + parameters);
+        log.trace("invoking method: " + command.getMethod().getName() + " with parameters: " + parameters);
         return command.getMethod().invoke(command.getInstance(), params.toArray());
     }
 
-    private static String  getString(FileInputStream fileInputStream){
+    private static String getString(FileInputStream fileInputStream) {
         StringBuilder builder = new StringBuilder();
         int ch;
         try {
-            while((ch = fileInputStream.read()) != -1){
-                builder.append((char)ch);
+            while ((ch = fileInputStream.read()) != -1) {
+                builder.append((char) ch);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -261,16 +254,13 @@ public class NFVOCommandLineInterface {
             exit(123);
         }
         String replacement = null;
-        if (className.endsWith("RestRequest")){
+        if (className.endsWith("RestRequest")) {
             replacement = className.substring(0, className.indexOf("RestRequest"));
-        }
-        else if (className.endsWith("RestAgent")){
+        } else if (className.endsWith("RestAgent")) {
             replacement = className.substring(0, className.indexOf("RestAgent"));
-        }
-        else if (className.endsWith("Agent")){
+        } else if (className.endsWith("Agent")) {
             replacement = className.substring(0, className.indexOf("Agent"));
-        }
-        else
+        } else
             exit(700);
         log.debug("Clazz: " + clazz);
         log.debug("Replacement: " + replacement);
@@ -309,7 +299,7 @@ public class NFVOCommandLineInterface {
             properties.put("nfvo-ip", System.getenv().get("nfvo_ip"));
             properties.put("nfvo-port", System.getenv().get("nfvo_port"));
             properties.put("nfvo-version", System.getenv().get("nfvo_version"));
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             return;
         }
     }
@@ -317,17 +307,14 @@ public class NFVOCommandLineInterface {
     /**
      * * * EXIT STATUS CODE
      *
-     *  @param status:
-     *
-     * *) 1XX Variable errors
-     * *    *) 100: variable not found
-     *
-     * *) 8XX: reflection Errors
-     * *    *) 801 ConsoleReader not able to read
-     * *) 9XX: Libraries Errors
-     * *    *) 990 ConsoleReader not able to read
-     * *    *) 999: ConsoleReader not created
-     *
+     * @param status: *) 1XX Variable errors
+     *                *    *) 100: variable not found
+     *                <p/>
+     *                *) 8XX: reflection Errors
+     *                *    *) 801 ConsoleReader not able to read
+     *                *) 9XX: Libraries Errors
+     *                *    *) 990 ConsoleReader not able to read
+     *                *    *) 999: ConsoleReader not created
      */
     private static void exit(int status) {
         System.exit(status);

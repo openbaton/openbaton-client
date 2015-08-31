@@ -1,7 +1,8 @@
 package org.project.openbaton.cli.model;
 
-import org.project.openbaton.cli.util.PrintFormat;
 import org.project.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
+import org.project.openbaton.cli.util.PrintFormat;
+
 import java.util.List;
 
 /**
@@ -15,17 +16,16 @@ public class PrintNetworkServiceDescriptor extends PrintFormat {
     }
 
 
-    public static String printNetworkServiceDescriptor( List<Object> object)
-    {
-        String result="";
+    public static String printNetworkServiceDescriptor(List<Object> object) {
+        String result = "";
 
         addRow("\n");
-        addRow("ID","NAME","VENDOR","VERSION");
-        addRow("-------------------------------------","--------------","--------------","--------------");
+        addRow("ID", "NAME", "VENDOR", "VERSION");
+        addRow("-------------------------------------", "--------------", "--------------", "--------------");
         for (int i = 0; i < object.size(); i++) {
             NetworkServiceDescriptor networkservicedescriptor = (NetworkServiceDescriptor) object.get(i);
-            addRow(networkservicedescriptor.getId(),networkservicedescriptor.getName(),networkservicedescriptor.getVendor(),networkservicedescriptor.getVersion());
-            addRow("-------------------------------------","--------------","--------------","--------------");
+            addRow(networkservicedescriptor.getId(), networkservicedescriptor.getName(), networkservicedescriptor.getVendor(), networkservicedescriptor.getVersion());
+            addRow("-------------------------------------", "--------------", "--------------", "--------------");
         }
 
         result = printer();

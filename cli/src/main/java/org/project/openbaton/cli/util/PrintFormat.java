@@ -2,11 +2,7 @@ package org.project.openbaton.cli.util;
 
 
 import org.apache.commons.lang3.StringUtils;
-import org.project.openbaton.cli.model.PrintVimInstance;
-import org.project.openbaton.cli.model.PrintNetworkServiceDescriptor;
-import org.project.openbaton.cli.model.PrintNetworkServiceRecord;
-import org.project.openbaton.cli.model.PrintVirtualLink;
-import org.project.openbaton.cli.model.PrintVNFFG;
+import org.project.openbaton.cli.model.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -22,50 +18,26 @@ public abstract class PrintFormat {
 
     public static String printResult(Object obj) {
 
-        List<Object> object= new ArrayList<Object>();
+        List<Object> object = new ArrayList<Object>();
         rows.clear();
         String result = "";
 
-        if(obj == null)
-        {
+        if (obj == null) {
             //TODO
             return result;
-        }else if(isCollection(obj))
-        {
-           object = (List<Object>) obj;
-        }else
-        {
-           object.add((Object) obj);
+        } else if (isCollection(obj)) {
+            object = (List<Object>) obj;
+        } else {
+            object.add((Object) obj);
         }
 
 
-        if(object.size() == 0)
-        {
+        if (object.size() == 0) {
             result = "Empty List";
 
-        }else
-        {
+        } else {
 
-
-            if (PrintVimInstance.isVimInstance(object)) {
-                result = PrintVimInstance.printVimInstance(object);
-            }
-
-            if (PrintNetworkServiceDescriptor.isNetworkServiceDescriptor(object)) {
-                result = PrintNetworkServiceDescriptor.printNetworkServiceDescriptor(object);
-            }
-
-            if (PrintNetworkServiceRecord.isNetworkServiceRecord(object)) {
-                result = PrintNetworkServiceRecord.printNetworkServiceRecord(object);
-            }
-
-            if (PrintVirtualLink.isVirtualLink(object)) {
-                result = PrintVirtualLink.printVirtualLink(object);
-            }
-
-            if (PrintVNFFG.isVNFFG(object)) {
-                result = PrintVNFFG.printVNFFG(object);
-            }
+            result = PrintTables(object);
         }
 
         return result;
@@ -74,22 +46,20 @@ public abstract class PrintFormat {
     }
 
 
-    public static void addRow(String... cols)
-    {
+    public static void addRow(String... cols) {
         rows.add(cols);
     }
 
-    private static int[] colWidths()
-    {
+    private static int[] colWidths() {
         int cols = -1;
 
-        for(String[] row : rows)
+        for (String[] row : rows)
             cols = Math.max(cols, row.length);
 
         int[] widths = new int[cols];
 
-        for(String[] row : rows) {
-            for(int colNum = 0; colNum < row.length; colNum++) {
+        for (String[] row : rows) {
+            for (int colNum = 0; colNum < row.length; colNum++) {
                 widths[colNum] =
                         Math.max(
                                 widths[colNum],
@@ -101,14 +71,13 @@ public abstract class PrintFormat {
     }
 
 
-    public static String printer()
-    {
+    public static String printer() {
         StringBuilder buf = new StringBuilder();
 
         int[] colWidths = colWidths();
 
-        for(String[] row : rows) {
-            for(int colNum = 0; colNum < row.length; colNum++) {
+        for (String[] row : rows) {
+            for (int colNum = 0; colNum < row.length; colNum++) {
                 buf.append(
                         StringUtils.rightPad(
                                 StringUtils.defaultString(
@@ -126,10 +95,33 @@ public abstract class PrintFormat {
         return ob instanceof List;
     }
 
+    public static String PrintTables(List<Object> object) {
+        String result = "";
+
+        if (PrintVimInstance.isVimInstance(object)) {
+            result = PrintVimInstance.printVimInstance(object);
+        }
+
+        if (PrintNetworkServiceDescriptor.isNetworkServiceDescriptor(object)) {
+            result = PrintNetworkServiceDescriptor.printNetworkServiceDescriptor(object);
+        }
+
+        if (PrintNetworkServiceRecord.isNetworkServiceRecord(object)) {
+            result = PrintNetworkServiceRecord.printNetworkServiceRecord(object);
+        }
+
+        if (PrintVirtualLink.isVirtualLink(object)) {
+            result = PrintVirtualLink.printVirtualLink(object);
+        }
+
+        if (PrintVNFFG.isVNFFG(object)) {
+            result = PrintVNFFG.printVNFFG(object);
+        }
 
 
+        return result;
 
-
+    }
 
 
 }
