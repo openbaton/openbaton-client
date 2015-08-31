@@ -6,7 +6,6 @@ import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 import jline.console.completer.FileNameCompleter;
 import jline.console.completer.StringsCompleter;
-import org.project.openbaton.catalogue.nfvo.VimInstance;
 import org.project.openbaton.cli.model.Command;
 import org.project.openbaton.cli.util.PrintFormat;
 import org.project.openbaton.sdk.NFVORequestor;
@@ -148,6 +147,7 @@ public class NFVOCommandLineInterface {
                 }else
                     try {
                         //System.out.println(executeCommand(line));
+
 
                         String result = PrintFormat.printResult(executeCommand(line));
                         System.out.println(result);

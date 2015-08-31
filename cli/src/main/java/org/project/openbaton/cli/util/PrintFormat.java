@@ -2,11 +2,11 @@ package org.project.openbaton.cli.util;
 
 
 import org.apache.commons.lang3.StringUtils;
-import org.project.openbaton.catalogue.nfvo.VimInstance;
-import org.project.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
 import org.project.openbaton.cli.model.PrintVimInstance;
 import org.project.openbaton.cli.model.PrintNetworkServiceDescriptor;
 import org.project.openbaton.cli.model.PrintNetworkServiceRecord;
+import org.project.openbaton.cli.model.PrintVirtualLink;
+import org.project.openbaton.cli.model.PrintVNFFG;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -38,12 +38,14 @@ public abstract class PrintFormat {
            object.add((Object) obj);
         }
 
+
         if(object.size() == 0)
         {
             result = "Empty List";
 
         }else
         {
+
 
             if (PrintVimInstance.isVimInstance(object)) {
                 result = PrintVimInstance.printVimInstance(object);
@@ -55,6 +57,14 @@ public abstract class PrintFormat {
 
             if (PrintNetworkServiceRecord.isNetworkServiceRecord(object)) {
                 result = PrintNetworkServiceRecord.printNetworkServiceRecord(object);
+            }
+
+            if (PrintVirtualLink.isVirtualLink(object)) {
+                result = PrintVirtualLink.printVirtualLink(object);
+            }
+
+            if (PrintVNFFG.isVNFFG(object)) {
+                result = PrintVNFFG.printVNFFG(object);
             }
         }
 
