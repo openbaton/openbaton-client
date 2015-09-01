@@ -39,8 +39,16 @@ public class NFVOCommandLineInterface {
     }};
 
     public static void usage() {
+        log.info("\n" +
+                " _______  _______________   ____________            _________ .____    .___ \n" +
+                " \\      \\ \\_   _____/\\   \\ /   /\\_____  \\           \\_   ___ \\|    |   |   |\n" +
+                " /   |   \\ |    __)   \\   Y   /  /   |   \\   ______ /    \\  \\/|    |   |   |\n" +
+                "/    |    \\|     \\     \\     /  /    |    \\ /_____/ \\     \\___|    |___|   |\n" +
+                "\\____|__  /\\___  /      \\___/   \\_______  /          \\______  /_______ \\___|\n" +
+                "        \\/     \\/                       \\/                  \\/        \\/    ");
+        log.info("Nfvo OpenBaton Command Line Interface");
         System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
-        System.out.println("Usage: java -jar build/libs/neutrino-<$version>.jar");
+        //System.out.println("Usage: java -jar build/libs/neutrino-<$version>.jar");
         System.out.println("Available commands are");
         String format = "%-80s%s%n";
         for (Object entry : helpCommandList.entrySet()) {
@@ -68,15 +76,7 @@ public class NFVOCommandLineInterface {
 
     public static void main(String[] args) {
 
-        log.info("\n" +
-                " _______  _______________   ____________            _________ .____    .___ \n" +
-                " \\      \\ \\_   _____/\\   \\ /   /\\_____  \\           \\_   ___ \\|    |   |   |\n" +
-                " /   |   \\ |    __)   \\   Y   /  /   |   \\   ______ /    \\  \\/|    |   |   |\n" +
-                "/    |    \\|     \\     \\     /  /    |    \\ /_____/ \\     \\___|    |___|   |\n" +
-                "\\____|__  /\\___  /      \\___/   \\_______  /          \\______  /_______ \\___|\n" +
-                "        \\/     \\/                       \\/                  \\/        \\/    ");
-        log.info("Nfvo OpenBaton Command Line Interface");
-        log.info("Log class: { " + log.getClass().getName() + " }");
+        //log.info("Log class: { " + log.getClass().getName() + " }");
 
         ConsoleReader reader = getConsoleReader();
         Properties properties = new Properties();
@@ -90,7 +90,8 @@ public class NFVOCommandLineInterface {
             try {
                 log.trace("File exists");
                 properties.load(new FileInputStream(file));
-                log.trace("Properties are: " + properties);            } catch (IOException e) {
+                log.trace("Properties are: " + properties);
+            } catch (IOException e) {
                 log.warn("Error reading /etc/openbaton/cli.properties, trying with Environment Variables");
                 readEnvVars(properties);
             }
@@ -120,7 +121,38 @@ public class NFVOCommandLineInterface {
         try {
             reader.setPrompt("\u001B[135m" + properties.get("nfvo-usr") + "@[\u001B[32mopen-baton\u001B[0m]~> ");
 
-            while ((line = reader.readLine()) != null) {
+            //input reader
+            //arg[0] == help  default value
+            String s;
+            if (args.length > 2) //tree parameters
+            {
+                s = args[0] + " " + args[1] + " " + args[2];
+            } else if (args.length > 1) //two parameters
+            {
+                s = args[0] + " " + args[1];
+            } else {
+                s = args[0];
+            }
+            System.out.println("STAMPA: " + s);
+            if (s.equalsIgnoreCase("help")) {
+                usage();
+                exit(0);
+            } else {
+                try {
+
+                    String result = PrintFormat.printResult(executeCommand(s));
+                    System.out.println(result);
+                    exit(0);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.error("Error while invoking command");
+                    exit(0);
+                }
+            }
+
+
+            /*while ((line = reader.readLine()) != null) {
                 out.flush();
                 line = line.trim();
                 if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit")) {
@@ -141,7 +173,6 @@ public class NFVOCommandLineInterface {
                     try {
                         //System.out.println(executeCommand(line));
 
-
                         String result = PrintFormat.printResult(executeCommand(line));
                         System.out.println(result);
 
@@ -149,7 +180,7 @@ public class NFVOCommandLineInterface {
                         e.printStackTrace();
                         log.error("Error while invoking command");
                     }
-            }
+            }*/
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -262,11 +293,11 @@ public class NFVOCommandLineInterface {
             replacement = className.substring(0, className.indexOf("Agent"));
         } else
             exit(700);
-        log.debug("Clazz: " + clazz);
-        log.debug("Replacement: " + replacement);
+        log.trace("Clazz: " + clazz);
+        log.trace("Replacement: " + replacement);
         for (Method method : agent.getClass().getSuperclass().getDeclaredMethods()) {
             if (method.isAnnotationPresent(Help.class)) {
-                log.debug("Method: " + method.getName());
+                log.trace("Method: " + method.getName());
                 helpCommandList.put(replacement + "-" + method.getName(), method.getAnnotation(Help.class).help().replace("{#}", replacement));
                 Command command = new Command(agent, method, method.getParameterTypes(), clazz);
                 commandList.put(replacement + "-" + method.getName(), command);
