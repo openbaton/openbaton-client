@@ -52,10 +52,21 @@ public class NFVOCommandLineInterface {
         System.out.println("Available commands are");
         String format = "%-80s%s%n";
         for (Object entry : helpCommandList.entrySet()) {
-            System.out.printf(format, ((Map.Entry) entry).getKey() + ":", ((Map.Entry) entry).getValue());
+            System.out.printf(format, ((Map.Entry) entry).getKey().toString() + ":", ((Map.Entry) entry).getValue().toString());
+
         }
         System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
     }
+
+    public static void helpUsage(String s) {
+        for (Object entry : helpCommandList.entrySet()) {
+            String format = "%-80s%s%n";
+            if (((Map.Entry) entry).getKey().toString().startsWith(s) || ((Map.Entry) entry).getKey().toString().startsWith(s + "-")) {
+                System.out.printf(format, ((Map.Entry) entry).getKey().toString() + ":", ((Map.Entry) entry).getValue().toString());
+            }
+        }
+    }
+
 
     private static void helpCommand(String command) {
         Command cmd = commandList.get(command);
@@ -123,33 +134,88 @@ public class NFVOCommandLineInterface {
 
             //input reader
             //arg[0] == help  default value
-            String s;
-            if (args.length > 2) //tree parameters
-            {
-                s = args[0] + " " + args[1] + " " + args[2];
-            } else if (args.length > 1) //two parameters
-            {
-                s = args[0] + " " + args[1];
-            } else {
-                s = args[0];
-            }
-            System.out.println("STAMPA: " + s);
-            if (s.equalsIgnoreCase("help")) {
-                usage();
-                exit(0);
-            } else {
-                try {
+            String s = "";
+            int find = 0;
 
+            for (Object entry : helpCommandList.entrySet()) {
+                String format = "%-80s%s%n";
+                String search = args[0] + "-";
+                if (((Map.Entry) entry).getKey().toString().equals(args[0])) {
+                    find++;
+                }
+            }
+
+            if (find > 0) { //correct comand
+
+                if (args.length > 2) //tree parameters
+                {
+                    s = args[0] + " " + args[1] + " " + args[2];
+                    if (!args[0].endsWith("update")) {
+                        System.out.println("Error: too much arguments");
+                        exit(0);
+                    }
+
+                } else if (args.length > 1) //two parameters
+                {
+                    if (args[1].equalsIgnoreCase("help")) {
+                        helpUsage(args[0]);
+                        exit(0);
+                    }else if (args[0].endsWith("All")) {
+                        System.out.println("Error: too much arguments");
+                        exit(0);
+                    }
+
+                    s = args[0] + " " + args[1];
+                    if (args[0].contains("update")) {
+                        System.out.println("Error: no id or object passed");
+                        exit(0);
+                    }
+                } else if (args.length > 0) {
+                    s = args[0];
+                    if (s.equalsIgnoreCase("help")) {
+                        usage();
+                        exit(0);
+                    } else if (s.contains("delete") || s.endsWith("ById") || s.contains("get")) {
+                        System.out.println("Error: no id passed");
+                        exit(0);
+                    } else if (s.contains("create")) {
+                        System.out.println("Error: no object or id passed");
+                        exit(0);
+                    }else if (s.contains("update")) {
+                        System.out.println("Error: no id and/or object passed");
+                        exit(0);
+                    }
+
+                }
+                //execute comand
+                try {
                     String result = PrintFormat.printResult(executeCommand(s));
                     System.out.println(result);
                     exit(0);
 
-                } catch (Exception e) {
+                } catch (Exception e)
+                {
                     e.printStackTrace();
                     log.error("Error while invoking command");
                     exit(0);
                 }
+            } else { //wrong comand
+                for (Object entry : helpCommandList.entrySet()) {
+                    String format = "%-80s%s%n";
+                    if (((Map.Entry) entry).getKey().toString().startsWith(args[0])) {
+                        System.out.printf(format, ((Map.Entry) entry).getKey().toString() + ":", ((Map.Entry) entry).getValue().toString());
+                        find++;
+                    }
+                }
+                if (find == 0) {
+
+                    System.out.println("Nfvo OpenBaton Command Line Interface");
+                    System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
+                    System.out.println(args[0] + ": comand not found");
+                    exit(0);
+                }
             }
+
 
 
             /*while ((line = reader.readLine()) != null) {
@@ -184,6 +250,7 @@ public class NFVOCommandLineInterface {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+
     }
 
     private static void getProperty(ConsoleReader reader, Properties properties, String property, String defaultProperty) {

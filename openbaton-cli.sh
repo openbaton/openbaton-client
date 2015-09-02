@@ -1,7 +1,7 @@
 #!/bin/bash
 source gradle.properties
 
-
+_version=${version}
 
 function check_already_running_client {
         result=$(ps aux | grep cli-all- | wc -l);
@@ -20,6 +20,7 @@ function check_not_running {
 }
 
 
+
 ##
 #   MAIN
 ##
@@ -29,12 +30,12 @@ then
         check_already_running_client
         check_not_running
         cd cli/build/libs/
-        java -jar cli-all-0.4-SNAPSHOT.jar "help"
+        java -jar "cli-all-$_version.jar" "help" 
 else
         check_already_running_client
         check_not_running
         cd cli/build/libs/
-        java -jar cli-all-0.4-SNAPSHOT.jar $1 $2 $3
+        java -jar "cli-all-$_version.jar" $1 $2 $3 
 fi
 
 

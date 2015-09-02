@@ -24,7 +24,9 @@ public abstract class PrintFormat {
 
         if (obj == null) {
             //TODO
+            result = "Error: invalid command line";
             return result;
+
         } else if (isCollection(obj)) {
             object = (List<Object>) obj;
         } else {
