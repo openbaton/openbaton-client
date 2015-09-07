@@ -189,7 +189,7 @@ public class NFVOCommandLineInterface {
                 }
                 //execute comand
                 try {
-                    String result = PrintFormat.printResult(executeCommand(s));
+                    String result = PrintFormat.printResult(args[0],executeCommand(s));
                     System.out.println(result);
                     exit(0);
 

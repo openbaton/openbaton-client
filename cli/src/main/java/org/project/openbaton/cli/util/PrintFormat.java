@@ -16,7 +16,7 @@ public abstract class PrintFormat {
 
     private static List<String[]> rows = new LinkedList<String[]>();
 
-    public static String printResult(Object obj) {
+    public static String printResult(String comand,Object obj) {
 
         List<Object> object = new ArrayList<Object>();
         rows.clear();
@@ -39,7 +39,7 @@ public abstract class PrintFormat {
 
         } else {
 
-            result = PrintTables(object);
+            result = PrintTables(comand,object);
         }
 
         return result;
@@ -97,11 +97,15 @@ public abstract class PrintFormat {
         return ob instanceof List;
     }
 
-    public static String PrintTables(List<Object> object) {
+    public static String PrintTables(String comand,List<Object> object) {
         String result = "";
 
         if (PrintVimInstance.isVimInstance(object)) {
-            result = PrintVimInstance.printVimInstance(object);
+            try {
+                result = PrintVimInstance.printVimInstance(comand,object);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
 
         if (PrintNetworkServiceDescriptor.isNetworkServiceDescriptor(object)) {
