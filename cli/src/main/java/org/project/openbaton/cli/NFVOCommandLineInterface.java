@@ -28,7 +28,7 @@ public class NFVOCommandLineInterface {
     private static Logger log = LoggerFactory.getLogger(NFVOCommandLineInterface.class);
 
     private static final Character mask = '*';
-    private static final String CONFIGURATION_FILE = "/etc/openbaton/cli.properties";
+    private static String CONFIGURATION_FILE = "/etc/openbaton/cli.properties";
     private static final String VERSION = "1";
 
     private final static LinkedHashMap<String, Command> commandList = new LinkedHashMap<>();
@@ -92,6 +92,7 @@ public class NFVOCommandLineInterface {
         ConsoleReader reader = getConsoleReader();
         Properties properties = new Properties();
 
+        CONFIGURATION_FILE = args[0];
         File file = new File(CONFIGURATION_FILE);
 
         String line;
@@ -139,39 +140,39 @@ public class NFVOCommandLineInterface {
 
             for (Object entry : helpCommandList.entrySet()) {
                 String format = "%-80s%s%n";
-                String search = args[0] + "-";
-                if (((Map.Entry) entry).getKey().toString().equals(args[0])) {
+                String search = args[1] + "-";
+                if (((Map.Entry) entry).getKey().toString().equals(args[1])) {
                     find++;
                 }
             }
 
             if (find > 0) { //correct comand
 
-                if (args.length > 2) //tree parameters
+                if (args.length > 3) //tree parameters
                 {
-                    s = args[0] + " " + args[1] + " " + args[2];
-                    if (!args[0].endsWith("update")) {
+                    s = args[1] + " " + args[2] + " " + args[3];
+                    if (!args[1].endsWith("update")) {
                         System.out.println("Error: too much arguments");
                         exit(0);
                     }
 
-                } else if (args.length > 1) //two parameters
+                } else if (args.length > 2) //two parameters
                 {
-                    if (args[1].equalsIgnoreCase("help")) {
-                        helpUsage(args[0]);
+                    if (args[2].equalsIgnoreCase("help")) {
+                        helpUsage(args[1]);
                         exit(0);
-                    }else if (args[0].endsWith("All")) {
+                    }else if (args[1].endsWith("All")) {
                         System.out.println("Error: too much arguments");
                         exit(0);
                     }
 
-                    s = args[0] + " " + args[1];
-                    if (args[0].contains("update")) {
+                    s = args[1] + " " + args[2];
+                    if (args[1].contains("update")) {
                         System.out.println("Error: no id or object passed");
                         exit(0);
                     }
-                } else if (args.length > 0) {
-                    s = args[0];
+                } else if (args.length > 1) {
+                    s = args[1];
                     if (s.equalsIgnoreCase("help")) {
                         usage();
                         exit(0);
@@ -189,7 +190,7 @@ public class NFVOCommandLineInterface {
                 }
                 //execute comand
                 try {
-                    String result = PrintFormat.printResult(args[0],executeCommand(s));
+                    String result = PrintFormat.printResult(args[1],executeCommand(s));
                     System.out.println(result);
                     exit(0);
 
@@ -202,7 +203,7 @@ public class NFVOCommandLineInterface {
             } else { //wrong comand
                 for (Object entry : helpCommandList.entrySet()) {
                     String format = "%-80s%s%n";
-                    if (((Map.Entry) entry).getKey().toString().startsWith(args[0])) {
+                    if (((Map.Entry) entry).getKey().toString().startsWith(args[1])) {
                         System.out.printf(format, ((Map.Entry) entry).getKey().toString() + ":", ((Map.Entry) entry).getValue().toString());
                         find++;
                     }
@@ -211,7 +212,7 @@ public class NFVOCommandLineInterface {
 
                     System.out.println("Nfvo OpenBaton Command Line Interface");
                     System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
-                    System.out.println(args[0] + ": comand not found");
+                    System.out.println(args[1] + ": comand not found");
                     exit(0);
                 }
             }
