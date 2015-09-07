@@ -4,6 +4,9 @@ package org.project.openbaton.cli.util;
 import org.apache.commons.lang3.StringUtils;
 import org.project.openbaton.cli.model.*;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +19,7 @@ public abstract class PrintFormat {
 
     private static List<String[]> rows = new LinkedList<String[]>();
 
-    public static String printResult(String comand,Object obj) {
+    public static String printResult(String comand,Object obj) throws InvocationTargetException, IllegalAccessException {
 
         List<Object> object = new ArrayList<Object>();
         rows.clear();
@@ -97,36 +100,80 @@ public abstract class PrintFormat {
         return ob instanceof List;
     }
 
-    public static String PrintTables(String comand,List<Object> object) {
+    public static String PrintTables(String comand,List<Object> object) throws InvocationTargetException, IllegalAccessException {
         String result = "";
 
-        if (PrintVimInstance.isVimInstance(object)) {
-            try {
-                result = PrintVimInstance.printVimInstance(comand,object);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+        if(comand.contains("create"))
+        {
+            result = showObject(object);
+        }
+        else {
+
+            if (PrintVimInstance.isVimInstance(object)) {
+
+                result = PrintVimInstance.printVimInstance(comand, object);
+
             }
-        }
 
-        if (PrintNetworkServiceDescriptor.isNetworkServiceDescriptor(object)) {
-            result = PrintNetworkServiceDescriptor.printNetworkServiceDescriptor(object);
-        }
+            if (PrintNetworkServiceDescriptor.isNetworkServiceDescriptor(object)) {
+                result = PrintNetworkServiceDescriptor.printNetworkServiceDescriptor(object);
+            }
 
-        if (PrintNetworkServiceRecord.isNetworkServiceRecord(object)) {
-            result = PrintNetworkServiceRecord.printNetworkServiceRecord(object);
-        }
+            if (PrintNetworkServiceRecord.isNetworkServiceRecord(object)) {
+                result = PrintNetworkServiceRecord.printNetworkServiceRecord(object);
+            }
 
-        if (PrintVirtualLink.isVirtualLink(object)) {
-            result = PrintVirtualLink.printVirtualLink(object);
-        }
+            if (PrintVirtualLink.isVirtualLink(object)) {
+                result = PrintVirtualLink.printVirtualLink(object);
+            }
 
-        if (PrintVNFFG.isVNFFG(object)) {
-            result = PrintVNFFG.printVNFFG(object);
+            if (PrintVNFFG.isVNFFG(object)) {
+                result = PrintVNFFG.printVNFFG(object);
+            }
         }
 
 
         return result;
 
+    }
+
+    public static String showObject(List<Object> object)throws IllegalAccessException, InvocationTargetException
+    {
+        String result = "";
+
+        addRow("\n");
+        addRow("+-------------------------------------",  "+-------------------------------------", "+");
+        addRow("| PROPERTY", "| VALUE", "|");
+        addRow("+-------------------------------------",  "+-------------------------------------", "+");
+        Field[] field = object.get(0).getClass().getDeclaredFields();
+
+        for (int i = 0; i < field.length; i++)
+        {
+            System.out.println(field[i].getName());
+            Method[] methods = object.get(0).getClass().getDeclaredMethods();
+            for (int z = 0; z < methods.length; z++)
+            {
+
+                if(methods[z].getName().equalsIgnoreCase("get" + field[i].getName()))
+                {
+                    if (methods[z].invoke(object.get(0)).toString().contains("{") == false) {
+                        try {
+
+                            addRow("| " + field[i].getName(), "| " + methods[z].invoke(object.get(0)).toString(), "|");
+                            addRow("|", "|", "|");
+                        } catch (InvocationTargetException e) {
+                            e.printStackTrace();
+
+                        }
+
+                    }
+                }
+            }
+        }
+        addRow("+-------------------------------------",  "+-------------------------------------", "+");
+        result = printer();
+
+        return result;
     }
 
 
