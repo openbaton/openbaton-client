@@ -2,6 +2,7 @@ package org.project.openbaton.cli.util;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.project.openbaton.catalogue.nfvo.VimInstance;
 import org.project.openbaton.cli.model.*;
 
 import java.lang.reflect.Field;
@@ -103,33 +104,14 @@ public abstract class PrintFormat {
     public static String PrintTables(String comand,List<Object> object) throws InvocationTargetException, IllegalAccessException {
         String result = "";
 
-        if(comand.contains("create"))
+        if(comand.contains("create") || comand.contains("update"))
         {
             result = showObject(object);
         }
-        else {
-
-            if (PrintVimInstance.isVimInstance(object)) {
-
-                result = PrintVimInstance.printVimInstance(comand, object);
-
-            }
-
-            if (PrintNetworkServiceDescriptor.isNetworkServiceDescriptor(object)) {
-                result = PrintNetworkServiceDescriptor.printNetworkServiceDescriptor(object);
-            }
-
-            if (PrintNetworkServiceRecord.isNetworkServiceRecord(object)) {
-                result = PrintNetworkServiceRecord.printNetworkServiceRecord(object);
-            }
-
-            if (PrintVirtualLink.isVirtualLink(object)) {
-                result = PrintVirtualLink.printVirtualLink(object);
-            }
-
-            if (PrintVNFFG.isVNFFG(object)) {
-                result = PrintVNFFG.printVNFFG(object);
-            }
+        else
+        {
+           result =  generalPrint(object);
+            
         }
 
 
@@ -149,14 +131,13 @@ public abstract class PrintFormat {
 
         for (int i = 0; i < field.length; i++)
         {
-            System.out.println(field[i].getName());
             Method[] methods = object.get(0).getClass().getDeclaredMethods();
             for (int z = 0; z < methods.length; z++)
             {
 
                 if(methods[z].getName().equalsIgnoreCase("get" + field[i].getName()))
                 {
-                    if (methods[z].invoke(object.get(0)).toString().contains("{") == false) {
+                    if (methods[z].invoke(object.get(0)) != null && methods[z].invoke(object.get(0)).toString().contains("{") == false) {
                         try {
 
                             addRow("| " + field[i].getName(), "| " + methods[z].invoke(object.get(0)).toString(), "|");
@@ -171,6 +152,43 @@ public abstract class PrintFormat {
             }
         }
         addRow("+-------------------------------------",  "+-------------------------------------", "+");
+        result = printer();
+
+        return result;
+    }
+
+
+    public static String generalPrint(List<Object> object)throws IllegalAccessException, InvocationTargetException
+    {
+        String result = "";
+        String id = "";
+        String version = "";
+
+        addRow("\n");
+        addRow("+-------------------------------------", "+-------------------", "+");
+        addRow("| ID", "| VERSION", "|");
+        addRow("+-------------------------------------", "+-------------------", "+");
+        for (int i = 0; i < object.size(); i++) {
+            Method[] methods = object.get(i).getClass().getDeclaredMethods();
+            for (int z = 0; z < methods.length; z++)
+            {
+
+                if (methods[z].getName().equalsIgnoreCase("getID"))
+                {
+                    id = methods[z].invoke(object.get(i)).toString();
+                }
+
+                if (methods[z].getName().equalsIgnoreCase("getVersion"))
+                {
+                    version = methods[z].invoke(object.get(i)).toString();
+                }
+            }
+            addRow("| " + id, "| " + version, "|");
+            addRow("|", "|", "|");
+        }
+        addRow("+-------------------------------------", "+-------------------", "+");
+
+
         result = printer();
 
         return result;
