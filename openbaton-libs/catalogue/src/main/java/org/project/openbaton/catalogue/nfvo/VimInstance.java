@@ -13,8 +13,10 @@ import java.util.Set;
  */
 @Entity
 public class VimInstance implements Serializable{
+
     @Id
-    private String id = IdGenerator.createUUID();
+    private String id;
+
     @Version
     private int version = 0;
 
@@ -60,6 +62,11 @@ public class VimInstance implements Serializable{
                 ", images=" + images +
                 ", networks=" + networks +
                 '}';
+    }
+
+    @PrePersist
+    public void ensureId(){
+        id= IdGenerator.createUUID();
     }
 
     public String getId() {
