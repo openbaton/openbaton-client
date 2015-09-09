@@ -2,6 +2,7 @@ package org.project.openbaton.cli.util;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.project.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
 import org.project.openbaton.catalogue.nfvo.VimInstance;
 import org.project.openbaton.cli.model.*;
 
@@ -9,6 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import org.apache.commons.lang3.ArrayUtils;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -111,7 +113,7 @@ public abstract class PrintFormat {
         else
         {
            result =  generalPrint(object);
-            
+
         }
 
 
@@ -123,15 +125,21 @@ public abstract class PrintFormat {
     {
         String result = "";
 
+
         addRow("\n");
         addRow("+-------------------------------------",  "+-------------------------------------", "+");
         addRow("| PROPERTY", "| VALUE", "|");
         addRow("+-------------------------------------",  "+-------------------------------------", "+");
-        Field[] field = object.get(0).getClass().getDeclaredFields();
+        Field[] fieldBase = object.get(0).getClass().getDeclaredFields();
+        Field[] fieldSuper = object.get(0).getClass().getSuperclass().getDeclaredFields();
+        Field[] field = ArrayUtils.addAll(fieldBase, fieldSuper);
 
         for (int i = 0; i < field.length; i++)
         {
-            Method[] methods = object.get(0).getClass().getDeclaredMethods();
+            Method[] methodBase = object.get(0).getClass().getDeclaredMethods();
+            Method[] methodSuper = object.get(0).getClass().getSuperclass().getDeclaredMethods();
+            Method[] methods = ArrayUtils.addAll(methodBase, methodSuper);
+
             for (int z = 0; z < methods.length; z++)
             {
 
@@ -164,12 +172,19 @@ public abstract class PrintFormat {
         String id = "";
         String version = "";
 
+        Field[] fieldBase = object.get(0).getClass().getDeclaredFields();
+        Field[] fieldSuper = object.get(0).getClass().getSuperclass().getDeclaredFields();
+        Field[] field = ArrayUtils.addAll(fieldBase, fieldSuper);
+
         addRow("\n");
         addRow("+-------------------------------------", "+-------------------", "+");
         addRow("| ID", "| VERSION", "|");
         addRow("+-------------------------------------", "+-------------------", "+");
         for (int i = 0; i < object.size(); i++) {
-            Method[] methods = object.get(i).getClass().getDeclaredMethods();
+            Method[] methodBase = object.get(i).getClass().getDeclaredMethods();
+            Method[] methodSuper = object.get(i).getClass().getSuperclass().getDeclaredMethods();
+            Method[] methods = ArrayUtils.addAll(methodBase, methodSuper);
+
             for (int z = 0; z < methods.length; z++)
             {
 
