@@ -11,6 +11,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -121,15 +123,39 @@ public abstract class PrintFormat {
 
     }
 
+    public static String buildLine(String[] dimension)
+    {
+        String result = "+";
+        int maxLength = 0;
+        for (String s : dimension) {
+            if( s != null)
+            {
+                if (s.length() > maxLength)
+                {
+                    maxLength = s.length();
+                }
+            }
+        }
+
+        for(int i=0; i<maxLength+2;i++)
+        {
+            result = result+"-";
+
+        }
+
+
+        return  result;
+    }
+
     public static String showObject(List<Object> object)throws IllegalAccessException, InvocationTargetException
     {
         String result = "";
+        String firstline ="";
+        String secondline="";
+        String[] rowproperty = new String[500];
+        String[] rowvalue = new String[500];
+        int rowcount=0;
 
-
-        addRow("\n");
-        addRow("+-------------------------------------",  "+-------------------------------------", "+");
-        addRow("| PROPERTY", "| VALUE", "|");
-        addRow("+-------------------------------------",  "+-------------------------------------", "+");
         Field[] fieldBase = object.get(0).getClass().getDeclaredFields();
         Field[] fieldSuper = object.get(0).getClass().getSuperclass().getDeclaredFields();
         Field[] field = ArrayUtils.addAll(fieldBase, fieldSuper);
@@ -145,11 +171,62 @@ public abstract class PrintFormat {
 
                 if(methods[z].getName().equalsIgnoreCase("get" + field[i].getName()))
                 {
-                    if (methods[z].invoke(object.get(0)) != null && methods[z].invoke(object.get(0)).toString().contains("{") == false) {
+                    if (methods[z].invoke(object.get(0)) != null ) {
                         try {
 
-                            addRow("| " + field[i].getName(), "| " + methods[z].invoke(object.get(0)).toString(), "|");
-                            addRow("|", "|", "|");
+                            if(methods[z].invoke(object.get(0)).toString().contains("[")) {
+                                rowproperty[rowcount] = " |"+field[i].getName().toUpperCase();
+                                rowvalue[rowcount]  = "|";
+                                rowcount++;
+                                rowproperty[rowcount] = "|";
+                                rowvalue[rowcount]  = "|";
+                                rowcount++;
+
+                                LinkedHashSet<Object> objectHash = (LinkedHashSet<Object>) methods[z].invoke(object.get(0));
+
+                                for (Object obj : objectHash)
+                                {
+                                    Field[] fieldBase2 = obj.getClass().getDeclaredFields();
+                                    Field[] fieldSuper2 = obj.getClass().getSuperclass().getDeclaredFields();
+                                    Field[] field2 = ArrayUtils.addAll(fieldBase2, fieldSuper2);
+
+                                    for (int r = 0; r < field2.length; r++)
+                                    {
+                                        Method[] methodBase2 = obj.getClass().getDeclaredMethods();
+                                        Method[] methodSuper2 = obj.getClass().getSuperclass().getDeclaredMethods();
+                                        Method[] methods2 = ArrayUtils.addAll(methodBase2, methodSuper2);
+
+                                        for (int s = 0; s < methods2.length; s++)
+                                        {
+
+                                            if (methods2[s].getName().equalsIgnoreCase("get" + field2[r].getName()) && methods2[s].invoke(obj) != null && !methods2[s].invoke(obj).toString().contains("[") ) {
+                                                rowproperty[rowcount] = "| "+field2[r].getName();
+                                                rowvalue[rowcount]  = "| "+methods2[s].invoke(obj).toString();
+                                                rowcount++;
+                                                rowproperty[rowcount] = "|";
+                                                rowvalue[rowcount]  = "|";
+                                                rowcount++;
+                                            }
+
+                                        }
+                                    }
+                                }
+
+
+                            }
+                            else
+                                {
+                                    rowproperty[rowcount] = "| "+field[i].getName();
+                                    rowvalue[rowcount]  = "| "+methods[z].invoke(object.get(0)).toString();
+                                    rowcount++;
+                                    rowproperty[rowcount] = "|";
+                                    rowvalue[rowcount]  = "|";
+                                    rowcount++;
+
+                            }
+
+
+
                         } catch (InvocationTargetException e) {
                             e.printStackTrace();
 
@@ -159,7 +236,23 @@ public abstract class PrintFormat {
                 }
             }
         }
-        addRow("+-------------------------------------",  "+-------------------------------------", "+");
+
+        addRow("\n");
+        firstline = buildLine(rowproperty);
+        secondline = buildLine(rowvalue);
+        addRow(firstline, secondline, "+");
+        addRow("| PROPERTY", "| VALUE", "|");
+        addRow(firstline, secondline, "+");
+
+        for(int c=0; c<rowcount; c++)
+        {
+            addRow(rowproperty[c], rowvalue[c], "|");
+        }
+
+        //end
+        addRow(firstline, secondline, "+");
+
+
         result = printer();
 
         return result;

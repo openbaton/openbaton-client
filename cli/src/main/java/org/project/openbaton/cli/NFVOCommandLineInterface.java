@@ -217,37 +217,6 @@ public class NFVOCommandLineInterface {
                 }
             }
 
-
-
-            /*while ((line = reader.readLine()) != null) {
-                out.flush();
-                line = line.trim();
-                if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit")) {
-                    exit(0);
-                } else if (line.equalsIgnoreCase("cls")) {
-                    reader.clearScreen();
-                } else if (line.equalsIgnoreCase("help")) {
-                    usage();
-                } else if (line.startsWith("help ")) {
-                    StringTokenizer st = new StringTokenizer(line, " ");
-                    st.nextToken();
-                    helpCommand(st.nextToken());
-                } else if (line.equalsIgnoreCase("print properties")) {
-                    log.info("" + properties.toString());
-                } else if (line.equalsIgnoreCase("")) {
-                    continue;
-                } else
-                    try {
-                        //System.out.println(executeCommand(line));
-
-                        String result = PrintFormat.printResult(executeCommand(line));
-                        System.out.println(result);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        log.error("Error while invoking command");
-                    }
-            }*/
         } catch (Throwable t) {
             t.printStackTrace();
         }
