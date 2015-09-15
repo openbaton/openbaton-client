@@ -48,7 +48,7 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
      * @return List<VirtualNetworkFunctionDescriptor>: The List of
      * VirtualNetworkFunctionDescriptor into NSD
      */
-    @Help(help = "Get the VirtualNetworkFunctionDescriptor of a NetworkServiceDescriptor with specific id")
+    @Help(help = "Get the VirtualNetworkFunctionDescriptor with specific id of a NetworkServiceDescriptor with specific id")
     public VirtualNetworkFunctionDescriptor getVirtualNetworkFunctionDescriptor(final String networkServiceDescriptor_id, final String id_vfn) throws SDKException {
         String url = networkServiceDescriptor_id + "/vnfdescriptors" + "/" + id_vfn;
         return (VirtualNetworkFunctionDescriptor) requestGetWithStatusAccepted(url, VirtualNetworkFunctionDescriptor.class);
@@ -182,7 +182,7 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
      * @return PhysicalNetworkFunctionDescriptor: The
      * PhysicalNetworkFunctionDescriptor selected
      */
-    @Help(help = "Get the PhysicalNetworkFunctionDescriptor of a NetworkServiceDescriptor with specific id")
+    @Help(help = "Get the PhysicalNetworkFunctionDescriptor with specif id of a NetworkServiceDescriptor with specific id")
     public PhysicalNetworkFunctionDescriptor getPhysicalNetworkFunctionDescriptor(final String networkServiceDescriptor_id, final String id_pnf) throws SDKException {
         String url = networkServiceDescriptor_id + "/pnfdescriptors" + "/" + id_pnf;
         return (PhysicalNetworkFunctionDescriptor) requestGetWithStatusAccepted(url, PhysicalNetworkFunctionDescriptor.class);
@@ -240,9 +240,9 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
      * NSD
      */
     @Help(help = "Get all the Security of a NetworkServiceDescriptor with specific id")
-    public Security getSecurities(final String networkServiceDescriptor_id) throws SDKException {
+    public List<Security> getSecurities(final String networkServiceDescriptor_id) throws SDKException {
         String url = networkServiceDescriptor_id + "/security";
-        return (Security) requestGetWithStatusAccepted(url, Security.class);
+        return Arrays.asList((Security[]) requestGetAll(url, Security.class));
     }
 
 

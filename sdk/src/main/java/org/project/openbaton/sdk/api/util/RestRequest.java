@@ -76,8 +76,8 @@ public abstract class RestRequest {
         HttpResponse<JsonNode> jsonResponse = null;
         try {
 
-            log.debug("baseUrl: " + baseUrl);
-            log.debug("id: " + baseUrl + id);
+            //log.debug("baseUrl: " + baseUrl);
+            //log.debug("id: " + baseUrl + id);
 
             checkToken();
 
@@ -98,7 +98,7 @@ public abstract class RestRequest {
             checkStatus(jsonResponse, HttpURLConnection.HTTP_CREATED);
             // return the response of the request
             String result = jsonResponse.getBody().toString();
-            //log.debug("received: " + result);
+            log.debug("received: " + result);
 
             return result;
         } catch (IOException e) {
@@ -135,12 +135,12 @@ public abstract class RestRequest {
     public Serializable requestPost(final String id,final Serializable object) throws SDKException {
         HttpResponse<JsonNode> jsonResponse = null;
         try {
-            log.debug("Object is: " + object);
+            //log.debug("Object is: " + object);
          
             String fileJSONNode = mapper.toJson(object);
 
-            log.debug("sending: " + fileJSONNode.toString());
-            log.debug("baseUrl: " + baseUrl + "/" +id);
+            //log.debug("sending: " + fileJSONNode.toString());
+            //log.debug("baseUrl: " + baseUrl + "/" +id);
 
             checkToken();
 
@@ -173,7 +173,7 @@ public abstract class RestRequest {
             log.debug("received: " + result);
 
 
-            log.debug("Casting it into: " + object.getClass());
+            //log.debug("Casting it into: " + object.getClass());
 //            return mapper.readValue(jsonResponse.getBody().toString(), object.getClass());
 
             return mapper.fromJson(result, object.getClass());
@@ -264,6 +264,7 @@ public abstract class RestRequest {
     }
 
     protected Object requestGetAll(String url, Class type) throws SDKException {
+        url = this.baseUrl + "/" + url;
         return requestGetAll(url, type, null);
     }
     private Object requestGetAll(String url, Class type, final Integer httpStatus) throws SDKException {
