@@ -151,7 +151,7 @@ public class NFVOCommandLineInterface {
                 if (args.length > 3) //tree parameters
                 {
                     s = args[1] + " " + args[2] + " " + args[3];
-                    if (!args[1].endsWith("update")) {
+                    if (!args[1].endsWith("Descriptor")) {
                         System.out.println("Error: too much arguments");
                         exit(0);
                     }

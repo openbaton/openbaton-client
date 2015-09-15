@@ -108,6 +108,9 @@ public abstract class PrintFormat {
 
         if (comand.contains("create") || comand.contains("update") || comand.contains("ById")) {
             result = showObject(object);
+
+        } else if (comand.contains("Event")) {
+            result = showEvent(object);
         } else {
             result = generalPrint(object);
 
@@ -237,6 +240,60 @@ public abstract class PrintFormat {
         //end
         addRow(firstline, secondline, "+");
 
+
+        result = printer();
+
+        return result;
+    }
+
+    public static String showEvent(List<Object> object) throws IllegalAccessException, InvocationTargetException {
+
+        String result = "";
+        String firstline = "";
+        String secondline  = "";
+        String[] rowvalue = new String[500];
+        String[] rowproperty = new String[500];
+        int rowcount = 0;
+
+        Field[] fieldBase = object.get(0).getClass().getDeclaredFields();
+        Field[] fieldSuper = object.get(0).getClass().getSuperclass().getDeclaredFields();
+        Field[] field = ArrayUtils.addAll(fieldBase, fieldSuper);
+
+        rowvalue[rowcount] = "| EVENT";
+        rowproperty[rowcount] = "| ID";
+        rowcount++;
+
+        for (int i = 0; i < object.size(); i++) {
+            Method[] methodBase = object.get(i).getClass().getDeclaredMethods();
+            Method[] methodSuper = object.get(i).getClass().getSuperclass().getDeclaredMethods();
+            Method[] methods = ArrayUtils.addAll(methodBase, methodSuper);
+
+            for (int z = 0; z < methods.length; z++) {
+
+                if (methods[z].getName().equalsIgnoreCase("getEvent")) {
+                    rowvalue[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
+                }
+
+                if (methods[z].getName().equalsIgnoreCase("getID")) {
+                    rowvalue[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
+                }
+            }
+            rowcount++;
+        }
+
+
+        addRow("\n");
+        firstline = buildLine(rowvalue);
+        addRow(firstline, "+");
+
+        for (int c = 0; c < rowcount; c++) {
+            addRow(rowvalue[c], "|");
+            if (c == 0) {
+                addRow(firstline, "+");
+            }
+        }
+        //end
+        addRow(firstline, "+");
 
         result = printer();
 
