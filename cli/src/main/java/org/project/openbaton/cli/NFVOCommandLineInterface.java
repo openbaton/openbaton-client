@@ -134,7 +134,6 @@ public class NFVOCommandLineInterface {
             reader.setPrompt("\u001B[135m" + properties.get("nfvo-usr") + "@[\u001B[32mopen-baton\u001B[0m]~> ");
 
             //input reader
-            //arg[0] == help  default value
             String s = "";
             int find = 0;
 
