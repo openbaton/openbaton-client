@@ -56,8 +56,8 @@ then
 else
         check_already_running_client
         check_not_running
-        cd cli/build/libs/
-        java -jar "cli-all-$_version.jar" $_openbaton_config_file $1 $2 $3
+        #cd cli/build/libs/
+        java -jar "cli/build/libs/cli-all-$_version.jar" $_openbaton_config_file $1 $2 $3
 fi
 
 
