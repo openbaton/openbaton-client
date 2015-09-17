@@ -111,7 +111,7 @@ public abstract class PrintFormat {
 
 
 
-        if (comand.contains("create") || comand.contains("update") || comand.contains("ById") || comand.contains("Dependency") || comand.contains("Descriptor")) {
+        if (comand.contains("create") || comand.contains("update") || comand.contains("ById") || comand.endsWith("Dependency") ||  comand.endsWith("Descriptor")) {
             result = showObject(object);
 
         } else if (comand.contains("Event")) {
@@ -181,19 +181,16 @@ public abstract class PrintFormat {
                             rowvalue[rowcount] = "|";
                             rowcount++;
 
-                            Set<Object> objectHash = null;
+                            Set<Object> objectHash = new HashSet<Object>();
 
-                            if (methods[z].getName().contains("security"))
-                            {
-                                //  TODO
+                            if (methods[z].getName().contains("security") || methods[z].getName().contains("Source") || methods[z].getName().contains("Target")) {
 
-                            } else {
+                                Object obj2 = (Object) methods[z].invoke(object.get(0));
+                                objectHash.add(obj2);
 
-
+                            }else{
                                 objectHash = (Set<Object>) methods[z].invoke(object.get(0));
-
-
-
+                            }
 
                             for (Object obj : objectHash) {
                                 Field[] fieldBase2 = obj.getClass().getDeclaredFields();
@@ -219,7 +216,7 @@ public abstract class PrintFormat {
 
                                     }
                                 }
-                              }
+
                             }
 
 

@@ -98,7 +98,7 @@ public abstract class RestRequest {
             checkStatus(jsonResponse, HttpURLConnection.HTTP_CREATED);
             // return the response of the request
             String result = jsonResponse.getBody().toString();
-            log.debug("received: " + result);
+            //log.debug("received: " + result);
 
             return result;
         } catch (IOException e) {
@@ -170,7 +170,7 @@ public abstract class RestRequest {
             JsonParser jp = new JsonParser();
             JsonElement je = jp.parse(jsonResponse.getBody().toString());
             String result = gson.toJson(je);
-            log.debug("received: " + result);
+            //log.debug("received: " + result);
 
 
             //log.debug("Casting it into: " + object.getClass());
