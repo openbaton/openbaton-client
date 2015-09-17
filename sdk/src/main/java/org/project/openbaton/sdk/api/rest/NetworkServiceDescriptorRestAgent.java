@@ -51,7 +51,7 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
     @Help(help = "Get the VirtualNetworkFunctionDescriptor with specific id of a NetworkServiceDescriptor with specific id")
     public VirtualNetworkFunctionDescriptor getVirtualNetworkFunctionDescriptor(final String networkServiceDescriptor_id, final String id_vfn) throws SDKException {
         String url = networkServiceDescriptor_id + "/vnfdescriptors" + "/" + id_vfn;
-        return (VirtualNetworkFunctionDescriptor) requestGetWithStatusAccepted(url, VirtualNetworkFunctionDescriptor.class);
+        return (VirtualNetworkFunctionDescriptor) requestGet(url, VirtualNetworkFunctionDescriptor.class);
 
     }
 

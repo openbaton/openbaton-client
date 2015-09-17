@@ -111,7 +111,7 @@ public abstract class PrintFormat {
 
 
 
-        if (comand.contains("create") || comand.contains("update") || comand.contains("ById") || comand.contains("Dependency")) {
+        if (comand.contains("create") || comand.contains("update") || comand.contains("ById") || comand.contains("Dependency") || comand.contains("Descriptor")) {
             result = showObject(object);
 
         } else if (comand.contains("Event")) {
