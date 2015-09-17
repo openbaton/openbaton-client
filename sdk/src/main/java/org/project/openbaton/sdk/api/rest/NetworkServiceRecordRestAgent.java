@@ -44,7 +44,7 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
     /**
      *
      */
-    @Help(help = "Get the VirtualNetworkFunctionRecord of NetworkServiceRecord with specific id")
+    @Help(help = "Get the VirtualNetworkFunctionRecord with specific id of NetworkServiceRecord with specific id")
     public VirtualNetworkFunctionRecord getVirtualNetworkFunctionRecord(final String id, final String id_vnf) throws SDKException {
         String url = id + "/vnfrecords" + "/" + id_vnf;
         return (VirtualNetworkFunctionRecord) requestGetWithStatusAccepted(url, VirtualNetworkFunctionRecord.class);
@@ -91,7 +91,7 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
     /**
      *
      */
-    @Help(help = "Get the VirtualNetworkFunctionRecord Dependency of a NetworkServiceRecord with specific id")
+    @Help(help = "Get the VirtualNetworkFunctionRecord Dependency with specific id of a NetworkServiceRecord with specific id")
     public VNFRecordDependency getVNFDependency(final String networkServiceRecord_id, final String id_vnfd) throws SDKException {
         String url = networkServiceRecord_id + "/vnfdependencies" + "/" + id_vnfd;
         return (VNFRecordDependency) requestGet(url, VNFRecordDependency.class);
@@ -146,7 +146,7 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
      * @return PhysicalNetworkFunctionRecord: The PhysicalNetworkFunctionRecord
      * selected
      */
-    @Help(help = "Get the PhysicalNetworkFunctionRecord of a NetworkServiceRecord with specific id")
+    @Help(help = "Get the PhysicalNetworkFunctionRecord with specific id of a NetworkServiceRecord with specific id")
     public PhysicalNetworkFunctionRecord getPhysicalNetworkFunctionRecord(final String networkServiceRecord_id, final String id_pnf) throws SDKException {
         String url = networkServiceRecord_id + "/pnfrecords" + "/" + id_pnf;
         return (PhysicalNetworkFunctionRecord) requestGetWithStatusAccepted(url, PhysicalNetworkFunctionRecord.class);

@@ -3,27 +3,27 @@ package org.project.openbaton.cli.util;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import org.project.openbaton.catalogue.mano.common.Security;
-
 
 /**
  * Created by tce on 25.08.15.
  */
-public abstract class PrintFormat {
+public class PrintFormat {
 
     private static List<String[]> rows = new LinkedList<String[]>();
     private static Logger log = LoggerFactory.getLogger(PrintFormat.class);
 
 
+
     public static String printResult(String comand, Object obj) throws InvocationTargetException, IllegalAccessException {
+
 
         List<Object> object = new ArrayList<Object>();
         rows.clear();
@@ -107,9 +107,8 @@ public abstract class PrintFormat {
     }
 
     public static String PrintTables(String comand, List<Object> object) throws InvocationTargetException, IllegalAccessException {
+
         String result = "";
-
-
 
         if (comand.contains("create") || comand.contains("update") || comand.contains("ById") || comand.endsWith("Dependency") ||  comand.endsWith("Descriptor")) {
             result = showObject(object);

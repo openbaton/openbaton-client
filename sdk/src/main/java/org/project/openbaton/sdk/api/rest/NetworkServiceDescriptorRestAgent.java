@@ -113,7 +113,7 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
      * @param id_vnfd : The VNFDependencies id
      * @return VNFDependency:  The List of VNFDependency into NSD
      */
-    @Help(help = "get the VirtualNetworkFunctionDescriptor dependency of a NetworkServiceDescriptor with specific id")
+    @Help(help = "get the VirtualNetworkFunctionDescriptor dependency with specific id of a NetworkServiceDescriptor with specific id")
     public VNFDependency getVNFDependency(final String networkServiceDescriptor_id, final String id_vnfd) throws SDKException {
         String url = networkServiceDescriptor_id + "/vnfdependencies" + "/" + id_vnfd;
         return (VNFDependency) requestGet(url, VNFDependency.class);
@@ -182,7 +182,7 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
      * @return PhysicalNetworkFunctionDescriptor: The
      * PhysicalNetworkFunctionDescriptor selected
      */
-    @Help(help = "Get the PhysicalNetworkFunctionDescriptor with specif id of a NetworkServiceDescriptor with specific id")
+    @Help(help = "Get the PhysicalNetworkFunctionDescriptor with specific id of a NetworkServiceDescriptor with specific id")
     public PhysicalNetworkFunctionDescriptor getPhysicalNetworkFunctionDescriptor(final String networkServiceDescriptor_id, final String id_pnf) throws SDKException {
         String url = networkServiceDescriptor_id + "/pnfdescriptors" + "/" + id_pnf;
         return (PhysicalNetworkFunctionDescriptor) requestGetWithStatusAccepted(url, PhysicalNetworkFunctionDescriptor.class);

@@ -82,7 +82,7 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest{
      *            : the id of VNF software object
      * @return object: the VNF software object updated
      */
-    @Help(help = "Update the object of type {#} passing th new object and the id of the old object")
+    @Help(help = "Update the object of type {#} passing the new object and the id of the old object")
 	public T update(final T object, final String id) throws SDKException {
         return (T) requestPut(id, object);
 	}
