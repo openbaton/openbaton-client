@@ -240,9 +240,9 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
      * NSD
      */
     @Help(help = "Get all the Security of a NetworkServiceDescriptor with specific id")
-    public List<Security> getSecurities(final String networkServiceDescriptor_id) throws SDKException {
+    public Security getSecurities(final String networkServiceDescriptor_id) throws SDKException {
         String url = networkServiceDescriptor_id + "/security";
-        return Arrays.asList((Security[]) requestGetAll(url, Security.class));
+        return ((Security) requestGet(url, Security.class));
     }
 
 
