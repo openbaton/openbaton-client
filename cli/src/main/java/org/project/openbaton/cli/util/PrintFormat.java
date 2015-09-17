@@ -3,14 +3,15 @@ package org.project.openbaton.cli.util;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+
+import org.project.openbaton.catalogue.mano.common.Security;
 
 
 /**
@@ -19,6 +20,8 @@ import java.util.List;
 public abstract class PrintFormat {
 
     private static List<String[]> rows = new LinkedList<String[]>();
+    private static Logger log = LoggerFactory.getLogger(PrintFormat.class);
+
 
     public static String printResult(String comand, Object obj) throws InvocationTargetException, IllegalAccessException {
 
@@ -106,7 +109,9 @@ public abstract class PrintFormat {
     public static String PrintTables(String comand, List<Object> object) throws InvocationTargetException, IllegalAccessException {
         String result = "";
 
-        if (comand.contains("create") || comand.contains("update") || comand.contains("ById")) {
+
+
+        if (comand.contains("create") || comand.contains("update") || comand.contains("ById") || comand.contains("Dependency")) {
             result = showObject(object);
 
         } else if (comand.contains("Event")) {
@@ -162,64 +167,75 @@ public abstract class PrintFormat {
             Method[] methodSuper = object.get(0).getClass().getSuperclass().getDeclaredMethods();
             Method[] methods = ArrayUtils.addAll(methodBase, methodSuper);
 
+
             for (int z = 0; z < methods.length; z++) {
 
                 if (methods[z].getName().equalsIgnoreCase("get" + field[i].getName())) {
-                    if (methods[z].invoke(object.get(0)) != null) {
-                        try {
+                    if (methods[z].invoke(object.get(0)) != null) try {
 
-                            if (methods[z].invoke(object.get(0)).toString().contains("[")) {
-                                rowproperty[rowcount] = "| " + field[i].getName().toUpperCase();
-                                rowvalue[rowcount] = "|";
-                                rowcount++;
-                                rowproperty[rowcount] = "|";
-                                rowvalue[rowcount] = "|";
-                                rowcount++;
+                        if (methods[z].invoke(object.get(0)).toString().contains("[")) {
+                            rowproperty[rowcount] = "| " + field[i].getName().toUpperCase();
+                            rowvalue[rowcount] = "|";
+                            rowcount++;
+                            rowproperty[rowcount] = "|";
+                            rowvalue[rowcount] = "|";
+                            rowcount++;
 
-                                LinkedHashSet<Object> objectHash = (LinkedHashSet<Object>) methods[z].invoke(object.get(0));
+                            Set<Object> objectHash = null;
 
-                                for (Object obj : objectHash) {
-                                    Field[] fieldBase2 = obj.getClass().getDeclaredFields();
-                                    Field[] fieldSuper2 = obj.getClass().getSuperclass().getDeclaredFields();
-                                    Field[] field2 = ArrayUtils.addAll(fieldBase2, fieldSuper2);
-
-                                    for (int r = 0; r < field2.length; r++) {
-                                        Method[] methodBase2 = obj.getClass().getDeclaredMethods();
-                                        Method[] methodSuper2 = obj.getClass().getSuperclass().getDeclaredMethods();
-                                        Method[] methods2 = ArrayUtils.addAll(methodBase2, methodSuper2);
-
-                                        for (int s = 0; s < methods2.length; s++) {
-
-                                            if (methods2[s].getName().equalsIgnoreCase("get" + field2[r].getName()) && methods2[s].invoke(obj) != null && !methods2[s].invoke(obj).toString().contains("[")) {
-
-                                                rowproperty[rowcount] = "| " + field2[r].getName();
-                                                rowvalue[rowcount] = "| " + methods2[s].invoke(obj).toString();
-                                                rowcount++;
-                                                rowproperty[rowcount] = "|";
-                                                rowvalue[rowcount] = "|";
-                                                rowcount++;
-                                            }
-
-                                        }
-                                    }
-                                }
-
+                            if (methods[z].getName().contains("security"))
+                            {
+                                //  TODO
 
                             } else {
-                                rowproperty[rowcount] = "| " + field[i].getName();
-                                rowvalue[rowcount] = "| " + methods[z].invoke(object.get(0)).toString();
-                                rowcount++;
-                                rowproperty[rowcount] = "|";
-                                rowvalue[rowcount] = "|";
-                                rowcount++;
 
+
+                                objectHash = (Set<Object>) methods[z].invoke(object.get(0));
+
+
+
+
+                            for (Object obj : objectHash) {
+                                Field[] fieldBase2 = obj.getClass().getDeclaredFields();
+                                Field[] fieldSuper2 = obj.getClass().getSuperclass().getDeclaredFields();
+                                Field[] field2 = ArrayUtils.addAll(fieldBase2, fieldSuper2);
+
+                                for (int r = 0; r < field2.length; r++) {
+                                    Method[] methodBase2 = obj.getClass().getDeclaredMethods();
+                                    Method[] methodSuper2 = obj.getClass().getSuperclass().getDeclaredMethods();
+                                    Method[] methods2 = ArrayUtils.addAll(methodBase2, methodSuper2);
+
+                                    for (int s = 0; s < methods2.length; s++) {
+
+                                        if (methods2[s].getName().equalsIgnoreCase("get" + field2[r].getName()) && methods2[s].invoke(obj) != null && !methods2[s].invoke(obj).toString().contains("[")) {
+
+                                            rowproperty[rowcount] = "| " + field2[r].getName();
+                                            rowvalue[rowcount] = "| " + methods2[s].invoke(obj).toString();
+                                            rowcount++;
+                                            rowproperty[rowcount] = "|";
+                                            rowvalue[rowcount] = "|";
+                                            rowcount++;
+                                        }
+
+                                    }
+                                }
+                              }
                             }
 
 
-                        } catch (InvocationTargetException e) {
-                            e.printStackTrace();
+                        } else {
+                            rowproperty[rowcount] = "| " + field[i].getName();
+                            rowvalue[rowcount] = "| " + methods[z].invoke(object.get(0)).toString();
+                            rowcount++;
+                            rowproperty[rowcount] = "|";
+                            rowvalue[rowcount] = "|";
+                            rowcount++;
 
                         }
+
+
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
 
                     }
                 }

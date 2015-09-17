@@ -82,9 +82,9 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
      *
      */
     @Help(help = "Get all the VirtualNetworkFunctionRecord dependencies of NetworkServiceRecord with specific id")
-    public List<VNFDependency> getVNFDependencies(final String networkServiceRecord_id) throws SDKException {
+    public List<VNFRecordDependency> getVNFDependencies(final String networkServiceRecord_id) throws SDKException {
         String url = networkServiceRecord_id + "/vnfdependencies";
-        return Arrays.asList((VNFDependency[]) requestGetAll(url, VNFDependency.class));
+        return Arrays.asList((VNFRecordDependency[]) requestGetAll(url, VNFRecordDependency.class));
 
     }
 
@@ -92,9 +92,9 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
      *
      */
     @Help(help = "Get the VirtualNetworkFunctionRecord Dependency of a NetworkServiceRecord with specific id")
-    public VNFDependency getVNFDependency(final String networkServiceRecord_id, final String id_vnfd) throws SDKException {
+    public VNFRecordDependency getVNFDependency(final String networkServiceRecord_id, final String id_vnfd) throws SDKException {
         String url = networkServiceRecord_id + "/vnfdependencies" + "/" + id_vnfd;
-        return (VNFDependency) requestGetWithStatusAccepted(url, VNFDependency.class);
+        return (VNFRecordDependency) requestGet(url, VNFRecordDependency.class);
     }
 
     /**
