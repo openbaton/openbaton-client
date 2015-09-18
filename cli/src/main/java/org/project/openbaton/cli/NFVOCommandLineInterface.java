@@ -171,6 +171,12 @@ public class NFVOCommandLineInterface {
                         System.out.println("Error: no id or object passed");
                         exit(0);
                     }
+
+                    if (args[1].contains("NetworkServiceDescriptor-delete") && !args[1].endsWith("NetworkServiceDescriptor-delete")) {
+                        System.out.println("Error: no id of the Descriptor or the Object");
+                        exit(0);
+                    }
+
                 } else if (args.length > 1) {
                     s = args[1];
                     if (s.equalsIgnoreCase("help")) {
@@ -184,6 +190,8 @@ public class NFVOCommandLineInterface {
                         exit(0);
                     }else if (s.contains("update")) {
                         System.out.println("Error: no id and/or object passed");
+                        exit(0);
+                    }else if(s.contains("exit")) {
                         exit(0);
                     }
 

@@ -24,7 +24,6 @@ public class PrintFormat {
 
     public static String printResult(String comand, Object obj) throws InvocationTargetException, IllegalAccessException {
 
-
         List<Object> object = new ArrayList<Object>();
         rows.clear();
         String result = "";
@@ -110,11 +109,11 @@ public class PrintFormat {
 
         String result = "";
 
-        if (comand.contains("create") || comand.contains("update") || comand.contains("ById") || comand.endsWith("Dependency") ||  comand.endsWith("Descriptor")) {
+        if(comand.contains("Event")) {
+            result = showEvent(object);
+        } else if (comand.contains("create") || comand.contains("update") || comand.contains("ById") || comand.endsWith("Dependency") ||  comand.endsWith("Descriptor")) {
             result = showObject(object);
 
-        } else if (comand.contains("Event")) {
-            result = showEvent(object);
         } else {
             result = generalPrint(object);
 
@@ -263,9 +262,7 @@ public class PrintFormat {
 
         String result = "";
         String firstline = "";
-        String secondline  = "";
         String[] rowvalue = new String[500];
-        String[] rowproperty = new String[500];
         int rowcount = 0;
 
         Field[] fieldBase = object.get(0).getClass().getDeclaredFields();
@@ -273,7 +270,6 @@ public class PrintFormat {
         Field[] field = ArrayUtils.addAll(fieldBase, fieldSuper);
 
         rowvalue[rowcount] = "| EVENT";
-        rowproperty[rowcount] = "| ID";
         rowcount++;
 
         for (int i = 0; i < object.size(); i++) {
@@ -284,10 +280,6 @@ public class PrintFormat {
             for (int z = 0; z < methods.length; z++) {
 
                 if (methods[z].getName().equalsIgnoreCase("getEvent")) {
-                    rowvalue[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
-                }
-
-                if (methods[z].getName().equalsIgnoreCase("getID")) {
                     rowvalue[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
                 }
             }
