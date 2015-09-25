@@ -3,6 +3,9 @@ package org.project.openbaton.cli.util;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.project.openbaton.cli.model.GenearlVimInstance;
+import org.project.openbaton.cli.model.GeneralDependency;
+import org.project.openbaton.cli.model.GeneralImage;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -115,7 +118,7 @@ public class PrintFormat {
             result = showObject(object);
 
         } else {
-            result = generalPrint(object);
+            result = generalPrint(comand,object);
 
         }
 
@@ -306,7 +309,7 @@ public class PrintFormat {
     }
 
 
-    public static String generalPrint(List<Object> object) throws IllegalAccessException, InvocationTargetException {
+    public static String generalPrint(String comand,List<Object> object) throws IllegalAccessException, InvocationTargetException {
         String result = "";
         String firstline = "";
         String secondline = "";
@@ -314,49 +317,70 @@ public class PrintFormat {
         String[] rowvalue = new String[500];
         int rowcount = 0;
 
-        Field[] fieldBase = object.get(0).getClass().getDeclaredFields();
-        Field[] fieldSuper = object.get(0).getClass().getSuperclass().getDeclaredFields();
-        Field[] field = ArrayUtils.addAll(fieldBase, fieldSuper);
+        if(comand.contains("VimInstance"))
+        {
+            result = GenearlVimInstance.Print(object);
 
-        rowproperty[rowcount] = "| ID";
-        rowvalue[rowcount] = "| VERSION";
-        rowcount++;
+        }else if(comand.contains("Image")) {
 
-        for (int i = 0; i < object.size(); i++) {
-            Method[] methodBase = object.get(i).getClass().getDeclaredMethods();
-            Method[] methodSuper = object.get(i).getClass().getSuperclass().getDeclaredMethods();
-            Method[] methods = ArrayUtils.addAll(methodBase, methodSuper);
+            result = GeneralImage.Print(object);
 
-            for (int z = 0; z < methods.length; z++) {
+        }else if(comand.contains("Record-getVNFDependencies")) {
 
-                if (methods[z].getName().equalsIgnoreCase("getID")) {
-                    rowproperty[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
-                }
+            result = GeneralDependency.Print(object);
 
-                if (methods[z].getName().equalsIgnoreCase("getVersion")) {
-                    rowvalue[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
-                }
-            }
+        }else{
+
+            Field[] fieldBase = object.get(0).getClass().getDeclaredFields();
+            Field[] fieldSuper = object.get(0).getClass().getSuperclass().getDeclaredFields();
+            Field[] field = ArrayUtils.addAll(fieldBase, fieldSuper);
+
+            rowproperty[rowcount] = "| ID";
+            rowvalue[rowcount] = "| VERSION";
+
             rowcount++;
-        }
+
+            for (int i = 0; i < object.size(); i++) {
+                Method[] methodBase = object.get(i).getClass().getDeclaredMethods();
+                Method[] methodSuper = object.get(i).getClass().getSuperclass().getDeclaredMethods();
+                Method[] methods = ArrayUtils.addAll(methodBase, methodSuper);
+
+                for (int z = 0; z < methods.length; z++) {
+
+                    if (methods[z].getName().equalsIgnoreCase("getID")) {
+                        rowproperty[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
+                    }
+
+                    if (methods[z].getName().equalsIgnoreCase("getVersion")) {
+                        rowvalue[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
+                    }
 
 
-        addRow("\n");
-        firstline = buildLine(rowproperty);
-        secondline = buildLine(rowvalue);
-        addRow(firstline, secondline, "+");
-
-        for (int c = 0; c < rowcount; c++) {
-            addRow(rowproperty[c], rowvalue[c], "|");
-            if (c == 0) {
-                addRow(firstline, secondline, "+");
+                }
+                rowcount++;
             }
+
+
+            addRow("\n");
+            firstline = buildLine(rowproperty);
+            secondline = buildLine(rowvalue);
+            addRow(firstline, secondline, "+");
+
+            for (int c = 0; c < rowcount; c++) {
+                addRow(rowproperty[c], rowvalue[c], "|");
+                if (c == 0) {
+                    addRow(firstline, secondline, "+");
+                }
+            }
+
+
+            //end
+            addRow(firstline, secondline, "+");
+
+
+            result = printer();
         }
 
-        //end
-        addRow(firstline, secondline, "+");
-
-        result = printer();
 
         return result;
     }

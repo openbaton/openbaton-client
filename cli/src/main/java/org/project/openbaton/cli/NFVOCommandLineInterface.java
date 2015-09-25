@@ -26,6 +26,7 @@ import java.util.*;
  */
 public class NFVOCommandLineInterface {
 
+
     private static Logger log = LoggerFactory.getLogger(NFVOCommandLineInterface.class);
 
     private static final Character mask = '*';
@@ -40,6 +41,8 @@ public class NFVOCommandLineInterface {
     }};
 
     public static void usage() {
+
+
         log.info("\n" +
                 " _______  _______________   ____________            _________ .____    .___ \n" +
                 " \\      \\ \\_   _____/\\   \\ /   /\\_____  \\           \\_   ___ \\|    |   |   |\n" +
