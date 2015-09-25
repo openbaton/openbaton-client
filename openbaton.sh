@@ -2,6 +2,7 @@
 source gradle.properties
 
 _version=${version}
+_level=info
 _openbaton_config_file=/etc/openbaton/cli.properties
 
 function check_already_running_client {
@@ -42,7 +43,7 @@ do
              #echo $_openbaton_config_file
              ;;
          d)
-             echo debug mode
+             _level=debug
              ;;
      esac
 done
@@ -57,7 +58,7 @@ else
         check_already_running_client
         check_not_running
         #cd cli/build/libs/
-        java -jar "cli/build/libs/cli-all-$_version.jar" $_openbaton_config_file $1 $2 $3
+        java -jar -Dorg.slf4j.simpleLogger.defaultLogLevel=$_level "cli/build/libs/cli-all-$_version.jar" $_openbaton_config_file $1 $2 $3
 fi
 
 

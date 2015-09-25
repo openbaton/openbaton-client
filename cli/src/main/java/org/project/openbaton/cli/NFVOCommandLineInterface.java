@@ -42,7 +42,6 @@ public class NFVOCommandLineInterface {
 
     public static void usage() {
 
-
         log.info("\n" +
                 " _______  _______________   ____________            _________ .____    .___ \n" +
                 " \\      \\ \\_   _____/\\   \\ /   /\\_____  \\           \\_   ___ \\|    |   |   |\n" +
@@ -92,6 +91,7 @@ public class NFVOCommandLineInterface {
     public static void main(String[] args) {
 
         //log.info("Log class: { " + log.getClass().getName() + " }");
+
 
         ConsoleReader reader = getConsoleReader();
         Properties properties = new Properties();
