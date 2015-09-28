@@ -145,7 +145,7 @@ public abstract class RestRequest {
             checkToken();
 
             // call the api here
-            log.debug("Executing post on: " + this.baseUrl + "/" +id);
+            //log.debug("Executing post on: " + this.baseUrl + "/" +id);
             if (token != null)
                 jsonResponse = Unirest.post(this.baseUrl + "/" +id)
                     .header("accept", "application/json")
@@ -218,7 +218,7 @@ public abstract class RestRequest {
         try {
             // call the api here
             checkToken();
-            log.trace("Executing delete on: " + this.baseUrl + "/" + id);
+            //log.trace("Executing delete on: " + this.baseUrl + "/" + id);
             if (token != null)
                 jsonResponse = Unirest.delete(this.baseUrl + "/" + id)
                     .header("Authorization", bearerToken.replaceAll("\"", ""))
@@ -280,7 +280,7 @@ public abstract class RestRequest {
                 e.printStackTrace();
                 throw new SDKException("Could not get token");
             }
-            log.debug("Executing get on: " + url);
+            //log.debug("Executing get on: " + url);
 
             if (token != null)
                 jsonResponse = Unirest.get(url)
@@ -342,7 +342,7 @@ public abstract class RestRequest {
                 e.printStackTrace();
                 throw new SDKException("Could not get token");
             }
-            log.debug("Executing get on: " +url);
+            //log.debug("Executing get on: " +url);
 
             if (token != null)
                 jsonResponse = Unirest.get(url)
@@ -413,7 +413,7 @@ public abstract class RestRequest {
                 throw new SDKException("Could not get token");
             }
             // call the api here
-            log.debug("Executing put on: " + this.baseUrl + "/" + id);
+            //log.debug("Executing put on: " + this.baseUrl + "/" + id);
             if (token != null)
                 jsonResponse = Unirest.put(this.baseUrl + "/" + id)
                     .header("accept", "application/json")
@@ -458,7 +458,7 @@ public abstract class RestRequest {
      */
     private void checkStatus(HttpResponse<JsonNode> jsonResponse, final int httpStatus) throws SDKException {
         if (jsonResponse.getStatus() != httpStatus) {
-            log.debug("Status expected: " + httpStatus + " obtained: " + jsonResponse.getStatus());
+            //log.debug("Status expected: " + httpStatus + " obtained: " + jsonResponse.getStatus());
             throw new SDKException("Received wrong API HTTPStatus");
         }
     }
@@ -482,7 +482,7 @@ public abstract class RestRequest {
         String responseString = null;
         responseString = EntityUtils.toString(response.getEntity());
         int statusCode = response.getStatusLine().getStatusCode();
-        log.debug(statusCode + ": " + responseString);
+        //log.debug(statusCode + ": " + responseString);
 
         if (statusCode != 200) {
             ParseComError error = new Gson().fromJson(responseString, ParseComError.class);

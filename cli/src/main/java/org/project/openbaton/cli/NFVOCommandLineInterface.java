@@ -36,8 +36,8 @@ public class NFVOCommandLineInterface {
     private final static LinkedHashMap<String, Command> commandList = new LinkedHashMap<>();
     private final static LinkedHashMap<String, String> helpCommandList = new LinkedHashMap<String, String>() {{
         put("help", "Print the usage");
-        put("exit", "Exit the application");
-        put("print properties", "print all the properties");
+        //put("exit", "Exit the application");
+        //put("print properties", "print all the properties");
     }};
 
     public static void usage() {
