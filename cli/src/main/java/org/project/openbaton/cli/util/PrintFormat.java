@@ -321,7 +321,7 @@ public class PrintFormat {
         {
             result = GenearlVimInstance.Print(object);
 
-        }else if(comand.contains("Image")) {
+        }else if(comand.contains("Image") || comand.contains("Configuration")) {
 
             result = GeneralImage.Print(object);
 
