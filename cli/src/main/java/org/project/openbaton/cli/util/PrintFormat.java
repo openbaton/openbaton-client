@@ -205,14 +205,15 @@ public class PrintFormat {
 
                                     for (int s = 0; s < methods2.length; s++) {
 
-                                        if (methods2[s].getName().equalsIgnoreCase("get" + field2[r].getName()) && methods2[s].invoke(obj) != null && !methods2[s].invoke(obj).toString().contains("[")) {
+                                        if (methods2[s].getName().equalsIgnoreCase("get" + field2[r].getName()) && methods2[s].invoke(obj) != null && !methods2[s].invoke(obj).toString().contains("[") && !methods2[s].invoke(obj).toString().contains("{")) {
 
-                                            rowproperty[rowcount] = "| " + field2[r].getName();
-                                            rowvalue[rowcount] = "| " + methods2[s].invoke(obj).toString();
-                                            rowcount++;
-                                            rowproperty[rowcount] = "|";
-                                            rowvalue[rowcount] = "|";
-                                            rowcount++;
+                                                rowproperty[rowcount] = "| " + field2[r].getName();
+                                                rowvalue[rowcount] = "| " + methods2[s].invoke(obj).toString();
+                                                rowcount++;
+                                                rowproperty[rowcount] = "|";
+                                                rowvalue[rowcount] = "|";
+                                                rowcount++;
+
                                         }
 
                                     }

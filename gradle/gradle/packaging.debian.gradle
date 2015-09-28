@@ -35,7 +35,7 @@ buildscript {
 
 apply plugin: 'os-package'
 
-task openbatonDeb(type: Deb, dependsOn: [jar, installDist]) {
+task openbatonDeb(type: Deb, dependsOn: [jar]) {
     packageName = 'openbaton-client'
     version = debianApplicationVersionFull
     release '1'
