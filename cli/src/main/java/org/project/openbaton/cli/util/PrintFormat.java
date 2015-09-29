@@ -151,8 +151,8 @@ public class PrintFormat {
         String result = "";
         String firstline = "";
         String secondline = "";
-        String[] rowproperty = new String[500];
-        String[] rowvalue = new String[500];
+        String[] rowproperty = new String[5000];
+        String[] rowvalue = new String[5000];
         int rowcount = 0;
 
         Field[] fieldBase = object.get(0).getClass().getDeclaredFields();
@@ -172,12 +172,14 @@ public class PrintFormat {
             for (int z = 0; z < methods.length; z++) {
 
                 if (methods[z].getName().equalsIgnoreCase("get" + field[i].getName())) {
-                    if (methods[z].invoke(object.get(0)) != null) try {
+                    Object lvlDown = methods[z].invoke(object.get(0));
+                    if (lvlDown != null) try {
 
-                        if (methods[z].invoke(object.get(0)).toString().contains("[")) {
+                        if (lvlDown instanceof Set || lvlDown instanceof List || lvlDown instanceof Iterable) {
                             rowproperty[rowcount] = "| " + field[i].getName().toUpperCase();
                             rowvalue[rowcount] = "|";
                             rowcount++;
+
                             rowproperty[rowcount] = "|";
                             rowvalue[rowcount] = "|";
                             rowcount++;
@@ -186,11 +188,11 @@ public class PrintFormat {
 
                             if (methods[z].getName().contains("security") || methods[z].getName().contains("Source") || methods[z].getName().contains("Target")) {
 
-                                Object obj2 = (Object) methods[z].invoke(object.get(0));
+                                Object obj2 = (Object) lvlDown;
                                 objectHash.add(obj2);
 
                             }else{
-                                objectHash = (Set<Object>) methods[z].invoke(object.get(0));
+                                objectHash = (Set<Object>) lvlDown;
                             }
 
                             for (Object obj : objectHash) {
@@ -198,25 +200,68 @@ public class PrintFormat {
                                 Field[] fieldSuper2 = obj.getClass().getSuperclass().getDeclaredFields();
                                 Field[] field2 = ArrayUtils.addAll(fieldBase2, fieldSuper2);
 
+                                String name="";
+                                String id="";
+
                                 for (int r = 0; r < field2.length; r++) {
                                     Method[] methodBase2 = obj.getClass().getDeclaredMethods();
                                     Method[] methodSuper2 = obj.getClass().getSuperclass().getDeclaredMethods();
                                     Method[] methods2 = ArrayUtils.addAll(methodBase2, methodSuper2);
 
+
                                     for (int s = 0; s < methods2.length; s++) {
 
-                                        if (methods2[s].getName().equalsIgnoreCase("get" + field2[r].getName()) && methods2[s].invoke(obj) != null && !methods2[s].invoke(obj).toString().contains("[") && !methods2[s].invoke(obj).toString().contains("{")) {
+                                            if(methods2[s].getName().equalsIgnoreCase("get" + field2[r].getName())) {
+                                                Object lvlDown2 = methods2[s].invoke(obj);
+                                                if (lvlDown2 != null) try {
 
-                                                rowproperty[rowcount] = "| " + field2[r].getName();
-                                                rowvalue[rowcount] = "| " + methods2[s].invoke(obj).toString();
-                                                rowcount++;
-                                                rowproperty[rowcount] = "|";
-                                                rowvalue[rowcount] = "|";
-                                                rowcount++;
+                                                    if (!(lvlDown2 instanceof Set) && !(lvlDown2 instanceof List ) && !(lvlDown2 instanceof Iterable )) {
 
-                                        }
+                                                        if(methods2[s].getName().equalsIgnoreCase("getID"))
+                                                        {
+                                                            id = methods2[s].invoke(obj).toString();
+                                                        }
+
+                                                        if(methods2[s].getName().equalsIgnoreCase("getName"))
+                                                        {
+                                                            name = methods2[s].invoke(obj).toString();
+                                                        }
+
+                                                    }
+
+                                                } catch (InvocationTargetException e) {
+
+                                                    e.printStackTrace();
+                                                }
+                                            }
 
                                     }
+
+                                }
+
+                                if(id.length()>0 || name.length()>0)
+                                {
+                                    rowcount--;
+                                    rowproperty[rowcount] = "|";
+                                    if(name.length()>0) {
+                                        rowvalue[rowcount] = "| id: " + id + " - name:  " + name;
+                                    }else
+                                    {
+                                        rowvalue[rowcount] = "| id: " + id ;
+                                    }
+                                    rowcount++;
+                                    rowproperty[rowcount] = "|";
+                                    rowvalue[rowcount] = "|";
+                                    rowcount++;
+                                }else
+                                {
+                                    rowcount--;
+                                    rowproperty[rowcount] = "|";
+                                    rowvalue[rowcount] = "| " + " [ ]";
+                                    rowcount++;
+                                    rowproperty[rowcount] = "|";
+                                    rowvalue[rowcount] = "|";
+                                    rowcount++;
                                 }
 
                             }
@@ -224,7 +269,7 @@ public class PrintFormat {
 
                         } else {
                             rowproperty[rowcount] = "| " + field[i].getName();
-                            rowvalue[rowcount] = "| " + methods[z].invoke(object.get(0)).toString();
+                            rowvalue[rowcount] = "| " + lvlDown.toString();
                             rowcount++;
                             rowproperty[rowcount] = "|";
                             rowvalue[rowcount] = "|";
