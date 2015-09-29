@@ -6,8 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.project.openbaton.cli.model.GenearlVimInstance;
 import org.project.openbaton.cli.model.GeneralDependency;
 import org.project.openbaton.cli.model.GeneralImage;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -195,6 +195,9 @@ public class PrintFormat {
                                 objectHash = (Set<Object>) lvlDown;
                             }
 
+                            String fieldName="";
+                            String fieldCheck="";
+
                             for (Object obj : objectHash) {
                                 Field[] fieldBase2 = obj.getClass().getDeclaredFields();
                                 Field[] fieldSuper2 = obj.getClass().getSuperclass().getDeclaredFields();
@@ -202,6 +205,7 @@ public class PrintFormat {
 
                                 String name="";
                                 String id="";
+                                String array="";
 
                                 for (int r = 0; r < field2.length; r++) {
                                     Method[] methodBase2 = obj.getClass().getDeclaredMethods();
@@ -217,20 +221,19 @@ public class PrintFormat {
 
                                                     if (!(lvlDown2 instanceof Set) && !(lvlDown2 instanceof List ) && !(lvlDown2 instanceof Iterable )) {
 
-                                                        if(methods2[s].getName().equalsIgnoreCase("getID"))
+                                                        if(methods2[s].getName().equalsIgnoreCase("getId"))
                                                         {
                                                             id = methods2[s].invoke(obj).toString();
+
                                                         }
 
                                                         if(methods2[s].getName().equalsIgnoreCase("getName"))
                                                         {
                                                             name = methods2[s].invoke(obj).toString();
                                                         }
-
                                                     }
 
                                                 } catch (InvocationTargetException e) {
-
                                                     e.printStackTrace();
                                                 }
                                             }
@@ -239,15 +242,18 @@ public class PrintFormat {
 
                                 }
 
-                                if(id.length()>0 || name.length()>0)
+                                if(id.length()>0 || name.length()>0 || array.length()>0)
                                 {
                                     rowcount--;
                                     rowproperty[rowcount] = "|";
                                     if(name.length()>0) {
                                         rowvalue[rowcount] = "| id: " + id + " - name:  " + name;
-                                    }else
+                                    }else if(id.length()>0)
                                     {
                                         rowvalue[rowcount] = "| id: " + id ;
+                                    }else
+                                    {
+                                        rowvalue[rowcount] = "| "+array ;
                                     }
                                     rowcount++;
                                     rowproperty[rowcount] = "|";
@@ -257,28 +263,29 @@ public class PrintFormat {
                                 {
                                     rowcount--;
                                     rowproperty[rowcount] = "|";
-                                    rowvalue[rowcount] = "| " + " [ ]";
+                                    rowvalue[rowcount-1] = "| [ ]";
                                     rowcount++;
-                                    rowproperty[rowcount] = "|";
-                                    rowvalue[rowcount] = "|";
-                                    rowcount++;
+
                                 }
 
                             }
 
 
                         } else {
-                            rowproperty[rowcount] = "| " + field[i].getName();
-                            rowvalue[rowcount] = "| " + lvlDown.toString();
-                            rowcount++;
-                            rowproperty[rowcount] = "|";
-                            rowvalue[rowcount] = "|";
-                            rowcount++;
+                            if(lvlDown instanceof String || lvlDown instanceof  Integer) {
+                                rowproperty[rowcount] = "| " + field[i].getName();
+                                rowvalue[rowcount] = "| " + lvlDown.toString();
+                                rowcount++;
+                                rowproperty[rowcount] = "|";
+                                rowvalue[rowcount] = "|";
+                                rowcount++;
+                            }
 
                         }
 
 
                     } catch (InvocationTargetException e) {
+
                         e.printStackTrace();
 
                     }
@@ -367,7 +374,7 @@ public class PrintFormat {
         {
             result = GenearlVimInstance.Print(object);
 
-        }else if(comand.contains("Image") || comand.contains("Configuration")) {
+        }else if(comand.contains("Image") || comand.contains("Configuration") || comand.contains("NetworkServiceDescriptor-findAll") || comand.contains("NetworkServiceRecord-findAll")) {
 
             result = GeneralImage.Print(object);
 
