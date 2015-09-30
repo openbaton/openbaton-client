@@ -4,8 +4,8 @@ package org.project.openbaton.cli.util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.project.openbaton.cli.model.GenearlVimInstance;
-import org.project.openbaton.cli.model.GeneralTarget;
 import org.project.openbaton.cli.model.GeneralName;
+import org.project.openbaton.cli.model.GeneralTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,6 @@ public class PrintFormat {
 
     private static List<String[]> rows = new LinkedList<String[]>();
     public static Logger log = LoggerFactory.getLogger(PrintFormat.class);
-
 
 
     public static String printResult(String comand, Object obj) throws InvocationTargetException, IllegalAccessException {
@@ -112,13 +111,13 @@ public class PrintFormat {
 
         String result = "";
 
-        if(comand.contains("Event")) {
+        if (comand.contains("Event")) {
             result = showEvent(object);
-        } else if (comand.contains("create") || comand.contains("update") || comand.contains("ById") || comand.endsWith("Dependency") ||  comand.endsWith("Descriptor") || comand.endsWith("getVirtualNetworkFunctionRecord")) {
+        } else if (comand.contains("create") || comand.contains("update") || comand.contains("ById") || comand.endsWith("Dependency") || comand.endsWith("Descriptor") || comand.endsWith("getVirtualNetworkFunctionRecord")) {
             result = showObject(object);
 
         } else {
-            result = generalPrint(comand,object);
+            result = generalPrint(comand, object);
 
         }
 
@@ -155,8 +154,8 @@ public class PrintFormat {
         String[] rowvalue = new String[5000];
         int rowcount = 0;
 
-        String fieldName="";
-        String fieldCheck="";
+        String fieldName = "";
+        String fieldCheck = "";
 
         Field[] fieldBase = object.get(0).getClass().getDeclaredFields();
         Field[] fieldSuper = object.get(0).getClass().getSuperclass().getDeclaredFields();
@@ -194,7 +193,7 @@ public class PrintFormat {
                                 Object obj2 = (Object) lvlDown;
                                 objectHash.add(obj2);
 
-                            }else{
+                            } else {
                                 objectHash = (Set<Object>) lvlDown;
                             }
 
@@ -204,8 +203,8 @@ public class PrintFormat {
                                 Field[] fieldSuper2 = obj.getClass().getSuperclass().getDeclaredFields();
                                 Field[] field2 = ArrayUtils.addAll(fieldBase2, fieldSuper2);
 
-                                String name="";
-                                String id="";
+                                String name = "";
+                                String id = "";
 
                                 for (int r = 0; r < field2.length; r++) {
                                     Method[] methodBase2 = obj.getClass().getDeclaredMethods();
@@ -215,58 +214,53 @@ public class PrintFormat {
 
                                     for (int s = 0; s < methods2.length; s++) {
 
-                                            if(methods2[s].getName().equalsIgnoreCase("get" + field2[r].getName())) {
-                                                Object lvlDown2 = methods2[s].invoke(obj);
-                                                if (lvlDown2 != null) try {
+                                        if (methods2[s].getName().equalsIgnoreCase("get" + field2[r].getName())) {
+                                            Object lvlDown2 = methods2[s].invoke(obj);
+                                            if (lvlDown2 != null) try {
 
-                                                    if (!(lvlDown2 instanceof Set) && !(lvlDown2 instanceof List ) && !(lvlDown2 instanceof Iterable )) {
+                                                if (!(lvlDown2 instanceof Set) && !(lvlDown2 instanceof List) && !(lvlDown2 instanceof Iterable)) {
 
-                                                        if(methods2[s].getName().equalsIgnoreCase("getId"))
-                                                        {
-                                                            id = methods2[s].invoke(obj).toString();
+                                                    if (methods2[s].getName().equalsIgnoreCase("getId")) {
+                                                        id = methods2[s].invoke(obj).toString();
 
-                                                            fieldName = field[i].getName();
+                                                        fieldName = field[i].getName();
 
-                                                            if(!fieldCheck.equalsIgnoreCase(fieldName))
-                                                            {
-                                                                rowproperty[rowcount] = "| " + field[i].getName().toUpperCase();
-                                                                rowvalue[rowcount] = "|";
-                                                                rowcount++;
+                                                        if (!fieldCheck.equalsIgnoreCase(fieldName)) {
+                                                            rowproperty[rowcount] = "| " + field[i].getName().toUpperCase();
+                                                            rowvalue[rowcount] = "|";
+                                                            rowcount++;
 
-                                                                rowproperty[rowcount] = "|";
-                                                                rowvalue[rowcount] = "|";
-                                                                rowcount++;
+                                                            rowproperty[rowcount] = "|";
+                                                            rowvalue[rowcount] = "|";
+                                                            rowcount++;
 
-                                                                fieldCheck = fieldName;
-
-                                                            }
+                                                            fieldCheck = fieldName;
 
                                                         }
 
-                                                        if(methods2[s].getName().equalsIgnoreCase("getName"))
-                                                        {
-                                                            name = methods2[s].invoke(obj).toString();
-                                                        }
                                                     }
 
-                                                } catch (InvocationTargetException e) {
-                                                    e.printStackTrace();
+                                                    if (methods2[s].getName().equalsIgnoreCase("getName")) {
+                                                        name = methods2[s].invoke(obj).toString();
+                                                    }
                                                 }
+
+                                            } catch (InvocationTargetException e) {
+                                                e.printStackTrace();
                                             }
+                                        }
 
                                     }
 
                                 }
 
-                                if(id.length()>0 || name.length()>0)
-                                {
+                                if (id.length() > 0 || name.length() > 0) {
                                     rowcount--;
                                     rowproperty[rowcount] = "|";
-                                    if(name.length()>0) {
+                                    if (name.length() > 0) {
                                         rowvalue[rowcount] = "| id: " + id + " - name:  " + name;
-                                    }else if(id.length()>0)
-                                    {
-                                        rowvalue[rowcount] = "| id: " + id ;
+                                    } else if (id.length() > 0) {
+                                        rowvalue[rowcount] = "| id: " + id;
                                     }
                                     rowcount++;
                                     rowproperty[rowcount] = "|";
@@ -286,7 +280,7 @@ public class PrintFormat {
 
 
                         } else {
-                            if(lvlDown instanceof String || lvlDown instanceof  Integer || lvlDown instanceof  Enum) {
+                            if (lvlDown instanceof String || lvlDown instanceof Integer || lvlDown instanceof Enum) {
                                 rowproperty[rowcount] = "| " + field[i].getName();
                                 rowvalue[rowcount] = "| " + lvlDown.toString();
                                 rowcount++;
@@ -376,7 +370,7 @@ public class PrintFormat {
     }
 
 
-    public static String generalPrint(String comand,List<Object> object) throws IllegalAccessException, InvocationTargetException {
+    public static String generalPrint(String comand, List<Object> object) throws IllegalAccessException, InvocationTargetException {
         String result = "";
         String firstline = "";
         String secondline = "";
@@ -384,19 +378,18 @@ public class PrintFormat {
         String[] rowvalue = new String[500];
         int rowcount = 0;
 
-        if(comand.contains("VimInstance"))
-        {
+        if (comand.contains("VimInstance")) {
             result = GenearlVimInstance.Print(object);
 
-        }else if(comand.contains("Image") || comand.contains("Configuration") || comand.contains("NetworkServiceDescriptor-findAll") || comand.contains("NetworkServiceRecord-findAll") || comand.contains("getVirtualNetworkFunctionRecords")) {
+        } else if (comand.contains("Image") || comand.contains("Configuration") || comand.contains("NetworkServiceDescriptor-findAll") || comand.contains("NetworkServiceRecord-findAll") || comand.contains("getVirtualNetworkFunctionRecords")) {
 
             result = GeneralName.Print(object);
 
-        }else if(comand.contains("Record-getVNFDependencies")) {
+        } else if (comand.contains("Record-getVNFDependencies")) {
 
             result = GeneralTarget.Print(object);
 
-        }else{
+        } else {
 
             Field[] fieldBase = object.get(0).getClass().getDeclaredFields();
             Field[] fieldSuper = object.get(0).getClass().getSuperclass().getDeclaredFields();
@@ -414,13 +407,13 @@ public class PrintFormat {
 
                 for (int z = 0; z < methods.length; z++) {
 
-                        if (methods[z].getName().equalsIgnoreCase("getID")) {
-                            rowproperty[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
-                        }
+                    if (methods[z].getName().equalsIgnoreCase("getID")) {
+                        rowproperty[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
+                    }
 
-                        if (methods[z].getName().equalsIgnoreCase("getVersion")) {
-                            rowvalue[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
-                        }
+                    if (methods[z].getName().equalsIgnoreCase("getVersion")) {
+                        rowvalue[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
+                    }
 
                 }
                 rowcount++;
