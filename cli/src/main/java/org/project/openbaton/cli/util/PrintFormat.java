@@ -4,8 +4,8 @@ package org.project.openbaton.cli.util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.project.openbaton.cli.model.GenearlVimInstance;
-import org.project.openbaton.cli.model.GeneralDependency;
-import org.project.openbaton.cli.model.GeneralImage;
+import org.project.openbaton.cli.model.GeneralTarget;
+import org.project.openbaton.cli.model.GeneralName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,7 @@ import java.util.*;
 public class PrintFormat {
 
     private static List<String[]> rows = new LinkedList<String[]>();
-    private static Logger log = LoggerFactory.getLogger(PrintFormat.class);
+    public static Logger log = LoggerFactory.getLogger(PrintFormat.class);
 
 
 
@@ -114,7 +114,7 @@ public class PrintFormat {
 
         if(comand.contains("Event")) {
             result = showEvent(object);
-        } else if (comand.contains("create") || comand.contains("update") || comand.contains("ById") || comand.endsWith("Dependency") ||  comand.endsWith("Descriptor")) {
+        } else if (comand.contains("create") || comand.contains("update") || comand.contains("ById") || comand.endsWith("Dependency") ||  comand.endsWith("Descriptor") || comand.endsWith("getVirtualNetworkFunctionRecord")) {
             result = showObject(object);
 
         } else {
@@ -155,6 +155,9 @@ public class PrintFormat {
         String[] rowvalue = new String[5000];
         int rowcount = 0;
 
+        String fieldName="";
+        String fieldCheck="";
+
         Field[] fieldBase = object.get(0).getClass().getDeclaredFields();
         Field[] fieldSuper = object.get(0).getClass().getSuperclass().getDeclaredFields();
         Field[] field = ArrayUtils.addAll(fieldBase, fieldSuper);
@@ -176,13 +179,13 @@ public class PrintFormat {
                     if (lvlDown != null) try {
 
                         if (lvlDown instanceof Set || lvlDown instanceof List || lvlDown instanceof Iterable) {
-                            rowproperty[rowcount] = "| " + field[i].getName().toUpperCase();
-                            rowvalue[rowcount] = "|";
-                            rowcount++;
-
-                            rowproperty[rowcount] = "|";
-                            rowvalue[rowcount] = "|";
-                            rowcount++;
+//                            rowproperty[rowcount] = "| " + field[i].getName().toUpperCase();
+//                            rowvalue[rowcount] = "|";
+//                            rowcount++;
+//
+//                            rowproperty[rowcount] = "|";
+//                            rowvalue[rowcount] = "|";
+//                            rowcount++;
 
                             Set<Object> objectHash = new HashSet<Object>();
 
@@ -195,8 +198,6 @@ public class PrintFormat {
                                 objectHash = (Set<Object>) lvlDown;
                             }
 
-                            String fieldName="";
-                            String fieldCheck="";
 
                             for (Object obj : objectHash) {
                                 Field[] fieldBase2 = obj.getClass().getDeclaredFields();
@@ -205,7 +206,6 @@ public class PrintFormat {
 
                                 String name="";
                                 String id="";
-                                String array="";
 
                                 for (int r = 0; r < field2.length; r++) {
                                     Method[] methodBase2 = obj.getClass().getDeclaredMethods();
@@ -225,6 +225,22 @@ public class PrintFormat {
                                                         {
                                                             id = methods2[s].invoke(obj).toString();
 
+                                                            fieldName = field[i].getName();
+
+                                                            if(!fieldCheck.equalsIgnoreCase(fieldName))
+                                                            {
+                                                                rowproperty[rowcount] = "| " + field[i].getName().toUpperCase();
+                                                                rowvalue[rowcount] = "|";
+                                                                rowcount++;
+
+                                                                rowproperty[rowcount] = "|";
+                                                                rowvalue[rowcount] = "|";
+                                                                rowcount++;
+
+                                                                fieldCheck = fieldName;
+
+                                                            }
+
                                                         }
 
                                                         if(methods2[s].getName().equalsIgnoreCase("getName"))
@@ -242,7 +258,7 @@ public class PrintFormat {
 
                                 }
 
-                                if(id.length()>0 || name.length()>0 || array.length()>0)
+                                if(id.length()>0 || name.length()>0)
                                 {
                                     rowcount--;
                                     rowproperty[rowcount] = "|";
@@ -251,28 +267,26 @@ public class PrintFormat {
                                     }else if(id.length()>0)
                                     {
                                         rowvalue[rowcount] = "| id: " + id ;
-                                    }else
-                                    {
-                                        rowvalue[rowcount] = "| "+array ;
                                     }
                                     rowcount++;
                                     rowproperty[rowcount] = "|";
                                     rowvalue[rowcount] = "|";
                                     rowcount++;
-                                }else
-                                {
-                                    rowcount--;
-                                    rowproperty[rowcount] = "|";
-                                    rowvalue[rowcount-1] = "| [ ]";
-                                    rowcount++;
-
                                 }
+//                                else
+//                                {
+//                                    //rowcount--;
+//                                    rowproperty[rowcount] = "|";
+//                                    rowvalue[rowcount-1] = "| [ ]";
+//                                    rowcount++;
+//
+//                                }
 
                             }
 
 
                         } else {
-                            if(lvlDown instanceof String || lvlDown instanceof  Integer) {
+                            if(lvlDown instanceof String || lvlDown instanceof  Integer || lvlDown instanceof  Enum) {
                                 rowproperty[rowcount] = "| " + field[i].getName();
                                 rowvalue[rowcount] = "| " + lvlDown.toString();
                                 rowcount++;
@@ -374,13 +388,13 @@ public class PrintFormat {
         {
             result = GenearlVimInstance.Print(object);
 
-        }else if(comand.contains("Image") || comand.contains("Configuration") || comand.contains("NetworkServiceDescriptor-findAll") || comand.contains("NetworkServiceRecord-findAll")) {
+        }else if(comand.contains("Image") || comand.contains("Configuration") || comand.contains("NetworkServiceDescriptor-findAll") || comand.contains("NetworkServiceRecord-findAll") || comand.contains("getVirtualNetworkFunctionRecords")) {
 
-            result = GeneralImage.Print(object);
+            result = GeneralName.Print(object);
 
         }else if(comand.contains("Record-getVNFDependencies")) {
 
-            result = GeneralDependency.Print(object);
+            result = GeneralTarget.Print(object);
 
         }else{
 
@@ -400,14 +414,13 @@ public class PrintFormat {
 
                 for (int z = 0; z < methods.length; z++) {
 
-                    if (methods[z].getName().equalsIgnoreCase("getID")) {
-                        rowproperty[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
-                    }
+                        if (methods[z].getName().equalsIgnoreCase("getID")) {
+                            rowproperty[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
+                        }
 
-                    if (methods[z].getName().equalsIgnoreCase("getVersion")) {
-                        rowvalue[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
-                    }
-
+                        if (methods[z].getName().equalsIgnoreCase("getVersion")) {
+                            rowvalue[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
+                        }
 
                 }
                 rowcount++;
