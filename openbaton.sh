@@ -5,21 +5,6 @@ _version=${version}
 _level=info
 _openbaton_config_file=/etc/openbaton/cli.properties
 
-function check_already_running_client {
-        result=$(ps aux | grep cli-all- | wc -l);
-        if [ "${result}" -ne "1" ]; then
-                echo "openbaton-client is already running.."
-		exit;
-        fi
-}
-
-function check_not_running {
-        result=$(screen -ls | grep openbaton | wc -l);
-        if [ "${result}" -eq "0" ]; then
-                echo "openbaton is not running.."
-		exit;
-        fi
-}
 
 function usage {
     echo -e "Open-Baton\n"
@@ -55,8 +40,6 @@ then
         usage
         exit 1
 else
-        check_already_running_client
-        check_not_running
         #cd cli/build/libs/
         java -jar -Dorg.slf4j.simpleLogger.defaultLogLevel=$_level "cli/build/libs/cli-all-$_version.jar" $_openbaton_config_file $1 $2 $3
 fi
