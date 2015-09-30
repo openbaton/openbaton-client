@@ -18,6 +18,7 @@ import org.project.openbaton.sdk.api.exception.SDKException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -33,7 +34,7 @@ import java.util.List;
  * OpenBaton api request request abstraction for all requester. Shares common data and methods.
  */
 public abstract class RestRequest {
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+    private Logger log = LoggerFactory.getLogger("cli");
     protected final String baseUrl;
 
 //	protected final String url;
@@ -76,8 +77,8 @@ public abstract class RestRequest {
         HttpResponse<JsonNode> jsonResponse = null;
         try {
 
-            //log.debug("baseUrl: " + baseUrl);
-            //log.debug("id: " + baseUrl + id);
+            log.debug("baseUrl: " + baseUrl);
+            log.debug("id: " + baseUrl + id);
 
             checkToken();
 
@@ -98,7 +99,7 @@ public abstract class RestRequest {
             checkStatus(jsonResponse, HttpURLConnection.HTTP_CREATED);
             // return the response of the request
             String result = jsonResponse.getBody().toString();
-            //log.debug("received: " + result);
+            log.trace("received: " + result);
 
             return result;
         } catch (IOException e) {
@@ -135,17 +136,17 @@ public abstract class RestRequest {
     public Serializable requestPost(final String id,final Serializable object) throws SDKException {
         HttpResponse<JsonNode> jsonResponse = null;
         try {
-            //log.debug("Object is: " + object);
+            log.trace("Object is: " + object);
          
             String fileJSONNode = mapper.toJson(object);
 
-            //log.debug("sending: " + fileJSONNode.toString());
-            //log.debug("baseUrl: " + baseUrl + "/" +id);
+            log.trace("sending: " + fileJSONNode.toString());
+            log.trace("baseUrl: " + baseUrl + "/" +id);
 
             checkToken();
 
             // call the api here
-            //log.debug("Executing post on: " + this.baseUrl + "/" +id);
+            log.debug("Executing post on: " + this.baseUrl + "/" +id);
             if (token != null)
                 jsonResponse = Unirest.post(this.baseUrl + "/" +id)
                     .header("accept", "application/json")
@@ -162,18 +163,18 @@ public abstract class RestRequest {
 //            check response status
             checkStatus(jsonResponse, HttpURLConnection.HTTP_CREATED);
             // return the response of the request
-            //String result = jsonResponse.getBody().toString();
-            //log.debug("received2: " + result);
+            String result2 = jsonResponse.getBody().toString();
+            log.trace("received2: " + result2);
 
 
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             JsonParser jp = new JsonParser();
             JsonElement je = jp.parse(jsonResponse.getBody().toString());
             String result = gson.toJson(je);
-            //log.debug("received: " + result);
+            log.trace("received: " + result);
 
 
-            //log.debug("Casting it into: " + object.getClass());
+            log.trace("Casting it into: " + object.getClass());
 //            return mapper.readValue(jsonResponse.getBody().toString(), object.getClass());
 
             return mapper.fromJson(result, object.getClass());
@@ -218,7 +219,7 @@ public abstract class RestRequest {
         try {
             // call the api here
             checkToken();
-            //log.trace("Executing delete on: " + this.baseUrl + "/" + id);
+            log.debug("Executing delete on: " + this.baseUrl + "/" + id);
             if (token != null)
                 jsonResponse = Unirest.delete(this.baseUrl + "/" + id)
                     .header("Authorization", bearerToken.replaceAll("\"", ""))
@@ -280,7 +281,7 @@ public abstract class RestRequest {
                 e.printStackTrace();
                 throw new SDKException("Could not get token");
             }
-            //log.debug("Executing get on: " + url);
+            log.debug("Executing get on: " + url);
 
             if (token != null)
                 jsonResponse = Unirest.get(url)
@@ -294,14 +295,14 @@ public abstract class RestRequest {
                 checkStatus(jsonResponse, httpStatus);
             }
             // return the response of the request
-            //log.debug("result is: " + jsonResponse.getBody().toString());
+            log.trace("result is: " + jsonResponse.getBody().toString());
 
-            //log.debug("result is: " + result);
+            //log.trace("result is: " + result);
 
             Class<?> aClass = Array.newInstance(type, 3).getClass();
-            //log.debug("class is: " + aClass);
+            log.trace("class is: " + aClass);
             Object[] o = (Object[]) mapper.fromJson(jsonResponse.getBody().toString(), aClass);
-            //log.debug("deserialized is: " + o);
+            log.trace("deserialized is: " + o);
 
             return o;
 
@@ -342,7 +343,7 @@ public abstract class RestRequest {
                 e.printStackTrace();
                 throw new SDKException("Could not get token");
             }
-            //log.debug("Executing get on: " +url);
+            log.debug("Executing get on: " +url);
 
             if (token != null)
                 jsonResponse = Unirest.get(url)
@@ -356,16 +357,16 @@ public abstract class RestRequest {
                 checkStatus(jsonResponse, httpStatus);
             }
             // return the response of the request
-            //log.debug("result is: " + jsonResponse.getBody().toString());
+            log.trace("result is: " + jsonResponse.getBody().toString());
 
-            //Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            //JsonParser jp = new JsonParser();
-            //JsonElement je = jp.parse(jsonResponse.getBody().toString());
-            //String result = gson.toJson(je);
-            //log.debug("result is: " + result);
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonParser jp = new JsonParser();
+            JsonElement je = jp.parse(jsonResponse.getBody().toString());
+            String result = gson.toJson(je);
+            log.trace("result is: " + result);
 
             Class<?> aClass = Array.newInstance(type, 1).getClass();
-            //log.debug("class is: " + aClass);
+            log.trace("class is: " + aClass);
 
             return mapper.fromJson(jsonResponse.getBody().toString(), type);
 
@@ -390,7 +391,7 @@ public abstract class RestRequest {
      * @return a string containing the response content
      */
     public Object requestGetWithStatusAccepted(String url, Class type) throws SDKException {
-        url = this.baseUrl + url;
+        url = this.baseUrl + "/" + url;
         return requestGetWithStatus(url, new Integer(HttpURLConnection.HTTP_ACCEPTED), type);
     }
 
@@ -413,7 +414,7 @@ public abstract class RestRequest {
                 throw new SDKException("Could not get token");
             }
             // call the api here
-            //log.debug("Executing put on: " + this.baseUrl + "/" + id);
+            log.debug("Executing put on: " + this.baseUrl + "/" + id);
             if (token != null)
                 jsonResponse = Unirest.put(this.baseUrl + "/" + id)
                     .header("accept", "application/json")
@@ -458,7 +459,7 @@ public abstract class RestRequest {
      */
     private void checkStatus(HttpResponse<JsonNode> jsonResponse, final int httpStatus) throws SDKException {
         if (jsonResponse.getStatus() != httpStatus) {
-            //log.debug("Status expected: " + httpStatus + " obtained: " + jsonResponse.getStatus());
+            log.debug("Status expected: " + httpStatus + " obtained: " + jsonResponse.getStatus());
             throw new SDKException("Received wrong API HTTPStatus");
         }
     }
@@ -482,7 +483,7 @@ public abstract class RestRequest {
         String responseString = null;
         responseString = EntityUtils.toString(response.getEntity());
         int statusCode = response.getStatusLine().getStatusCode();
-        //log.debug(statusCode + ": " + responseString);
+        log.trace(statusCode + ": " + responseString);
 
         if (statusCode != 200) {
             ParseComError error = new Gson().fromJson(responseString, ParseComError.class);
