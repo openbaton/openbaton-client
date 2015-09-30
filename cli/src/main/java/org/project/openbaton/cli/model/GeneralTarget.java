@@ -15,7 +15,7 @@ import static org.project.openbaton.cli.util.PrintFormat.printer;
 /**
  * Created by tce on 25.09.15.
  */
-public class GeneralDependency {
+public class GeneralTarget {
 
     public static String Print(List<Object> object) throws InvocationTargetException, IllegalAccessException {
         String result = "";
