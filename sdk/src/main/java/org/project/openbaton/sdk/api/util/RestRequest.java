@@ -110,9 +110,7 @@ public abstract class RestRequest {
             // catch request exceptions here
             e.printStackTrace();
             throw new SDKException("Could not http-post or open the object properly");
-        } catch (net.minidev.json.parser.ParseException e) {
-            e.printStackTrace();
-            throw new SDKException("Could not get token");
+
         } catch (SDKException e) {
             if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
@@ -186,9 +184,7 @@ public abstract class RestRequest {
             // catch request exceptions here
             e.printStackTrace();
             throw new SDKException("Could not http-post or open the object properly");
-        } catch (net.minidev.json.parser.ParseException e) {
-            e.printStackTrace();
-            throw new SDKException("Could not get token");
+
         } catch (SDKException e) {
             if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
@@ -198,7 +194,7 @@ public abstract class RestRequest {
         }
     }
 
-    private void checkToken() throws IOException, net.minidev.json.parser.ParseException {
+    private void checkToken() throws IOException {
         if (!(this.username == null || this.password == null))
             if (token == null && (!this.username.equals("") || !this.password.equals(""))) {
                 getAccessToken();
@@ -239,9 +235,7 @@ public abstract class RestRequest {
                 requestDelete(id);
             }
             throw new SDKException("Could not http-delete or the api response was wrong");
-        } catch (net.minidev.json.parser.ParseException e) {
-            e.printStackTrace();
-            throw new SDKException("Could not get token");
+
         } catch (IOException e) {
             e.printStackTrace();
             throw new SDKException("Could not get token");
@@ -277,9 +271,7 @@ public abstract class RestRequest {
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new SDKException("Could not get token");
-            } catch (net.minidev.json.parser.ParseException e) {
-                e.printStackTrace();
-                throw new SDKException("Could not get token");
+
             }
             log.debug("Executing get on: " + url);
 
@@ -339,9 +331,7 @@ public abstract class RestRequest {
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new SDKException("Could not get token");
-            } catch (net.minidev.json.parser.ParseException e) {
-                e.printStackTrace();
-                throw new SDKException("Could not get token");
+
             }
             log.debug("Executing get on: " +url);
 
@@ -409,7 +399,7 @@ public abstract class RestRequest {
             JsonNode fileJSONNode = getJsonNode(object);
             try {
                 checkToken();
-            } catch (net.minidev.json.parser.ParseException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 throw new SDKException("Could not get token");
             }

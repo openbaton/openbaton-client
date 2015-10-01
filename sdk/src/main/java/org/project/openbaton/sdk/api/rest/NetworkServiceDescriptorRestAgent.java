@@ -1,10 +1,10 @@
 package org.project.openbaton.sdk.api.rest;
 
-import org.project.openbaton.catalogue.mano.common.Security;
-import org.project.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
-import org.project.openbaton.catalogue.mano.descriptor.PhysicalNetworkFunctionDescriptor;
-import org.project.openbaton.catalogue.mano.descriptor.VNFDependency;
-import org.project.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
+import org.openbaton.catalogue.mano.common.Security;
+import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
+import org.openbaton.catalogue.mano.descriptor.PhysicalNetworkFunctionDescriptor;
+import org.openbaton.catalogue.mano.descriptor.VNFDependency;
+import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.project.openbaton.sdk.api.annotations.Help;
 import org.project.openbaton.sdk.api.exception.SDKException;
 import org.project.openbaton.sdk.api.util.AbstractRestAgent;

@@ -1,10 +1,9 @@
 package org.project.openbaton.sdk.api.rest;
 
-import org.project.openbaton.catalogue.mano.descriptor.VNFDependency;
-import org.project.openbaton.catalogue.mano.record.NetworkServiceRecord;
-import org.project.openbaton.catalogue.mano.record.PhysicalNetworkFunctionRecord;
-import org.project.openbaton.catalogue.mano.record.VNFRecordDependency;
-import org.project.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
+import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
+import org.openbaton.catalogue.mano.record.PhysicalNetworkFunctionRecord;
+import org.openbaton.catalogue.mano.record.VNFRecordDependency;
+import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 import org.project.openbaton.sdk.api.annotations.Help;
 import org.project.openbaton.sdk.api.exception.SDKException;
 import org.project.openbaton.sdk.api.util.AbstractRestAgent;
