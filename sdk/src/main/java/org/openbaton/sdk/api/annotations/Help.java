@@ -1,4 +1,4 @@
-package org.project.openbaton.sdk.api.annotations;
+package org.openbaton.sdk.api.annotations;
 
 import java.lang.annotation.*;
 

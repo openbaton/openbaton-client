@@ -1,7 +1,7 @@
-package org.project.openbaton.sdk.api.rest;
+package org.openbaton.sdk.api.rest;
 
 import org.openbaton.catalogue.mano.descriptor.VirtualLinkDescriptor;
-import org.project.openbaton.sdk.api.util.AbstractRestAgent;
+import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
  * OpenBaton VirtualLink -related api requester.

@@ -1,4 +1,4 @@
-package org.project.openbaton.sdk.api.util;
+package org.openbaton.sdk.api.util;
 
 
 import com.google.gson.*;
@@ -14,7 +14,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.project.openbaton.sdk.api.exception.SDKException;
+import org.openbaton.sdk.api.exception.SDKException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +68,9 @@ public abstract class RestRequest {
     }
 
     /**
-     *
-     * @param id: the id of the object
-     * @return the created object
+     * Does the POST Request
+     * @param id
+     * @return String
      * @throws SDKException
      */
     public String requestPost(final String id) throws SDKException {

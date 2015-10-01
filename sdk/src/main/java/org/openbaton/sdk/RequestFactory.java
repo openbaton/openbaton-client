@@ -1,8 +1,8 @@
-package org.project.openbaton.sdk;
+package org.openbaton.sdk;
 
-import org.project.openbaton.sdk.api.rest.*;
-import org.project.openbaton.sdk.api.util.AbstractRestAgent;
-import org.project.openbaton.sdk.api.util.PropertyReader;
+import org.openbaton.sdk.api.rest.*;
+import org.openbaton.sdk.api.util.PropertyReader;
+import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 public class RequestFactory {
 

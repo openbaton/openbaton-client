@@ -1,7 +1,7 @@
-package org.project.openbaton.sdk.api.util;
+package org.openbaton.sdk.api.util;
 
-import org.project.openbaton.sdk.api.annotations.Help;
-import org.project.openbaton.sdk.api.exception.SDKException;
+import org.openbaton.sdk.api.annotations.Help;
+import org.openbaton.sdk.api.exception.SDKException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

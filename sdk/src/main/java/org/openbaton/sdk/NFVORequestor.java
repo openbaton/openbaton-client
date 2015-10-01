@@ -1,9 +1,9 @@
-package org.project.openbaton.sdk;
+package org.openbaton.sdk;
 
 
 
-import org.project.openbaton.sdk.api.util.AbstractRestAgent;
-import org.project.openbaton.sdk.api.rest.*;
+import org.openbaton.sdk.api.rest.*;
+import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
  * OpenBaton api requestor. Can be extended with security features to provide instances only only to granted requestors.
@@ -20,9 +20,9 @@ public final class NFVORequestor {
 
 	/**
 	 * The public constructor taking as params
-	 * @param username: the NFVO username
-	 * @param password: the NFVO password
-	 * @param version: the NFVO api url
+	 * @param username
+	 * @param password
+	 * @param version
 	 */
 	public NFVORequestor(String username, String password, String version) {
 		this.factory = RequestFactory.getInstance(username,password, "localhost", "8080", version);

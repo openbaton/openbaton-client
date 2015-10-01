@@ -1,12 +1,15 @@
 package org.project.openbaton.cli.model;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.project.openbaton.cli.util.PrintFormat;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+
+import static org.project.openbaton.cli.util.PrintFormat.addRow;
+import static org.project.openbaton.cli.util.PrintFormat.buildLine;
+import static org.project.openbaton.cli.util.PrintFormat.printer;
 
 
 /**
@@ -51,34 +54,34 @@ public class GeneralTarget {
                 }
 
                 if (methods[z].getName().equalsIgnoreCase("getTarget")) {
-                        row1[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
-                    }
+                    row1[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
+                }
 
             }
             rowcount++;
         }
 
 
-        PrintFormat.addRow("\n");
+        addRow("\n");
 
 
-        firstline = PrintFormat.buildLine(rowproperty);
-        secondline = PrintFormat.buildLine(rowvalue);
-        line1 = PrintFormat.buildLine(row1);
+        firstline = buildLine(rowproperty);
+        secondline = buildLine(rowvalue);
+        line1 = buildLine(row1);
 
-        PrintFormat.addRow(firstline, secondline, line1, "+");
+        addRow(firstline, secondline, line1, "+");
 
         for (int c = 0; c < rowcount; c++) {
-            PrintFormat.addRow(rowproperty[c], rowvalue[c], row1[c], "|");
+            addRow(rowproperty[c], rowvalue[c], row1[c], "|");
             if (c == 0) {
-                PrintFormat.addRow(firstline, secondline, line1, "+");
+                addRow(firstline, secondline, line1, "+");
             }
         }
 
-        PrintFormat.addRow(firstline, secondline, line1, "+");
+        addRow(firstline, secondline, line1, "+");
 
 
-        result = PrintFormat.printer();
+        result = printer();
 
 
         return result;

@@ -1,4 +1,4 @@
-package org.project.openbaton.sdk.api.exception;
+package org.openbaton.sdk.api.exception;
 
 import java.lang.Exception;
 import java.lang.Throwable;
@@ -16,9 +16,7 @@ public class SDKException extends Exception {
 
     /**
      * Creates an sdk exeption with an exception message as string
-     *
-     * @param message:
-     *               the exceptions custom message
+     * @param message custom message
      */
     public SDKException (String message) {
         super(message);
@@ -26,9 +24,7 @@ public class SDKException extends Exception {
 
     /**
      * Creates an sdk exeption with a throwable cause
-     *
-     * @param cause:
-     *               the throwable cause
+     * @param cause the throwable cause
      */
     public SDKException (Throwable cause) {
         super(cause);
@@ -36,12 +32,8 @@ public class SDKException extends Exception {
 
     /**
      * Creates an sdk exeption with a message as string and a throwable cause
-     *
-     * @param message:
-     *               the exceptions custom message
-     *
-     * @param cause:
-     *               the throwable cause
+     * @param message custom message
+     * @param cause the throwable cause
      */
     public SDKException (String message, Throwable cause) {
         super(message, cause);

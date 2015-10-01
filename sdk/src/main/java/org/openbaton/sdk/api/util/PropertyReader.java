@@ -1,4 +1,4 @@
-package org.project.openbaton.sdk.api.util;
+package org.openbaton.sdk.api.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +23,7 @@ public class PropertyReader {
     /**
      *
      * @param propertiesPath
-     * @return
+     * @return Properties
      */
     private Properties readProperties(final String propertiesPath) {
         Properties properties = null;

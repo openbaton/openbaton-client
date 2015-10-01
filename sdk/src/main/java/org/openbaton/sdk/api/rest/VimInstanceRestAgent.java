@@ -1,7 +1,7 @@
-package org.project.openbaton.sdk.api.rest;
+package org.openbaton.sdk.api.rest;
 
 import org.openbaton.catalogue.nfvo.VimInstance;
-import org.project.openbaton.sdk.api.util.AbstractRestAgent;
+import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
  * OpenBaton viminstance(datacenter)-related api requester.
