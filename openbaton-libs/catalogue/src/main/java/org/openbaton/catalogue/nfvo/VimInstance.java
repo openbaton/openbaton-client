@@ -20,6 +20,7 @@ import org.openbaton.catalogue.util.IdGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -190,4 +191,6 @@ public class VimInstance implements Serializable {
     public void setNetworks(Set<Network> networks) {
         this.networks = networks;
     }
+
+
 }

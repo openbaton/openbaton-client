@@ -103,12 +103,4 @@ public class VNFRecordDependency implements Serializable {
     public void setTarget(String target) {
         this.target = target;
     }
-
-//    public Status getStatus() {
-//        return status;
-//    }
-//
-//    public void setStatus(Status status) {
-//        this.status = status;
-//    }
 }
