@@ -1,11 +1,16 @@
+apply plugin: 'java'
+repositories {
+    mavenCentral()
+    maven {
+        url "http://193.175.132.176:8081/nexus/content/groups/public"
+    }
+}
 dependencies {
-    compile project(':catalogue')
-
+    compile 'org.openbaton:catalogue:0.6'
     compile 'org.slf4j:slf4j-api:1.7.12'
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.mashape.unirest:unirest-java:1.4.5'
 
-    compile 'org.slf4j:slf4j-simple:1.7.12'
     compile 'net.minidev:json-smart:2.2'
 
     testCompile 'com.google.code.gson:gson:2.3.1'

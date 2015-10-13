@@ -19,7 +19,3 @@ rootProject.name = 'openbaton-client'
 
 include 'cli'
 include 'sdk'
-include 'catalogue'
-
-
-project(':catalogue').projectDir = file('openbaton-libs/catalogue')

@@ -3,6 +3,7 @@ package org.openbaton.sdk.test;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.openbaton.catalogue.mano.common.DeploymentFlavour;
@@ -40,7 +41,9 @@ public class SdkTest {
     private VimInstance vimInstance;
     private VimInstance res;
     private final static String descriptorFileName = "../../descriptors/network_service_descriptors/NetworkServiceDescriptor-with-dependencies.json";
+
     @Test
+    @Ignore
     public void createTest() throws SDKException, FileNotFoundException {
 
         NFVORequestor requestor = new NFVORequestor("1");

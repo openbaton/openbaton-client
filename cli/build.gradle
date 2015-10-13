@@ -1,3 +1,9 @@
+repositories {
+    mavenCentral()
+    maven {
+        url "http://193.175.132.176:8081/nexus/content/groups/public"
+    }
+}
 dependencies {
     compile project(":sdk")
     compile 'org.apache.commons:commons-lang3:3.0'
