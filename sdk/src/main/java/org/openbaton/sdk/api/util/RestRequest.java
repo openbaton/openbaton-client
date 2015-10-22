@@ -194,7 +194,7 @@ public abstract class RestRequest {
         }
     }
 
-    private void checkToken() throws IOException {
+    private void checkToken() throws IOException, SDKException {
         if (!(this.username == null || this.password == null))
             if (token == null && (!this.username.equals("") || !this.password.equals(""))) {
                 getAccessToken();
@@ -271,7 +271,6 @@ public abstract class RestRequest {
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new SDKException("Could not get token");
-
             }
             log.debug("Executing get on: " + url);
 
@@ -302,12 +301,17 @@ public abstract class RestRequest {
             // catch request exceptions here
             throw new SDKException("Could not http-get properly");
         } catch (SDKException e) {
-            if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
-                token = null;
-                return requestGetAll(url, type, httpStatus);
-            } else {
+            if (jsonResponse != null) {
+                if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
+                    token = null;
+                    return requestGetAll(url, type, httpStatus);
+                } else {
+                    e.printStackTrace();
+                    throw new SDKException("Could not authorize");
+                }
+            }else {
                 e.printStackTrace();
-                throw new SDKException("Could not authorize");
+                throw e;
             }
         }
     }
@@ -454,7 +458,7 @@ public abstract class RestRequest {
         }
     }
 
-    private void getAccessToken() throws IOException {
+    private void getAccessToken() throws IOException, SDKException {
         HttpClient httpClient = HttpClientBuilder.create().build();
 
         HttpPost httpPost = new HttpPost(provider);
@@ -465,9 +469,13 @@ public abstract class RestRequest {
         parametersBody.add(new BasicNameValuePair("username", this.username));
         parametersBody.add(new BasicNameValuePair("password", this.password));
 
+        log.debug("Username is: " + username);
+        log.debug("Password is: " + password);
+
         httpPost.setEntity(new UrlEncodedFormEntity(parametersBody, StandardCharsets.UTF_8));
 
         org.apache.http.HttpResponse response = null;
+        log.debug("httpPost is: " + httpPost.toString());
         response = httpClient.execute(httpPost);
 
         String responseString = null;
@@ -478,12 +486,21 @@ public abstract class RestRequest {
         if (statusCode != 200) {
             ParseComError error = new Gson().fromJson(responseString, ParseComError.class);
             log.error("Status Code [" + statusCode + "]: Error signing-in [" + error.error + "] - " + error.error_description);
+            throw new SDKException("Status Code [" + statusCode + "]: Error signing-in [" + error.error + "] - " + error.error_description);
         }
         JsonObject jobj = new Gson().fromJson(responseString, JsonObject.class);
-        String token = jobj.get("access_token").toString();
-        log.trace(token);
-        bearerToken = "Bearer " + token;
-        this.token = token;
+        log.trace("JsonTokeAccess is: " + jobj.toString());
+        try {
+            String token = jobj.get("access_token").getAsString();
+            log.trace(token);
+            bearerToken = "Bearer " + token;
+            this.token = token;
+        }catch (NullPointerException e){
+            String error = jobj.get("error").getAsString();
+            if (error.equals("invalid_grant")){
+                throw new SDKException("Error during authentication: " + jobj.get("error_description").getAsString());
+            }
+        }
 
     }
 

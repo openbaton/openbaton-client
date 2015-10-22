@@ -15,13 +15,11 @@ import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.PhysicalNetworkFunctionRecord;
 import org.openbaton.catalogue.mano.record.VNFRecordDependency;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
-import org.openbaton.catalogue.nfvo.NFVImage;
-import org.openbaton.catalogue.nfvo.Network;
-import org.openbaton.catalogue.nfvo.Subnet;
-import org.openbaton.catalogue.nfvo.VimInstance;
+import org.openbaton.catalogue.nfvo.*;
 
 import org.openbaton.sdk.api.exception.SDKException;
 import org.openbaton.sdk.NFVORequestor;
+import org.openbaton.sdk.api.rest.EventAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +57,16 @@ public class SdkTest {
         log.debug("Sending: " + networkServiceDescriptor);
         NetworkServiceDescriptor res2 = requestor.getNetworkServiceDescriptorAgent().create(networkServiceDescriptor);
         log.debug("DESCRIPTOR: "+res2);
-        
+
+
+        EventAgent eventAgent = requestor.getEventAgent();
+        EventEndpoint eventEndpoint = new EventEndpoint();
+        eventEndpoint.setType(EndpointType.REST);
+        eventEndpoint.setEndpoint("http://localhost:8082/callme");
+        eventEndpoint.setEvent(Action.INSTANTIATE_FINISH);
+        eventEndpoint.setNetworkServiceId("idhere");
+        EventEndpoint endpoint = eventAgent.create(eventEndpoint);
+        eventAgent.delete(endpoint.getName());
         
 //SECURITY//
         

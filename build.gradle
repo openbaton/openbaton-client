@@ -25,7 +25,22 @@ plugins {
     id 'net.researchgate.release' version '2.1.2'
 }
 
-apply from: 'openbaton-libs/gradle/gradle/git.release.gradle'
+release {
+    failOnCommitNeeded = true
+    failOnPublishNeeded = true
+    failOnSnapshotDependencies = true
+    failOnUnversionedFiles = true
+    failOnUpdateNeeded = true
+    revertOnFail = true
+    preCommitText = ''
+    preTagCommitMessage = 'Pre-tag commit: '
+    tagCommitMessage = 'Creating tag: '
+    newVersionCommitMessage = 'New version commit: '
+    tagTemplate = '${version}'
+    versionPropertyFile = 'gradle.properties'
+    versionProperties = []
+}
+
 
 apply plugin: 'java'
 apply plugin: 'idea'
@@ -48,8 +63,45 @@ project.ext {
 
     //------------------------------------------------//
 }
+subprojects {
 
-apply from: 'openbaton-libs/gradle/gradle/application.java.gradle'
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+    group = 'org.openbaton'
+
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+
+    repositories {
+        mavenCentral()
+    }
+
+    sourceSets {
+        main {
+            java      { srcDir 'src/main/java'}
+            resources { srcDir 'src/main/resources'}
+        }
+
+        test {
+            java      { srcDir 'src/test/java'}
+            resources { srcDir 'src/test/resources'}
+        }
+
+        integration {
+            java      { srcDir 'src/test/integration/java' }
+            resources { srcDir 'src/test/resources'}
+            compileClasspath += sourceSets.test.compileClasspath
+            runtimeClasspath += sourceSets.test.runtimeClasspath
+            output.classesDir = sourceSets.test.output.classesDir
+        }
+
+    }
+
+    dependencies {
+        integrationCompile sourceSets.test.output
+    }
+}
 
 repositories {
     mavenCentral()
@@ -59,11 +111,15 @@ repositories {
 }
 
 dependencies {
-    compile 'ch.qos.logback:logback-classic:1.1.3'
+    compile 'org.slf4j:slf4j-simple:1.7.12'
 }
 
 project(':sdk') {
     apply plugin: 'com.bmuschko.nexus'
+
+//    dependencies {
+//        compile 'org.slf4j:slf4j-simple:1.7.12'
+//    }
 
     modifyPom {
         project {
@@ -108,7 +164,7 @@ project(':sdk') {
 
     nexus {
         sign = false
-        repositoryUrl = 'http://193.175.132.176:8081/nexus/content/repositories/thirdparty/'
-        snapshotRepositoryUrl = 'http://193.175.132.176:8081/nexus/content/repositories/snapshots/'
+        repositoryUrl = 'http://get.openbaton.org:8081/nexus/content/repositories/thirdparty/'
+        snapshotRepositoryUrl = 'http://get.openbaton.org:8081/nexus/content/repositories/snapshots/'
     }
 }
