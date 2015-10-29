@@ -164,18 +164,20 @@ public abstract class RestRequest {
             String result2 = jsonResponse.getBody().toString();
             log.trace("received2: " + result2);
 
+            if (jsonResponse.getStatus() != HttpURLConnection.HTTP_NO_CONTENT) {
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                JsonParser jp = new JsonParser();
+                JsonElement je = jp.parse(jsonResponse.getBody().toString());
+                String result = gson.toJson(je);
+                log.trace("received: " + result);
 
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            JsonParser jp = new JsonParser();
-            JsonElement je = jp.parse(jsonResponse.getBody().toString());
-            String result = gson.toJson(je);
-            log.trace("received: " + result);
 
-
-            log.trace("Casting it into: " + object.getClass());
+                log.trace("Casting it into: " + object.getClass());
 //            return mapper.readValue(jsonResponse.getBody().toString(), object.getClass());
 
-            return mapper.fromJson(result, object.getClass());
+                return mapper.fromJson(result, object.getClass());
+            }
+            return null;
         } catch (IOException e) {
             // catch request exceptions here
             e.printStackTrace();

@@ -1,5 +1,6 @@
 package org.openbaton.sdk.api.rest;
 
+import org.openbaton.catalogue.mano.descriptor.VNFComponent;
 import org.openbaton.catalogue.mano.descriptor.VNFDependency;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
 import org.openbaton.catalogue.mano.record.PhysicalNetworkFunctionRecord;
@@ -66,6 +67,30 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
     public VirtualNetworkFunctionRecord createVNFR(final String idNSR, final VirtualNetworkFunctionRecord virtualNetworkFunctionRecord) throws SDKException {
         String url = idNSR + "/vnfrecords";
         return (VirtualNetworkFunctionRecord) requestPost(url, virtualNetworkFunctionRecord);
+    }
+
+    @Help(help = "create VNFCInstance. Aka SCALE IN")
+    public void createVNFCInstance(final String idNSR, final String idVNF, final VNFComponent component) throws SDKException {
+        String url = idNSR + "/vnfrecords/" + idVNF + "/vdunits/vnfcinstances";
+        requestPost(url, component);
+    }
+
+    @Help(help = "create VNFCInstance. Aka SCALE IN")
+    public void createVNFCInstance(final String idNSR, final String idVNF, final String idVDU, final VNFComponent component) throws SDKException {
+        String url = idNSR + "/vnfrecords/" + idVNF + "/vdunits/" + idVDU + "/vnfcinstances";
+        requestPost(url, component);
+    }
+
+    @Help(help = "remove VNFCInstance. Aka SCALE OUT")
+    public void deleteVNFCInstance(final String idNSR, final String idVNF) throws SDKException {
+        String url = idNSR + "/vnfrecords/" + idVNF + "/vdunits/vnfcinstances";
+        requestDelete(url);
+    }
+
+    @Help(help = "create VNFCInstance. Aka SCALE OUT")
+    public void deleteVNFCInstance(final String idNSR, final String idVNF, final String idVDU) throws SDKException {
+        String url = idNSR + "/vnfrecords/" + idVNF + "/vdunits/" + idVDU + "/vnfcinstances";
+        requestDelete(url);
     }
 
     /**
