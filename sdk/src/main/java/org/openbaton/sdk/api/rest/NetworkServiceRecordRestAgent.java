@@ -69,27 +69,33 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
         return (VirtualNetworkFunctionRecord) requestPost(url, virtualNetworkFunctionRecord);
     }
 
-    @Help(help = "create VNFCInstance. Aka SCALE IN")
+    @Help(help = "create VNFCInstance. Aka SCALE OUT")
     public void createVNFCInstance(final String idNSR, final String idVNF, final VNFComponent component) throws SDKException {
         String url = idNSR + "/vnfrecords/" + idVNF + "/vdunits/vnfcinstances";
         requestPost(url, component);
     }
 
-    @Help(help = "create VNFCInstance. Aka SCALE IN")
+    @Help(help = "create VNFCInstance. Aka SCALE OUT")
     public void createVNFCInstance(final String idNSR, final String idVNF, final String idVDU, final VNFComponent component) throws SDKException {
         String url = idNSR + "/vnfrecords/" + idVNF + "/vdunits/" + idVDU + "/vnfcinstances";
         requestPost(url, component);
     }
 
-    @Help(help = "remove VNFCInstance. Aka SCALE OUT")
+    @Help(help = "remove VNFCInstance. Aka SCALE IN")
     public void deleteVNFCInstance(final String idNSR, final String idVNF) throws SDKException {
         String url = idNSR + "/vnfrecords/" + idVNF + "/vdunits/vnfcinstances";
         requestDelete(url);
     }
 
-    @Help(help = "create VNFCInstance. Aka SCALE OUT")
+    @Help(help = "remove VNFCInstance. Aka SCALE IN")
     public void deleteVNFCInstance(final String idNSR, final String idVNF, final String idVDU) throws SDKException {
         String url = idNSR + "/vnfrecords/" + idVNF + "/vdunits/" + idVDU + "/vnfcinstances";
+        requestDelete(url);
+    }
+
+    @Help(help = "remove VNFCInstance. Aka SCALE IN")
+    public void deleteVNFCInstance(final String idNSR, final String idVNF, final String idVDU, final String idVNFCInstance) throws SDKException {
+        String url = idNSR + "/vnfrecords/" + idVNF + "/vdunits/" + idVDU + "/vnfcinstances/" + idVNFCInstance;
         requestDelete(url);
     }
 
