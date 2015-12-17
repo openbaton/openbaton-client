@@ -235,6 +235,7 @@ public abstract class RestRequest {
             if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
                 requestDelete(id);
+                return;
             }
             throw new SDKException("Could not http-delete or the api response was wrong");
 
