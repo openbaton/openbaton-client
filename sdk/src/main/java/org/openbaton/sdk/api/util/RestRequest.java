@@ -58,11 +58,11 @@ public abstract class RestRequest {
         this.password = password;
 
         GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
+        /*builder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
             public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
                 return new Date(json.getAsJsonPrimitive().getAsLong());
             }
-        });
+        });*/
         this.mapper = builder.create();
 
     }
