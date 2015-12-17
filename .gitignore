@@ -1,5 +1,9 @@
 *.class
+
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
+!plugins/*
+
 *.zip
 *.java.hsp
 *.sonarj
@@ -22,6 +26,10 @@ argfile*
 pom.xml
 activemq-data/
 .gradle/
+gradle/gradle/wrapper/
+gradle/osx
+gradle/gradlew
+gradle/gradlew.bat
 
 */build/*
 build/*
