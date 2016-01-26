@@ -494,7 +494,7 @@ public abstract class RestRequest {
         JsonObject jobj = new Gson().fromJson(responseString, JsonObject.class);
         log.trace("JsonTokeAccess is: " + jobj.toString());
         try {
-            String token = jobj.get("access_token").getAsString();
+            String token = jobj.get("value").getAsString();
             log.trace(token);
             bearerToken = "Bearer " + token;
             this.token = token;
