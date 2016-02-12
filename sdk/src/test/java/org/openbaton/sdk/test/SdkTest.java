@@ -241,7 +241,7 @@ public class SdkTest {
         VimInstance instance = new VimInstance();
         instance.setId(null);
         instance.setName(vimInstance.getName());
-        vdu.setVimInstance(instance);
+        //vdu.setVimInstance(instance);
 
         vdu.setVm_image(new HashSet<String>() {{
             add("image_name_1");

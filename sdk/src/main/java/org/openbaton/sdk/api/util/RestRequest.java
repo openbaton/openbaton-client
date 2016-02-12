@@ -34,7 +34,7 @@ import java.util.List;
  * OpenBaton api request request abstraction for all requester. Shares common data and methods.
  */
 public abstract class RestRequest {
-    private Logger log = LoggerFactory.getLogger("cli");
+    private Logger log = LoggerFactory.getLogger(this.getClass());
     protected final String baseUrl;
 
 //	protected final String url;
@@ -104,12 +104,12 @@ public abstract class RestRequest {
             return result;
         } catch (IOException e) {
             // catch request exceptions here
-            e.printStackTrace();
-            throw new SDKException("Could not http-post or open the object properly");
+            log.error(e.getMessage(), e);
+            throw new SDKException("Could not http-post or open the object properly", e);
         } catch (UnirestException e) {
             // catch request exceptions here
-            e.printStackTrace();
-            throw new SDKException("Could not http-post or open the object properly");
+            log.error(e.getMessage(), e);
+            throw new SDKException("Could not http-post or open the object properly", e);
 
         } catch (SDKException e) {
             if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
@@ -180,19 +180,18 @@ public abstract class RestRequest {
             return null;
         } catch (IOException e) {
             // catch request exceptions here
-            e.printStackTrace();
-            throw new SDKException("Could not http-post or open the object properly");
+            log.error(e.getMessage(), e);
+            throw new SDKException("Could not http-post or open the object properly", e);
         } catch (UnirestException e) {
             // catch request exceptions here
-            e.printStackTrace();
-            throw new SDKException("Could not http-post or open the object properly");
-
+            log.error(e.getMessage(), e);
+            throw new SDKException("Could not http-post or open the object properly", e);
         } catch (SDKException e) {
             if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
                 return requestPost(object);
             } else
-                throw new SDKException("Status is " + jsonResponse.getStatus());
+                throw new SDKException("Status is " + jsonResponse.getStatus(), e);
         }
     }
 
@@ -229,7 +228,7 @@ public abstract class RestRequest {
 
         } catch (UnirestException e) {
             // catch request exceptions here
-            throw new SDKException("Could not http-delete or the api response was wrong");
+            throw new SDKException("Could not http-delete or the api response was wrong", e);
         } catch (SDKException e) {
             // catch request exceptions here
             if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
@@ -237,11 +236,11 @@ public abstract class RestRequest {
                 requestDelete(id);
                 return;
             }
-            throw new SDKException("Could not http-delete or the api response was wrong");
+            throw new SDKException("Could not http-delete or the api response was wrong", e);
 
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new SDKException("Could not get token");
+            log.error(e.getMessage(), e);
+            throw new SDKException("Could not get token", e);
         }
     }
     
@@ -272,8 +271,8 @@ public abstract class RestRequest {
             try {
                 checkToken();
             } catch (IOException e) {
-                e.printStackTrace();
-                throw new SDKException("Could not get token");
+                log.error(e.getMessage(), e);
+                throw new SDKException("Could not get token", e);
             }
             log.debug("Executing get on: " + url);
 
@@ -287,6 +286,8 @@ public abstract class RestRequest {
             // check response status
             if (httpStatus != null) {
                 checkStatus(jsonResponse, httpStatus);
+            } else {
+                checkStatus(jsonResponse, HttpURLConnection.HTTP_OK);
             }
             // return the response of the request
             log.trace("result is: " + jsonResponse.getBody().toString());
@@ -302,18 +303,18 @@ public abstract class RestRequest {
 
         } catch (UnirestException e) {
             // catch request exceptions here
-            throw new SDKException("Could not http-get properly");
+            throw new SDKException("Could not http-get properly", e);
         } catch (SDKException e) {
             if (jsonResponse != null) {
                 if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
                     token = null;
                     return requestGetAll(url, type, httpStatus);
                 } else {
-                    e.printStackTrace();
-                    throw new SDKException("Could not authorize");
+                    log.error(e.getMessage(), e);
+                    throw new SDKException("Could not authorize", e);
                 }
             }else {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
                 throw e;
             }
         }
@@ -336,8 +337,8 @@ public abstract class RestRequest {
             try {
                 checkToken();
             } catch (IOException e) {
-                e.printStackTrace();
-                throw new SDKException("Could not get token");
+                log.error(e.getMessage(), e);
+                throw new SDKException("Could not get token", e);
 
             }
             log.debug("Executing get on: " +url);
@@ -352,6 +353,8 @@ public abstract class RestRequest {
             // check response status
             if (httpStatus != null) {
                 checkStatus(jsonResponse, httpStatus);
+            } else {
+                checkStatus(jsonResponse, HttpURLConnection.HTTP_OK);
             }
             // return the response of the request
             log.trace("result is: " + jsonResponse.getBody().toString());
@@ -369,14 +372,14 @@ public abstract class RestRequest {
 
         } catch (UnirestException e) {
             // catch request exceptions here
-            throw new SDKException("Could not http-get properly");
+            throw new SDKException("Could not http-get properly", e);
         } catch (SDKException e) {
             if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
                 return requestGetWithStatus(url, httpStatus, type);
             } else {
-                e.printStackTrace();
-                throw new SDKException("Could not authorize");
+                log.error(e.getMessage(), e);
+                throw new SDKException("Could not authorize", e);
             }
         }
     }
@@ -407,8 +410,8 @@ public abstract class RestRequest {
             try {
                 checkToken();
             } catch (IOException e) {
-                e.printStackTrace();
-                throw new SDKException("Could not get token");
+                log.error(e.getMessage(), e);
+                throw new SDKException("Could not get token", e);
             }
             // call the api here
             log.debug("Executing put on: " + this.baseUrl + "/" + id);
@@ -434,17 +437,17 @@ public abstract class RestRequest {
 
         } catch (IOException e) {
             // catch request exceptions here
-            throw new SDKException("Could not http-put or the api response was wrong or open the object properly");
+            throw new SDKException("Could not http-put or the api response was wrong or open the object properly", e);
         } catch (UnirestException e) {
             // catch request exceptions here
-            throw new SDKException("Could not http-put or the api response was wrong or open the object properly");
+            throw new SDKException("Could not http-put or the api response was wrong or open the object properly", e);
         } catch (SDKException e) {
             // catch request exceptions here
             if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
                 return requestPut(id, object);
             }
-            throw new SDKException("Could not http-put or the api response was wrong or open the object properly");
+            throw new SDKException("Could not http-put or the api response was wrong or open the object properly", e);
         }
     }
 
@@ -494,14 +497,14 @@ public abstract class RestRequest {
         JsonObject jobj = new Gson().fromJson(responseString, JsonObject.class);
         log.trace("JsonTokeAccess is: " + jobj.toString());
         try {
-            String token = jobj.get("access_token").getAsString();
+            String token = jobj.get("value").getAsString();
             log.trace(token);
             bearerToken = "Bearer " + token;
             this.token = token;
         }catch (NullPointerException e){
             String error = jobj.get("error").getAsString();
             if (error.equals("invalid_grant")){
-                throw new SDKException("Error during authentication: " + jobj.get("error_description").getAsString());
+                throw new SDKException("Error during authentication: " + jobj.get("error_description").getAsString(), e);
             }
         }
 
