@@ -48,7 +48,7 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
     @Help(help = "Get the VirtualNetworkFunctionRecord of NetworkServiceRecord with specific id")
     public VirtualNetworkFunctionRecord getVirtualNetworkFunctionRecord(final String id, final String id_vnf) throws SDKException {
         String url = id + "/vnfrecords" + "/" + id_vnf;
-        return (VirtualNetworkFunctionRecord) requestGetAll(url, VirtualNetworkFunctionRecord.class);
+        return (VirtualNetworkFunctionRecord) requestGet(url, VirtualNetworkFunctionRecord.class);
     }
 
     /**
