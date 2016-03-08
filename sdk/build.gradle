@@ -4,6 +4,7 @@ repositories {
     maven {
         url "http://get.openbaton.org:8081/nexus/content/groups/public"
     }
+    //maven {url "http://mvnrepository.com/artifact/org.apache.httpcomponents"}
 }
 dependencies {
     compile 'org.openbaton:catalogue:1.1.0-SNAPSHOT'
@@ -13,7 +14,7 @@ dependencies {
     compile 'com.mashape.unirest:unirest-java:1.4.5'
 
     compile 'net.minidev:json-smart:2.2'
-
+    compile 'org.apache.httpcomponents:httpclient:4.5.2'
     testCompile 'com.google.code.gson:gson:2.3.1'
     testCompile "junit:junit:4.12"
 
