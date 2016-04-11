@@ -1,4 +1,5 @@
 package org.openbaton.sdk.api.rest;
+import com.google.gson.JsonObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -46,7 +47,7 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
     @Help(help = "Retrieve all the packages as a list of VNFPackage objects")
     public List<VNFPackage> findAll() {
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpGet get = new HttpGet("http://localhost:8080/api/v1/vnf-packages");
+        HttpGet get = new HttpGet(baseUrl);
         CloseableHttpResponse response = null;
         try {
             response = client.execute(get);
@@ -59,7 +60,7 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        System.out.println(respS);
         JSONArray array = new JSONArray(respS);
         try {
             listScripts(respS);
@@ -96,7 +97,7 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
                 newPackage.setScriptsLink(elem.getString("scriptsLink"));
             }
             catch (Exception e) {
-                newPackage.setImageLink(null);
+                newPackage.setScriptsLink(null);
             }
             packages.add(newPackage);
 
@@ -189,6 +190,59 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
         }
         return scriptsList;
     }
+    public VNFPackage findPackage(String id) {
+        VNFPackage newPackage = new VNFPackage();
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGet get = new HttpGet("http://localhost:8080/api/v1/vnf-packages/" + id);
+        CloseableHttpResponse response = null;
+        try {
+            response = client.execute(get);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String respS = null;
+        try {
+            respS = EntityUtils.toString(response.getEntity());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(respS.toString());
+        JSONObject elem = new JSONObject(respS);
+     
+        newPackage.setId(elem.getString("id"));
+        try {
+            newPackage.setImageLink(elem.getString("imageLink"));
+        }
+        catch (Exception e) {
+            newPackage.setImageLink(null);
+            e.printStackTrace();
+        }
+        newPackage.setName(elem.getString("name"));
+        newPackage.setVersion(elem.getInt("version"));
+        NFVImage newImage = new NFVImage();
+        newImage.setId(elem.getJSONObject("image").getString("id"));
+        newImage.setVersion(elem.getJSONObject("image").getInt("version"));
+        newImage.setMinRam(elem.getJSONObject("image").getInt("minRam"));
+        newImage.setMinDiskSpace(elem.getJSONObject("image").getInt("minDiskSpace"));
+        newImage.setIsPublic(elem.getJSONObject("image").getBoolean("isPublic"));
+        newPackage.setImage(newImage);
+        try {
+            newPackage.setScripts(listScripts(respS));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            newPackage.setScriptsLink(elem.getString("scriptsLink"));
+        }
+        catch (Exception e) {
+            newPackage.setScriptsLink(null);
+        }
+
+
+        return newPackage;
+
+    }
+
 
 }
 
