@@ -63,8 +63,6 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
         //System.out.println(respS);
         JSONArray array = new JSONArray(respS);
 
-
-
         List<VNFPackage> packages = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
             VNFPackage newPackage = new VNFPackage();
@@ -194,7 +192,7 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
      * @param id : the id of the package to be retrieved
      *
      */
-    public VNFPackage findPackage(String id) {
+    public VNFPackage find(String id) {
         VNFPackage newPackage = new VNFPackage();
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(baseUrl + "/" + id);
@@ -250,7 +248,7 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
         return newPackage;
 
     }
-    
+
 
 
 }
