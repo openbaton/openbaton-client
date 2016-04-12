@@ -60,13 +60,10 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(respS);
+        //System.out.println(respS);
         JSONArray array = new JSONArray(respS);
-        try {
-            listScripts(respS);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+
 
         List<VNFPackage> packages = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
@@ -89,7 +86,7 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
             newImage.setIsPublic(elem.getJSONObject("image").getBoolean("isPublic"));
             newPackage.setImage(newImage);
             try {
-                newPackage.setScripts(listScripts(respS));
+                newPackage.setScripts(listScripts(elem));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -170,13 +167,13 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
         }
         return b;
     }
-    private static Set<Script> listScripts(String respS) throws Exception {
+    private static Set<Script> listScripts(JSONObject obj) throws Exception {
         Set<Script> scriptsList = new HashSet<>();
-        JSONArray array = new JSONArray(respS);
+        //JSONArray array = new JSONArray(respS);
 
         //System.out.println("Starting conversion");
-        for (int i = 0; i < array.length(); i++) {
-            JSONObject obj = array.getJSONObject(i);
+        //for (int i = 0; i < array.length(); i++) {
+
             JSONArray scripts = obj.getJSONArray("scripts");
             for (int j = 0; j < scripts.length(); j++) {
                 Script elem = new Script();
@@ -187,13 +184,20 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
                 elem.setPayload(scripttoString(payload));
                 scriptsList.add(elem);
             }
-        }
+        //}
         return scriptsList;
     }
+
+    /**
+     * Retrieves the package with a specific id
+     *
+     * @param id : the id of the package to be retrieved
+     *
+     */
     public VNFPackage findPackage(String id) {
         VNFPackage newPackage = new VNFPackage();
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpGet get = new HttpGet("http://localhost:8080/api/v1/vnf-packages/" + id);
+        HttpGet get = new HttpGet(baseUrl + "/" + id);
         CloseableHttpResponse response = null;
         try {
             response = client.execute(get);
@@ -206,9 +210,13 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(respS.toString());
-        JSONObject elem = new JSONObject(respS);
-     
+        JSONObject elem = null;
+        try {
+            elem = new JSONObject(respS);
+        } catch(org.json.JSONException e) {
+            return null;
+        }
+        //System.out.println(respS);
         newPackage.setId(elem.getString("id"));
         try {
             newPackage.setImageLink(elem.getString("imageLink"));
@@ -227,7 +235,7 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
         newImage.setIsPublic(elem.getJSONObject("image").getBoolean("isPublic"));
         newPackage.setImage(newImage);
         try {
-            newPackage.setScripts(listScripts(respS));
+            newPackage.setScripts(listScripts(elem));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -242,6 +250,7 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
         return newPackage;
 
     }
+    
 
 
 }
