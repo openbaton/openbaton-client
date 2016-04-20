@@ -1,5 +1,6 @@
 package org.openbaton.sdk;
 
+import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.sdk.api.rest.*;
 import org.openbaton.sdk.api.util.PropertyReader;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
@@ -16,6 +17,7 @@ public class RequestFactory {
     private static NetworkServiceRecordRestAgent networkServiceRecordRequest = null;
     private static VimInstanceRestAgent vimInstanceRequest = null;
     private static VirtualLinkRestAgent virtualLinkRequest = null;
+    private static VirtualNetworkFunctionDescriptorRestAgent virtualNetworkFunctionDescriptorRequest = null;
     private static VNFFGRestAgent vNFFGRequest = null;
     private static EventAgent eventAgent = null;
     private static String username;
@@ -79,6 +81,13 @@ public class RequestFactory {
             virtualLinkRequest = new VirtualLinkRestAgent(username, password, nfvoIp, nfvoPort, propertyReader.getRestVirtualLinkUrl(), version);
         }
         return virtualLinkRequest;
+    }
+
+    public VirtualNetworkFunctionDescriptorRestAgent getVirtualNetworkFunctionDescriptorAgent() {
+        if (virtualNetworkFunctionDescriptorRequest == null) {
+            virtualNetworkFunctionDescriptorRequest = new VirtualNetworkFunctionDescriptorRestAgent(username, password, nfvoIp, nfvoPort, propertyReader.getRestVirtualNetworkFunctionDescriptorUrl(), version);
+        }
+        return virtualNetworkFunctionDescriptorRequest;
     }
 
     public VNFFGRestAgent getVNFForwardingGraphAgent() {

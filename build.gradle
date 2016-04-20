@@ -112,6 +112,7 @@ repositories {
 
 dependencies {
     compile 'org.slf4j:slf4j-simple:1.7.12'
+    compile 'org.openbaton:catalogue:1.1.0-SNAPSHOT'
 }
 
 project(':sdk') {

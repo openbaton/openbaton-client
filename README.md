@@ -141,18 +141,8 @@ In a text editor, create a file named cli.properties file and add the following 
 
 * **deleteVNFDependency**                                   
   * Delete the Virtual Network Function Descriptor dependency of a Network Service Descriptor with specific id
-* **getVirtualNetworkFunctionDescriptors**                  
-  * Get all the VirtualNetworkFunctionDescriptors of a NetworkServiceDescriptor with specific id
-* **updateVNFD**                                    
-  * Update the VirtualNetwork Function Descriptor of a Network Service Descriptor with specific id
 * **createVNFDependency**                                   
   * Create the VirtualNetworkFunctionDescriptor dependency of a NetworkServiceDescriptor with specific id
-* **getVirtualNetworkFunctionDescriptor**                   
-  * Get the VirtualNetworkFunctionDescriptor with specific id of a NetworkServiceDescriptor with specific id
-* **deleteVirtualNetworkFunctionDescriptors**              
-  * Delete the Virtual Network Function Descriptor of a Network Service Descriptor with specific id
-* **createVNFD**                                        
-  * Create the Virtual Network Function Descriptor of a NetworkServiceDescriptor with specific id
 * **getPhysicalNetworkFunctionDescriptors**                 
   * Get all the Physical Network Function Descriptors of a Network Service Descriptor with specific id
 * **getPhysicalNetworkFunctionDescriptor**                  
@@ -169,6 +159,18 @@ In a text editor, create a file named cli.properties file and add the following 
   * Create the Security of a NetworkServiceDescriptor with specific id
 * **updateSecurity**                                       
   * Update the Security of a NetworkServiceDescriptor with specific id
+  
+### **VirtualNetworkFunctionDescriptor Subcommands**
+* **create**
+  * Create the object of type VirtualNetworkFunctionDescriptor
+* **delete**
+  * Delete the object of type VirtualNetworkFunctionDescriptor passing the id
+* **update**
+  * Update the object of type VirtualNetworkFunctionDescriptor passing the new object and the id of the old object
+* **findAll**
+  * Find all the objects of type VirtualNetworkFunctionDescriptor
+* **findById**
+  * Find the object of type VirtualNetworkFunctionDescriptor through the id
 
 ### **Network Service Record Subcommands**
 * **create**
