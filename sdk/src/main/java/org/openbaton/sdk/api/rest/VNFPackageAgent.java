@@ -1,5 +1,5 @@
 package org.openbaton.sdk.api.rest;
-import com.google.gson.JsonObject;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -19,8 +19,8 @@ import org.openbaton.catalogue.nfvo.VNFPackage;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
-
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -40,7 +40,7 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
      * Return the list of all VNFPackages as VNFPackage objects
      *
      *
-     * @return List<VNFPackage>: The List of
+     * @return : The List of
      * VNFPackage uploaded to the NFVO database
      */
 

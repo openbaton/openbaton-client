@@ -160,7 +160,7 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
      * Returns the set of PhysicalNetworkFunctionRecord into a NSD with id
      *
      * @param idNSR : The id of NSD
-     * @return Set<PhysicalNetworkFunctionRecord>: The Set of
+     * @return : The Set of
      * PhysicalNetworkFunctionRecord into NSD
      */
     @Help(help = "Get all the PhysicalNetworkFunctionRecords of a specific NetworkServiceRecord with id")
@@ -211,8 +211,6 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
     }
 
     /**
-     * TODO (check the orchestrator)
-     * <p/>
      * Edits the PhysicalNetworkFunctionRecord
      *
      * @param physicalNetworkFunctionRecord : The PhysicalNetworkFunctionRecord to be edited
