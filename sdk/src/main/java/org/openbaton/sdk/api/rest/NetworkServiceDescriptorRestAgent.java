@@ -27,13 +27,13 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
     }
 
     /**
-     * Return the list of VirtualNetworkFunctionDescriptor into a NSD with id
      *
      * @param idNSD : The id of NSD
-     * @return List<VirtualNetworkFunctionDescriptor>: The List of
-     * VirtualNetworkFunctionDescriptor into NSD
+     * @return The List of VirtualNetworkFunctionDescriptor into NSD
+     * @throws SDKException
      */
     @Help(help = "Get all the VirtualNetworkFunctionDescriptors of a NetworkServiceDescriptor with specific id")
+    @Deprecated
     public List<VirtualNetworkFunctionDescriptor> getVirtualNetworkFunctionDescriptors(final String idNSD) throws SDKException {
         String url = idNSD + "/vnfdescriptors";
         return Arrays.asList((VirtualNetworkFunctionDescriptor[]) requestGetAll(url, VirtualNetworkFunctionDescriptor.class));
@@ -45,10 +45,11 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
      *
      * @param idNSD     : The id of NSD
      * @param id_vfn : The id of the VNF Descriptor
-     * @return List<VirtualNetworkFunctionDescriptor>: The List of
+     * @return : The List of
      * VirtualNetworkFunctionDescriptor into NSD
      */
     @Help(help = "Get the VirtualNetworkFunctionDescriptor with specific id of a NetworkServiceDescriptor with specific id")
+    @Deprecated
     public VirtualNetworkFunctionDescriptor getVirtualNetworkFunctionDescriptor(final String idNSD, final String id_vfn) throws SDKException {
         String url = idNSD + "/vnfdescriptors" + "/" + id_vfn;
         return (VirtualNetworkFunctionDescriptor) requestGet(url, VirtualNetworkFunctionDescriptor.class);
@@ -62,6 +63,7 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
      * @param id_vfn : The id of the VNF Descriptor
      */
     @Help(help = "Delete the VirtualNetworkFunctionDescriptor of a NetworkServiceDescriptor with specific id")
+    @Deprecated
     public void deleteVirtualNetworkFunctionDescriptors(final String idNSD, final String id_vfn) throws SDKException {
         String url = idNSD + "/vnfdescriptors" + "/" + id_vfn;
         requestDelete(url);
@@ -74,6 +76,7 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
      * @param idNSD                               : The id of the networkServiceDescriptor the vnfd shall be created at
      */
     @Help(help = "create the VirtualNetworkFunctionDescriptor of a NetworkServiceDescriptor with specific id")
+    @Deprecated
     public VirtualNetworkFunctionDescriptor createVNFD(final String idNSD, final VirtualNetworkFunctionDescriptor virtualNetworkFunctionDescriptor) throws SDKException {
         String url = idNSD + "/vnfdescriptors" + "/";
         return (VirtualNetworkFunctionDescriptor) requestPost(url, virtualNetworkFunctionDescriptor);
@@ -85,9 +88,10 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
      * @param virtualNetworkFunctionDescriptor : : the Network Service Descriptor to be updated
      * @param idNSD                               : The id of the (old) VNF Descriptor
      * @param id_vfn                           : The id of the VNF Descriptor
-     * @return List<VirtualNetworkFunctionDescriptor>: The updated virtualNetworkFunctionDescriptor
+     * @return : The updated virtualNetworkFunctionDescriptor
      */
     @Help(help = "Update the VirtualNetworkFunctionDescriptor of a NetworkServiceDescriptor with specific id")
+    @Deprecated
     public VirtualNetworkFunctionDescriptor updateVNFD(final String idNSD, final String id_vfn, final VirtualNetworkFunctionDescriptor virtualNetworkFunctionDescriptor) throws SDKException {
         String url = idNSD + "/vnfdescriptors" + "/" + id_vfn;
         return (VirtualNetworkFunctionDescriptor) requestPut(url, virtualNetworkFunctionDescriptor);
@@ -97,7 +101,7 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
      * Return the list of VNFDependencies into a NSD
      *
      * @param idNSD : The id of the networkServiceDescriptor
-     * @return List<VNFDependency>:  The List of VNFDependency into NSD
+     * @return :  The List of VNFDependency into NSD
      */
     @Help(help = "Get all the VirtualNetworkFunctionDescriptor Dependency of a NetworkServiceDescriptor with specific id")
     public List<VNFDependency> getVNFDependencies(final String idNSD) throws SDKException {
@@ -164,7 +168,7 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
      * Return the list of PhysicalNetworkFunctionDescriptor into a NSD with id
      *
      * @param idNSD : The id of NSD
-     * @return List<PhysicalNetworkFunctionDescriptor>: The List of
+     * @return : The List of
      * PhysicalNetworkFunctionDescriptor into NSD
      */
     @Help(help = "Get all the PhysicalNetworkFunctionDescriptors of a NetworkServiceDescriptor with specific id")

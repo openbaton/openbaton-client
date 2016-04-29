@@ -54,7 +54,7 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest{
     /**
      * Returns the list of the VNF software images available
      *
-     * @return List<Obj>: The list of VNF software images available
+     * @return : The list of VNF software images available
      */
     @Help(help = "Find all the objects of type {#}")
     public List<T> findAll() throws SDKException, ClassNotFoundException {
