@@ -18,6 +18,8 @@ Navigate into the project's root directory and execute *source nfvo.properties*.
 
 ## Openbaton Client usage
     
+    run a command: openbaton.sh command-name [arg-1] [arg-2] [arg-3]
+    
     show the configuration: openbaton.sh -c
     
     activate debug mode: openbaton.sh -d command-name [arg-1] [arg-2] [arg-3]
