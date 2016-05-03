@@ -1,4 +1,4 @@
-package org.project.openbaton.cli.model;
+package org.openbaton.cli.model;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -7,9 +7,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import static org.project.openbaton.cli.util.PrintFormat.addRow;
-import static org.project.openbaton.cli.util.PrintFormat.buildLine;
-import static org.project.openbaton.cli.util.PrintFormat.printer;
+import static org.openbaton.cli.util.PrintFormat.addRow;
+import static org.openbaton.cli.util.PrintFormat.buildLine;
+import static org.openbaton.cli.util.PrintFormat.printer;
 
 
 /**

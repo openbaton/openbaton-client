@@ -1,4 +1,4 @@
-package org.project.openbaton.cli;
+package org.openbaton.cli;
 
 import com.google.gson.Gson;
 import jline.console.ConsoleReader;
@@ -6,8 +6,8 @@ import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 import jline.console.completer.FileNameCompleter;
 import jline.console.completer.StringsCompleter;
-import org.project.openbaton.cli.model.Command;
-import org.project.openbaton.cli.util.PrintFormat;
+import org.openbaton.cli.model.Command;
+import org.openbaton.cli.util.PrintFormat;
 import org.openbaton.sdk.NFVORequestor;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
@@ -30,7 +30,6 @@ public class NFVOCommandLineInterface {
     private static Logger log = LoggerFactory.getLogger(NFVOCommandLineInterface.class);
 
     private static final Character mask = '*';
-    private static String CONFIGURATION_FILE = "/etc/openbaton/cli.properties";
     private static final String VERSION = "1";
 
     private final static LinkedHashMap<String, Command> commandList = new LinkedHashMap<>();
@@ -49,9 +48,8 @@ public class NFVOCommandLineInterface {
                 "/    |    \\|     \\     \\     /  /    |    \\ /_____/ \\     \\___|    |___|   |\n" +
                 "\\____|__  /\\___  /      \\___/   \\_______  /          \\______  /_______ \\___|\n" +
                 "        \\/     \\/                       \\/                  \\/        \\/    ");
-        log.info("Nfvo OpenBaton Command Line Interface");
+        log.info("OpenBaton's NFVO Command Line Interface");
         System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
-        //System.out.println("Usage: java -jar build/libs/neutrino-<$version>.jar");
         System.out.println("Available commands are");
         String format = "%-80s%s%n";
         for (Object entry : helpCommandList.entrySet()) {
@@ -90,52 +88,29 @@ public class NFVOCommandLineInterface {
 
     public static void main(String[] args) {
 
-        //log.info("Log class: { " + log.getClass().getName() + " }");
-
-
         ConsoleReader reader = getConsoleReader();
         Properties properties = new Properties();
 
-        CONFIGURATION_FILE = args[0];
-        File file = new File(CONFIGURATION_FILE);
+        readEnvVars(properties);
+        getProperty(reader, properties, "NFVO_USERNAME", "admin");
+        getProperty(reader, properties, "NFVO_PASSWORD", "openbaton");
+        getProperty(reader, properties, "NFVO_IP", "127.0.0.1");
+        getProperty(reader, properties, "NFVO_PORT", "8080");
+        getProperty(reader, properties, "NFVO_VERSION", VERSION);
 
-        String line;
-        PrintWriter out = new PrintWriter(reader.getOutput());
-
-        if (file.exists()) {
-            try {
-                log.trace("File exists");
-                properties.load(new FileInputStream(file));
-                log.trace("Properties are: " + properties);
-            } catch (IOException e) {
-                log.warn("Error reading /etc/openbaton/cli.properties, trying with Environment Variables");
-                readEnvVars(properties);
-            }
-        } else {
-            log.warn("File [" + CONFIGURATION_FILE + "] not found, looking for Environment Variables");
-            readEnvVars(properties);
-        }
-
-        getProperty(reader, properties, "nfvo-usr", "");
-        getProperty(reader, properties, "nfvo-pwd", "");
-        getProperty(reader, properties, "nfvo-ip", "127.0.0.1");
-        getProperty(reader, properties, "nfvo-port", "8080");
-        getProperty(reader, properties, "nfvo-version", VERSION);
-
-        NFVORequestor nfvo = new NFVORequestor(properties.getProperty("nfvo-usr"), properties.getProperty("nfvo-pwd"), properties.getProperty("nfvo-ip"), properties.getProperty("nfvo-port"), properties.getProperty("nfvo-version"));
+        NFVORequestor nfvo = new NFVORequestor(properties.getProperty("NFVO_USERNAME"), properties.getProperty("NFVO_PASSWORD"), properties.getProperty("NFVO_IP"), properties.getProperty("NFVO_PORT"), properties.getProperty("NFVO_VERSION"));
 
         fillCommands(nfvo);
 
         List<Completer> completors = new LinkedList<Completer>();
         completors.add(new StringsCompleter(helpCommandList.keySet()));
         completors.add(new FileNameCompleter());
-//        completors.add(new NullCompleter());
 
         reader.addCompleter(new ArgumentCompleter(completors));
-        reader.setPrompt("\u001B[135m" + properties.get("nfvo-usr") + "@[\u001B[32mopen-baton\u001B[0m]~> ");
+        reader.setPrompt("\u001B[135m" + properties.get("NFVO_USERNAME") + "@[\u001B[32mopen-baton\u001B[0m]~> ");
 
         try {
-            reader.setPrompt("\u001B[135m" + properties.get("nfvo-usr") + "@[\u001B[32mopen-baton\u001B[0m]~> ");
+            reader.setPrompt("\u001B[135m" + properties.get("NFVO_USERNAME") + "@[\u001B[32mopen-baton\u001B[0m]~> ");
 
             //input reader
             String s = "";
@@ -143,45 +118,45 @@ public class NFVOCommandLineInterface {
 
             for (Object entry : helpCommandList.entrySet()) {
                 String format = "%-80s%s%n";
-                String search = args[1] + "-";
-                if (((Map.Entry) entry).getKey().toString().equals(args[1])) {
+                String search = args[0] + "-";
+                if (((Map.Entry) entry).getKey().toString().equals(args[0])) {
                     find++;
                 }
             }
 
             if (find > 0) { //correct comand
 
-                if (args.length > 3) //tree parameters
+                if (args.length >= 3) //three parameters
                 {
-                    s = args[1] + " " + args[2] + " " + args[3];
+                    s = args[0] + " " + args[1] + " " + args[2];
                     /*if (!args[1].endsWith("Descriptor") || !args[1].endsWith("Dependency")) {
                         System.out.println("Error: too much arguments");
                         exit(0);
                     }*/
 
-                } else if (args.length > 2) //two parameters
+                } else if (args.length >= 2) //two parameters
                 {
-                    if (args[2].equalsIgnoreCase("help")) {
-                        helpUsage(args[1]);
+                    if (args[1].equalsIgnoreCase("help")) {
+                        helpUsage(args[0]);
                         exit(0);
-                    }else if (args[1].endsWith("All")) {
+                    }else if (args[0].endsWith("All")) {
                         System.out.println("Error: too much arguments");
                         exit(0);
                     }
 
-                    s = args[1] + " " + args[2];
-                    if (args[1].contains("update")) {
+                    s = args[0] + " " + args[1];
+                    if (args[0].contains("update")) {
                         System.out.println("Error: no id or object passed");
                         exit(0);
                     }
 
-                    if (args[1].contains("NetworkServiceDescriptor-delete") && !args[1].endsWith("NetworkServiceDescriptor-delete")) {
+                    if (args[0].contains("NetworkServiceDescriptor-delete") && !args[0].endsWith("NetworkServiceDescriptor-delete")) {
                         System.out.println("Error: no id of the Descriptor or the Object");
                         exit(0);
                     }
 
-                } else if (args.length > 1) {
-                    s = args[1];
+                } else if (args.length >= 1) {
+                    s = args[0];
                     if (s.equalsIgnoreCase("help")) {
                         usage();
                         exit(0);
@@ -201,7 +176,7 @@ public class NFVOCommandLineInterface {
                 }
                 //execute comand
                 try {
-                    String result = PrintFormat.printResult(args[1],executeCommand(s));
+                    String result = PrintFormat.printResult(args[0],executeCommand(s));
                     System.out.println(result);
                     exit(0);
 
@@ -214,16 +189,16 @@ public class NFVOCommandLineInterface {
             } else { //wrong comand
                 for (Object entry : helpCommandList.entrySet()) {
                     String format = "%-80s%s%n";
-                    if (((Map.Entry) entry).getKey().toString().startsWith(args[1])) {
+                    if (((Map.Entry) entry).getKey().toString().startsWith(args[0])) {
                         System.out.printf(format, ((Map.Entry) entry).getKey().toString() + ":", ((Map.Entry) entry).getValue().toString());
                         find++;
                     }
                 }
                 if (find == 0) {
 
-                    System.out.println("Nfvo OpenBaton Command Line Interface");
+                    System.out.println("OpenBaton's NFVO Command Line Interface");
                     System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
-                    System.out.println(args[1] + ": comand not found");
+                    System.out.println(args[0] + ": comand not found");
                     exit(0);
                 }
             }
@@ -236,14 +211,13 @@ public class NFVOCommandLineInterface {
 
     private static void getProperty(ConsoleReader reader, Properties properties, String property, String defaultProperty) {
         if (properties.get(property) == null) {
-            log.warn(property + " property was not found neither in the file [" + CONFIGURATION_FILE + "] nor in Environment Variables");
+            //log.warn(property + " property was not found neither in the file [" + CONFIGURATION_FILE + "] nor in Environment Variables");
             try {
                 String insertedProperty = reader.readLine(property + "[" + defaultProperty + "]: ");
-                if (insertedProperty == null || insertedProperty.equals("")) {
+                if (insertedProperty == null) {
                     insertedProperty = defaultProperty;
                 }
                 properties.put(property, insertedProperty);
-
             } catch (IOException e) {
                 log.error("Oops, Error while reading from input");
                 exit(990);
@@ -373,11 +347,11 @@ public class NFVOCommandLineInterface {
 
     private static void readEnvVars(Properties properties) {
         try {
-            properties.put("nfvo-usr", System.getenv().get("nfvo_usr"));
-            properties.put("nfvo-pwd", System.getenv().get("nfvo_pwd"));
-            properties.put("nfvo-ip", System.getenv().get("nfvo_ip"));
-            properties.put("nfvo-port", System.getenv().get("nfvo_port"));
-            properties.put("nfvo-version", System.getenv().get("nfvo_version"));
+            properties.put("NFVO_USERNAME", System.getenv().get("NFVO_USERNAME"));
+            properties.put("NFVO_PASSWORD", System.getenv().get("NFVO_PASSWORD"));
+            properties.put("NFVO_IP", System.getenv().get("NFVO_IP"));
+            properties.put("NFVO_PORT", System.getenv().get("NFVO_PORT"));
+            properties.put("NFVO_VERSION", System.getenv().get("NFVO_VERSION"));
         } catch (NullPointerException e) {
             return;
         }

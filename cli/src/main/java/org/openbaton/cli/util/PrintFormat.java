@@ -1,11 +1,11 @@
-package org.project.openbaton.cli.util;
+package org.openbaton.cli.util;
 
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.project.openbaton.cli.model.GenearlVimInstance;
-import org.project.openbaton.cli.model.GeneralName;
-import org.project.openbaton.cli.model.GeneralTarget;
+import org.openbaton.cli.model.GeneralName;
+import org.openbaton.cli.model.GeneralTarget;
+import org.openbaton.cli.model.GeneralVimInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -379,7 +379,7 @@ public class PrintFormat {
         int rowcount = 0;
 
         if (comand.contains("VimInstance")) {
-            result = GenearlVimInstance.Print(object);
+            result = GeneralVimInstance.Print(object);
 
         } else if (comand.contains("Image") || comand.contains("Configuration") || comand.contains("NetworkServiceDescriptor-findAll") || comand.contains("NetworkServiceRecord-findAll") || comand.contains("getVirtualNetworkFunctionRecords")) {
 
