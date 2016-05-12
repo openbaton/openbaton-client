@@ -20,6 +20,7 @@ public class RequestFactory {
     private static VirtualNetworkFunctionDescriptorRestAgent virtualNetworkFunctionDescriptorRequest = null;
     private static VNFFGRestAgent vNFFGRequest = null;
     private static EventAgent eventAgent = null;
+    private static VNFPackageAgent vnfPackageAgent = null;
     private static String username;
     private static String password;
     private final String nfvoPort;
@@ -102,6 +103,13 @@ public class RequestFactory {
             eventAgent = new EventAgent(username, password, nfvoIp, nfvoPort, propertyReader.getEventUrl(), version);
         }
         return eventAgent;
+    }
+
+    public VNFPackageAgent getVNFPackageAgent() {
+        if (vnfPackageAgent == null) {
+            vnfPackageAgent = new VNFPackageAgent(username, password, nfvoIp, nfvoPort, propertyReader.getVNFPackageUrl(), version);
+        }
+        return vnfPackageAgent;
     }
 
     public AbstractRestAgent getAbstractAgent(Class clazz, String path) {

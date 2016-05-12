@@ -104,8 +104,22 @@ public final class NFVORequestor {
         return factory.getVNFForwardingGraphAgent();
     }
 
+    /**
+     * Gets the Event requester
+     *
+     * @return eventRequest; The (final) static Event requester
+     */
     public EventAgent getEventAgent() {
         return factory.getEventAgent();
+    }
+
+    /**
+     * Gets the VNFPackage requester
+     *
+     * @return vnfPackageRequest; The (final) static VNFPackage requester
+     */
+    public VNFPackageAgent getVNFPackageAgent() {
+        return factory.getVNFPackageAgent();
     }
 
     public AbstractRestAgent abstractRestAgent(Class clazz, String path){

@@ -120,8 +120,22 @@ public class PropertyReader {
         return sdkProperties.getProperty("restVNFFGPath");
     }
 
+    /**
+     * Gets the event Url path
+     *
+     * @return the event Url path property
+     */
     public String getEventUrl() {
         return sdkProperties.getProperty("restEventPath");
+    }
+
+    /**
+     * Gets the vnfPackage Url path
+     *
+     * @return the vnfPackage Url path property
+     */
+    public String getVNFPackageUrl() {
+        return sdkProperties.getProperty("restVNFPackagePath");
     }
 
     /**
