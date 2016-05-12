@@ -286,6 +286,7 @@ public class NFVOCommandLineInterface {
         getMethods(nfvo.getVNFFGAgent());
         getMethods(nfvo.getVimInstanceAgent());
         getMethods(nfvo.getNetworkServiceDescriptorAgent());
+        getMethods(nfvo.getVirtualNetworkFunctionDescriptorAgent());
         getMethods(nfvo.getVirtualLinkAgent());
         getMethods(nfvo.getVNFPackageAgent());
     }

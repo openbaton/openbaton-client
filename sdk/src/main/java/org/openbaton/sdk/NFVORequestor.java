@@ -58,6 +58,16 @@ public final class NFVORequestor {
     public NetworkServiceDescriptorRestAgent getNetworkServiceDescriptorAgent() {
         return factory.getNetworkServiceDescriptorAgent();
     }
+
+    /**
+     * Gets the networkServiceDescriptor requester
+     *
+     * @return networkServiceDescriptorRequest: The (final) static networkServiceDescriptor requester
+     */
+    public VirtualNetworkFunctionDescriptorRestAgent getVirtualNetworkFunctionDescriptorAgent() {
+        return factory.getVirtualNetworkFunctionDescriptorAgent();
+    }
+
     /**
      * Gets the networkServiceRecord requester
      *
