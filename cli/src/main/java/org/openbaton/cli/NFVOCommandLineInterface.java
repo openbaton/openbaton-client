@@ -1,13 +1,22 @@
 package org.openbaton.cli;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.google.gson.stream.MalformedJsonException;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 import jline.console.completer.FileNameCompleter;
 import jline.console.completer.StringsCompleter;
+import org.apache.commons.lang3.ArrayUtils;
+import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
+import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
+import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
+import org.openbaton.catalogue.mano.record.VNFCInstance;
+import org.openbaton.cli.exceptions.CommandLineException;
 import org.openbaton.cli.model.Command;
 import org.openbaton.cli.util.PrintFormat;
+import org.openbaton.cli.util.Utils;
 import org.openbaton.sdk.NFVORequestor;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
@@ -32,8 +41,8 @@ public class NFVOCommandLineInterface {
     private static final Character mask = '*';
     private static final String VERSION = "1";
 
-    private final static LinkedHashMap<String, Command> commandList = new LinkedHashMap<>();
-    private final static LinkedHashMap<String, String> helpCommandList = new LinkedHashMap<String, String>() {{
+    private final static LinkedHashMap<String, LinkedList<Command>> commandMap = new LinkedHashMap<>();
+    private final static LinkedHashMap<String, String> helpCommandMap = new LinkedHashMap<String, String>() {{
         put("help", "Print the usage");
         //put("exit", "Exit the application");
         //put("print properties", "print all the properties");
@@ -52,7 +61,7 @@ public class NFVOCommandLineInterface {
         System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
         System.out.println("Available commands are");
         String format = "%-80s%s%n";
-        for (Object entry : helpCommandList.entrySet()) {
+        for (Object entry : helpCommandMap.entrySet()) {
             System.out.printf(format, ((Map.Entry) entry).getKey().toString() + ":", ((Map.Entry) entry).getValue().toString());
 
         }
@@ -60,7 +69,7 @@ public class NFVOCommandLineInterface {
     }
 
     public static void helpUsage(String s) {
-        for (Object entry : helpCommandList.entrySet()) {
+        for (Object entry : helpCommandMap.entrySet()) {
             String format = "%-80s%s%n";
             if (((Map.Entry) entry).getKey().toString().startsWith(s) || ((Map.Entry) entry).getKey().toString().startsWith(s + "-")) {
                 System.out.printf(format, ((Map.Entry) entry).getKey().toString() + ":", ((Map.Entry) entry).getValue().toString());
@@ -70,7 +79,7 @@ public class NFVOCommandLineInterface {
 
 
     private static void helpCommand(String command) {
-        Command cmd = commandList.get(command);
+        Command cmd = commandMap.get(command).getFirst();
         System.out.println();
         System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
         System.out.print("Usage: " + command + " ");
@@ -103,7 +112,7 @@ public class NFVOCommandLineInterface {
         fillCommands(nfvo);
 
         List<Completer> completors = new LinkedList<Completer>();
-        completors.add(new StringsCompleter(helpCommandList.keySet()));
+        completors.add(new StringsCompleter(helpCommandMap.keySet()));
         completors.add(new FileNameCompleter());
 
         reader.addCompleter(new ArgumentCompleter(completors));
@@ -116,7 +125,7 @@ public class NFVOCommandLineInterface {
             String s = "";
             int find = 0;
 
-            for (Object entry : helpCommandList.entrySet()) {
+            for (Object entry : helpCommandMap.entrySet()) {
                 String format = "%-80s%s%n";
                 String search = args[0] + "-";
                 if (((Map.Entry) entry).getKey().toString().equals(args[0])) {
@@ -126,49 +135,55 @@ public class NFVOCommandLineInterface {
 
             if (find > 0) { //correct comand
 
-                if (args.length >= 3) //three parameters
+                if (args.length >= 5) {
+                    System.out.println("Error: too many arguments");
+                    usage();
+                    exit(1);
+                } else if (args.length == 4) { // four parameters
+                    s = args[0] + " " + args[1] + " " + args[2] + " " + args[3];
+                } else if (args.length == 3) //three parameters
                 {
                     s = args[0] + " " + args[1] + " " + args[2];
                     /*if (!args[1].endsWith("Descriptor") || !args[1].endsWith("Dependency")) {
-                        System.out.println("Error: too much arguments");
-                        exit(0);
+                        System.out.println("Error: too many arguments");
+                        exit(1);
                     }*/
 
-                } else if (args.length >= 2) //two parameters
+                } else if (args.length == 2) //two parameters
                 {
                     if (args[1].equalsIgnoreCase("help")) {
                         helpUsage(args[0]);
                         exit(0);
                     }else if (args[0].endsWith("All")) {
-                        System.out.println("Error: too much arguments");
-                        exit(0);
+                        System.out.println("Error: too many arguments");
+                        exit(1);
                     }
 
                     s = args[0] + " " + args[1];
                     if (args[0].contains("update")) {
                         System.out.println("Error: no id or object passed");
-                        exit(0);
+                        exit(1);
                     }
 
                     if (args[0].contains("NetworkServiceDescriptor-delete") && !args[0].endsWith("NetworkServiceDescriptor-delete")) {
                         System.out.println("Error: no id of the Descriptor or the Object");
-                        exit(0);
+                        exit(1);
                     }
 
-                } else if (args.length >= 1) {
+                } else if (args.length == 1) {
                     s = args[0];
                     if (s.equalsIgnoreCase("help")) {
                         usage();
                         exit(0);
                     } else if (s.contains("delete") || s.endsWith("ById") || s.contains("get")) {
                         System.out.println("Error: no id passed");
-                        exit(0);
+                        exit(1);
                     } else if (s.contains("create")) {
                         System.out.println("Error: no object or id passed");
-                        exit(0);
+                        exit(1);
                     }else if (s.contains("update")) {
                         System.out.println("Error: no id and/or object passed");
-                        exit(0);
+                        exit(1);
                     }else if(s.contains("exit")) {
                         exit(0);
                     }
@@ -180,14 +195,19 @@ public class NFVOCommandLineInterface {
                     System.out.println(result);
                     exit(0);
 
+                } catch (CommandLineException ce) {
+                    System.out.println("Error: " + ce.getMessage());
+                    if (log.isDebugEnabled())
+                        ce.getCause().printStackTrace();
+                    exit(1);
                 } catch (Exception e)
                 {
                     e.printStackTrace();
                     log.error("Error while invoking command");
-                    exit(0);
+                    exit(1);
                 }
             } else { //wrong comand
-                for (Object entry : helpCommandList.entrySet()) {
+                for (Object entry : helpCommandMap.entrySet()) {
                     String format = "%-80s%s%n";
                     if (((Map.Entry) entry).getKey().toString().startsWith(args[0])) {
                         System.out.printf(format, ((Map.Entry) entry).getKey().toString() + ":", ((Map.Entry) entry).getValue().toString());
@@ -199,7 +219,7 @@ public class NFVOCommandLineInterface {
                     System.out.println("OpenBaton's NFVO Command Line Interface");
                     System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
                     System.out.println(args[0] + ": comand not found");
-                    exit(0);
+                    exit(1);
                 }
             }
 
@@ -219,26 +239,79 @@ public class NFVOCommandLineInterface {
                 }
                 properties.put(property, insertedProperty);
             } catch (IOException e) {
-                log.error("Oops, Error while reading from input");
-                exit(990);
+                System.out.println("Error while reading from input");
+                exit(1);
             }
         }
     }
 
-    private static Object executeCommand(String line) throws InvocationTargetException, IllegalAccessException, FileNotFoundException {
-        StringBuffer sb = new StringBuffer();
+    private static Command validateParametersAndGetCommand(String line) throws CommandLineException{
         StringTokenizer st = new StringTokenizer(line);
-        sb.append(st.nextToken());
-        log.trace(sb.toString());
-        String commandString = sb.toString();
-        Command command = commandList.get(commandString);
-        if (command == null) {
-            return "Command: " + commandString + " not found!";
+        String commandName = "";
+        if (st.hasMoreTokens())
+            commandName = st.nextToken();
+
+        LinkedList<String> params = new LinkedList<>();
+        while (st.hasMoreTokens()) {
+            params.add(st.nextToken());
         }
+
+        LinkedList<Command> commandList = commandMap.get(commandName);
+        if (commandList == null || commandList.size() == 0) {
+            throw new CommandLineException("Command: " + commandName + " not found!");
+        }
+
+
+        Command command = null;
+        boolean paramTypeCorrect = true;
+        for (Command c : commandList) {
+            // check the number of arguments given in the cli to determine which command to use if there are multiple methods with the same name
+            if (c.getMethod().getParameterTypes().length == params.size()) {
+                command = c;
+                // check if the parameters passed are correct, namely if a passed file exists.
+                // If in the future the cli will accept other parameters than ids and paths to files, this has to be changed.
+                paramTypeCorrect = true;
+                int pos = 0;
+                for (Type t : command.getMethod().getParameterTypes()) {
+                    if (!t.equals(String.class)) {
+                        try {
+                            File f = new File(params.get(pos));
+                            if (!f.exists())
+                                paramTypeCorrect = false;
+                        } catch (Exception e) {
+                            paramTypeCorrect = false;
+                        }
+                    }
+                    pos++;
+                }
+                if (paramTypeCorrect == true)
+                    break;
+            }
+        }
+
+        if (paramTypeCorrect == false)
+            throw new CommandLineException("Missing filepath parameter.");
+
+        if (command == null)
+            throw new CommandLineException("Wrong number of parameters passed.");
+
+        return command;
+    }
+
+    private static Object executeCommand(String line) throws InvocationTargetException, IllegalAccessException, FileNotFoundException, CommandLineException {
+        StringTokenizer st = new StringTokenizer(line);
+
+        // remove command to get just the parameters
+        if (st.hasMoreTokens())
+            st.nextToken();
+
+        Command command = validateParametersAndGetCommand(line);
+        handleExceptionalCommandNames(command);
         log.trace("invoking method: " + command.getMethod().getName() + " with parameters: " + command.getParams());
+
         List<Object> params = new LinkedList<>();
         for (Type t : command.getParams()) {
-            log.trace("type is: " + t.getClass().getName());
+            log.trace("type is: " + t);
             if (t.equals(String.class)) { //for instance an id
                 params.add(st.nextToken());
             } else {// for instance waiting for an obj so passing a file
@@ -250,7 +323,12 @@ public class NFVOCommandLineInterface {
                 String file = getString(fileInputStream);
                 log.trace(file);
                 log.trace("waiting for an object of type " + command.getClazz().getName());
-                Object casted = command.getClazz().cast(gson.fromJson(file, command.getClazz()));
+                Object casted = null;
+                try {
+                    casted = command.getClazz().cast(gson.fromJson(file, command.getClazz()));
+                } catch (JsonParseException je) {
+                    throw new CommandLineException("The provided json file could not be cast to an object of type "+command.getClazz().getSimpleName(), je.getCause());
+                }
                 log.trace("Parameter added is: " + casted);
                 params.add(casted);
             }
@@ -261,6 +339,24 @@ public class NFVOCommandLineInterface {
         }
         log.trace("invoking method: " + command.getMethod().getName() + " with parameters: " + parameters);
         return command.getMethod().invoke(command.getInstance(), params.toArray());
+    }
+
+    /**
+     * This method modifies commands which do not use the object provided by their names.
+     * For example the command NetworkServiceRecord-createVNFCInstance will not create a NetworkServiceRecord but a VNFCInstance.
+     * Therefore the clazz attribute in the command object has to be changed from NetworkServiceRecord to VNFCInstance.
+     *
+     * @param command
+     */
+    private static void handleExceptionalCommandNames(Command command) {
+        if (command.getClazz().equals(NetworkServiceRecord.class)) {
+            if (command.getMethod().getName().equals("createVNFCInstance"))
+                command.setClazz(VNFCInstance.class);
+        }
+        if (command.getClazz().equals(NetworkServiceDescriptor.class)) {
+            if (command.getMethod().getName().equals("createVNFD"))
+                command.setClazz(VirtualNetworkFunctionDescriptor.class);
+        }
     }
 
     private static String getString(FileInputStream fileInputStream) {
@@ -318,21 +414,43 @@ public class NFVOCommandLineInterface {
             exit(700);
         log.trace("Clazz: " + clazz);
         log.trace("Replacement: " + replacement);
-        for (Method method : agent.getClass().getSuperclass().getDeclaredMethods()) {
-            if (method.isAnnotationPresent(Help.class)) {
-                log.trace("Method: " + method.getName());
-                helpCommandList.put(replacement + "-" + method.getName(), method.getAnnotation(Help.class).help().replace("{#}", replacement));
-                Command command = new Command(agent, method, method.getParameterTypes(), clazz);
-                commandList.put(replacement + "-" + method.getName(), command);
+
+        for (Method superMethod : agent.getClass().getSuperclass().getDeclaredMethods()) {
+            if (superMethod.isAnnotationPresent(Help.class) && !superMethod.isAnnotationPresent(Deprecated.class)) {
+                boolean superMethodOverridden = false;
+                for (Method subMethod : agent.getClass().getDeclaredMethods()) {
+                    if (Utils.methodsAreEqual(superMethod, subMethod))
+                        superMethodOverridden = true;
+                }
+                if (!superMethodOverridden) {
+                    helpCommandMap.put(replacement + "-" + superMethod.getName(), superMethod.getAnnotation(Help.class).help().replace("{#}", replacement));
+                    Command command = new Command(agent, superMethod, superMethod.getParameterTypes(), clazz);
+                    if (commandMap.containsKey(replacement+"-"+superMethod.getName())) {
+                        commandMap.get(replacement+"-"+superMethod.getName()).add(command);
+                    } else{
+                        LinkedList commandList = new LinkedList();
+                        commandList.add(command);
+                        commandMap.put(replacement + "-" + superMethod.getName(), commandList);
+                    }
+                }
             }
         }
+
         for (Method method : agent.getClass().getDeclaredMethods()) {
-            if (method.isAnnotationPresent(Help.class)) {
+            if (method.isAnnotationPresent(Help.class) && !method.isAnnotationPresent(Deprecated.class)) {
                 Command command = new Command(agent, method, method.getParameterTypes(), clazz);
-                commandList.put(replacement + "-" + method.getName(), command);
-                helpCommandList.put(replacement + "-" + method.getName(), method.getAnnotation(Help.class).help());
+                helpCommandMap.put(replacement + "-" + method.getName(), method.getAnnotation(Help.class).help());
+                // check if key is already in map
+                if (commandMap.containsKey(replacement+"-"+method.getName())) {
+                    commandMap.get(replacement+"-"+method.getName()).add(command);
+                } else{
+                    LinkedList commandList = new LinkedList();
+                    commandList.add(command);
+                    commandMap.put(replacement + "-" + method.getName(), commandList);
+                }
             }
         }
+
     }
 
     private static ConsoleReader getConsoleReader() {
@@ -340,8 +458,8 @@ public class NFVOCommandLineInterface {
         try {
             reader = new ConsoleReader();
         } catch (IOException e) {
-            log.error("Oops, Error while creating ConsoleReader");
-            exit(999);
+            System.out.println("Error while creating ConsoleReader");
+            exit(1);
         }
         return reader;
     }

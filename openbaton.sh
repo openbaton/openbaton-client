@@ -41,7 +41,7 @@ function checkEnvironmentVariable {
 }
 
 function execute {
-    java -jar -Dlog4j.logging.org.openbaton=DEBUG "cli/build/libs/cli-all-$_version.jar" $1 $2 $3
+    java -jar -Dlog4j.logging.org.openbaton=DEBUG "cli/build/libs/cli-all-$_version.jar" $*
 }
 
 ##
@@ -75,7 +75,7 @@ then
     exit 1
 else
     checkEnvironmentVariables
-    execute $1 $2 $3
+    execute $*
 fi
 
 

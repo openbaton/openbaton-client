@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
  */
 public class Command {
 
-    private final Class clazz;
+    private Class clazz;
     private Object instance;
     private Method method;
     private Class[] params;
@@ -21,6 +21,10 @@ public class Command {
 
     public Class getClazz() {
         return clazz;
+    }
+
+    public void setClazz(Class clazz) {
+        this.clazz = clazz;
     }
 
     public Object getInstance() {

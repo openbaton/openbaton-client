@@ -224,6 +224,13 @@ Navigate into the project's root directory and execute *source nfvo.properties*.
   ```sh
    $ openbaton.sh NetworkServiceRecord-deleteVNFDependency id-network-service-record id-vnfdependency
   ```
+  
+*  **createVNFCInstance**                                      
+  
+    * Add a VNFCInstance to a VNF by performing a SCALE_OUT operation on the VNF
+  ```sh
+  $ openbaton.sh NetworkServiceRecord-createVNFCInstance id-network-service-record id-virtual-network-function-record file.json
+  ```
 
 
 ### **Event Subcommands**
