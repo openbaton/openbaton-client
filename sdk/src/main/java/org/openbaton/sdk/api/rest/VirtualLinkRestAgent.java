@@ -13,8 +13,8 @@ public class VirtualLinkRestAgent extends AbstractRestAgent<VirtualLinkDescripto
 	 * @param path
 	 * 				the url path used for the api requests
 	 */
-	public VirtualLinkRestAgent(String username, String password, String nfvoIp, String nfvoPort, String path, String version) {
-		super(username, password, nfvoIp, nfvoPort, path, version, VirtualLinkDescriptor.class);
+	public VirtualLinkRestAgent(String username, String password, String projectId, String nfvoIp, String nfvoPort, String path, String version) {
+		super(username, password, projectId, nfvoIp, nfvoPort, path, version, VirtualLinkDescriptor.class);
 	}
 
 }

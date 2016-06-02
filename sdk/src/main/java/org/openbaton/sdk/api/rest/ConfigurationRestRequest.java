@@ -14,7 +14,7 @@ public class ConfigurationRestRequest extends AbstractRestAgent<Configuration> {
 	 * @param url
 	 * 				the url path used for the api requests
 	 */
-	public ConfigurationRestRequest(String username, String password, String url, String  nfvoIp, String nfvoPort, String version) {
-		super(username, password, nfvoIp, nfvoPort, url, version, Configuration.class);
+	public ConfigurationRestRequest(String username, String password, String projectId, String url, String  nfvoIp, String nfvoPort, String version) {
+		super(username, password, projectId, nfvoIp, nfvoPort, url, version, Configuration.class);
 	}
 }

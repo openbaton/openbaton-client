@@ -22,8 +22,8 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
      *
      * @param nfvoIp the url path used for the api requests
      */
-    public NetworkServiceDescriptorRestAgent(String username, String password, String nfvoIp, String nfvoPort, String path, String version) {
-        super(username, password, nfvoIp, nfvoPort, path, version, NetworkServiceDescriptor.class);
+    public NetworkServiceDescriptorRestAgent(String username, String password, String projectId, String nfvoIp, String nfvoPort, String path, String version) {
+        super(username, password, projectId, nfvoIp, nfvoPort, path, version, NetworkServiceDescriptor.class);
     }
 
     /**

@@ -14,22 +14,28 @@ public final class NFVORequestor {
 
     private static RequestFactory factory;
 
-    public NFVORequestor(String version){
-        this.factory = RequestFactory.getInstance(null,null, "localhost", "8080", version);
+    /**
+     * The public constructor taking as params
+     * @param username
+     * @param password
+     * @param projectId
+     * @param version
+     */
+    public NFVORequestor(String username, String password, String projectId, String version) {
+        this.factory = RequestFactory.getInstance(username,password, projectId, "localhost", "8080", version);
     }
 
     /**
      * The public constructor taking as params
      * @param username
      * @param password
+     * @param projectId
+     * @param nfvoIp
+     * @param nfvoPort
      * @param version
      */
-    public NFVORequestor(String username, String password, String version) {
-        this.factory = RequestFactory.getInstance(username,password, "localhost", "8080", version);
-    }
-
-    public NFVORequestor(String username, String password, String nfvoIp, String nfvoPort, String version) {
-        this.factory = RequestFactory.getInstance(username,password, nfvoIp, nfvoPort, version);
+    public NFVORequestor(String username, String password, String projectId, String nfvoIp, String nfvoPort, String version) {
+        this.factory = RequestFactory.getInstance(username,password, projectId, nfvoIp, nfvoPort, version);
     }
 
     /**

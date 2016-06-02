@@ -19,8 +19,8 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest{
 
 
 
-    public AbstractRestAgent(String username, String password, String nfvoIp, String nfvoPort, String path, String version, Class<T> tClass) {
-        super(username, password, nfvoIp, nfvoPort, path, version);
+    public AbstractRestAgent(String username, String password, String projectId, String nfvoIp, String nfvoPort, String path, String version, Class<T> tClass) {
+        super(username, password, projectId, nfvoIp, nfvoPort, path, version);
         clazz = tClass;
     }
 

@@ -22,11 +22,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -42,6 +40,7 @@ public abstract class RestRequest {
     protected Gson mapper;
     private String username;
     private String password;
+    private String projectId;
     private String authStr = "openbatonOSClient" + ":" + "secret";
     private String encoding = Base64.encodeBase64String(authStr.getBytes());
     private final String provider;
@@ -51,11 +50,12 @@ public abstract class RestRequest {
     /**
      * Create a request with a given url path
      */
-    public RestRequest(String username, String password, final String nfvoIp, String nfvoPort, String path, String version) {
+    public RestRequest(String username, String password, String projectId, final String nfvoIp, String nfvoPort, String path, String version) {
         this.baseUrl = "http://" + nfvoIp + ":" + nfvoPort + "/api/v" + version + path;
         this.provider = "http://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
         this.username = username;
         this.password = password;
+        this.projectId = projectId;
 
         GsonBuilder builder = new GsonBuilder();
         /*builder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
@@ -69,6 +69,7 @@ public abstract class RestRequest {
 
     /**
      * Does the POST Request
+     *
      * @param id
      * @return String
      * @throws SDKException
@@ -89,11 +90,13 @@ public abstract class RestRequest {
                         .header("accept", "application/json")
                         .header("Content-Type", "application/json")
                         .header("Authorization", bearerToken.replaceAll("\"", ""))
+                        .header("project-id", projectId)
                         .asJson();
             else
                 jsonResponse = Unirest.post(this.baseUrl + id)
                         .header("accept", "application/json")
                         .header("Content-Type", "application/json")
+                        .header("project-id", projectId)
                         .asJson();
 //            check response status
             checkStatus(jsonResponse, HttpURLConnection.HTTP_CREATED);
@@ -127,35 +130,37 @@ public abstract class RestRequest {
      * @return a string containing the response content
      */
     public Serializable requestPost(final Serializable object) throws SDKException {
-    	return requestPost("",object);
+        return requestPost("", object);
     }
-    
-    
-    public Serializable requestPost(final String id,final Serializable object) throws SDKException {
+
+
+    public Serializable requestPost(final String id, final Serializable object) throws SDKException {
         HttpResponse<JsonNode> jsonResponse = null;
         try {
             log.trace("Object is: " + object);
-         
+
             String fileJSONNode = mapper.toJson(object);
 
             log.trace("sending: " + fileJSONNode.toString());
-            log.trace("baseUrl: " + baseUrl + "/" +id);
+            log.trace("baseUrl: " + baseUrl + "/" + id);
 
             checkToken();
 
             // call the api here
-            log.debug("Executing post on: " + this.baseUrl + "/" +id);
+            log.debug("Executing post on: " + this.baseUrl + "/" + id);
             if (token != null)
-                jsonResponse = Unirest.post(this.baseUrl + "/" +id)
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", bearerToken.replaceAll("\"", ""))
-                    .body(fileJSONNode)
-                    .asJson();
-            else
-                jsonResponse = Unirest.post(this.baseUrl + "/" +id)
+                jsonResponse = Unirest.post(this.baseUrl + "/" + id)
                         .header("accept", "application/json")
                         .header("Content-Type", "application/json")
+                        .header("Authorization", bearerToken.replaceAll("\"", ""))
+                        .header("project-id", projectId)
+                        .body(fileJSONNode)
+                        .asJson();
+            else
+                jsonResponse = Unirest.post(this.baseUrl + "/" + id)
+                        .header("accept", "application/json")
+                        .header("Content-Type", "application/json")
+                        .header("project-id", projectId)
                         .body(fileJSONNode)
                         .asJson();
 //            check response status
@@ -219,10 +224,13 @@ public abstract class RestRequest {
             log.debug("Executing delete on: " + this.baseUrl + "/" + id);
             if (token != null)
                 jsonResponse = Unirest.delete(this.baseUrl + "/" + id)
-                    .header("Authorization", bearerToken.replaceAll("\"", ""))
-                    .asJson();
+                        .header("Authorization", bearerToken.replaceAll("\"", ""))
+                        .header("project-id", projectId)
+                        .asJson();
             else
-                jsonResponse = Unirest.delete(this.baseUrl + "/" + id).asJson();
+                jsonResponse = Unirest.delete(this.baseUrl + "/" + id)
+                        .header("project-id", projectId)
+                        .asJson();
 //            check response status
             checkStatus(jsonResponse, HttpURLConnection.HTTP_NO_CONTENT);
 
@@ -243,7 +251,7 @@ public abstract class RestRequest {
             throw new SDKException("Could not get token", e);
         }
     }
-    
+
 
     /**
      * Executes a http get with to a given id
@@ -253,17 +261,17 @@ public abstract class RestRequest {
      */
     public Object requestGet(final String id, Class type) throws SDKException {
         String url = this.baseUrl;
-        if (id != null){
+        if (id != null) {
             url += "/" + id;
             return requestGetWithStatus(url, null, type);
-        }
-        else return requestGetAll(url, type, null);
+        } else return requestGetAll(url, type, null);
     }
 
     protected Object requestGetAll(String url, Class type) throws SDKException {
         url = this.baseUrl + "/" + url;
         return requestGetAll(url, type, null);
     }
+
     private Object requestGetAll(String url, Class type, final Integer httpStatus) throws SDKException {
         HttpResponse<JsonNode> jsonResponse = null;
         try {
@@ -279,9 +287,12 @@ public abstract class RestRequest {
             if (token != null)
                 jsonResponse = Unirest.get(url)
                         .header("Authorization", bearerToken.replaceAll("\"", ""))
+                        .header("project-id", projectId)
                         .asJson();
             else
-                jsonResponse = Unirest.get(url).asJson();
+                jsonResponse = Unirest.get(url)
+                        .header("project-id", projectId)
+                        .asJson();
 
             // check response status
             if (httpStatus != null) {
@@ -313,7 +324,7 @@ public abstract class RestRequest {
                     log.error(e.getMessage(), e);
                     throw new SDKException("Could not authorize", e);
                 }
-            }else {
+            } else {
                 log.error(e.getMessage(), e);
                 throw e;
             }
@@ -341,14 +352,17 @@ public abstract class RestRequest {
                 throw new SDKException("Could not get token", e);
 
             }
-            log.debug("Executing get on: " +url);
+            log.debug("Executing get on: " + url);
 
             if (token != null)
                 jsonResponse = Unirest.get(url)
-                    .header("Authorization", bearerToken.replaceAll("\"", ""))
-                    .asJson();
+                        .header("Authorization", bearerToken.replaceAll("\"", ""))
+                        .header("project-id", projectId)
+                        .asJson();
             else
-                jsonResponse = Unirest.get(url).asJson();
+                jsonResponse = Unirest.get(url)
+                        .header("project-id", projectId)
+                        .asJson();
 
             // check response status
             if (httpStatus != null) {
@@ -417,17 +431,19 @@ public abstract class RestRequest {
             log.debug("Executing put on: " + this.baseUrl + "/" + id);
             if (token != null)
                 jsonResponse = Unirest.put(this.baseUrl + "/" + id)
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", bearerToken.replaceAll("\"", ""))
-                    .body(fileJSONNode)
-                    .asJson();
+                        .header("accept", "application/json")
+                        .header("Content-Type", "application/json")
+                        .header("Authorization", bearerToken.replaceAll("\"", ""))
+                        .header("project-id", projectId)
+                        .body(fileJSONNode)
+                        .asJson();
             else
                 jsonResponse = Unirest.put(this.baseUrl + "/" + id)
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .body(fileJSONNode)
-                    .asJson();
+                        .header("accept", "application/json")
+                        .header("Content-Type", "application/json")
+                        .header("project-id", projectId)
+                        .body(fileJSONNode)
+                        .asJson();
 
 //          check response status
             checkStatus(jsonResponse, HttpURLConnection.HTTP_ACCEPTED);
@@ -459,7 +475,7 @@ public abstract class RestRequest {
      */
     private void checkStatus(HttpResponse<JsonNode> jsonResponse, final int httpStatus) throws SDKException {
         if (jsonResponse.getStatus() != httpStatus) {
-            log.debug("Status expected: " + httpStatus + " obtained: " + jsonResponse.getStatus());
+            System.out.println("Status expected: " + httpStatus + " obtained: " + jsonResponse.getStatus());
             throw new SDKException("Received wrong API HTTPStatus");
         }
     }
@@ -501,9 +517,9 @@ public abstract class RestRequest {
             log.trace(token);
             bearerToken = "Bearer " + token;
             this.token = token;
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             String error = jobj.get("error").getAsString();
-            if (error.equals("invalid_grant")){
+            if (error.equals("invalid_grant")) {
                 throw new SDKException("Error during authentication: " + jobj.get("error_description").getAsString(), e);
             }
         }

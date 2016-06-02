@@ -103,11 +103,12 @@ public class NFVOCommandLineInterface {
         readEnvVars(properties);
         getProperty(reader, properties, "NFVO_USERNAME", "admin");
         getProperty(reader, properties, "NFVO_PASSWORD", "openbaton");
+        getProperty(reader, properties, "NFVO_PROJECT_ID", "default");
         getProperty(reader, properties, "NFVO_IP", "127.0.0.1");
         getProperty(reader, properties, "NFVO_PORT", "8080");
         getProperty(reader, properties, "NFVO_VERSION", VERSION);
 
-        NFVORequestor nfvo = new NFVORequestor(properties.getProperty("NFVO_USERNAME"), properties.getProperty("NFVO_PASSWORD"), properties.getProperty("NFVO_IP"), properties.getProperty("NFVO_PORT"), properties.getProperty("NFVO_VERSION"));
+        NFVORequestor nfvo = new NFVORequestor(properties.getProperty("NFVO_USERNAME"), properties.getProperty("NFVO_PASSWORD"), properties.getProperty("NFVO_PROJECT_ID"), properties.getProperty("NFVO_IP"), properties.getProperty("NFVO_PORT"), properties.getProperty("NFVO_VERSION"));
 
         fillCommands(nfvo);
 
@@ -433,6 +434,7 @@ public class NFVOCommandLineInterface {
         try {
             properties.put("NFVO_USERNAME", System.getenv().get("NFVO_USERNAME"));
             properties.put("NFVO_PASSWORD", System.getenv().get("NFVO_PASSWORD"));
+            properties.put("NFVO_PROJECT_ID", System.getenv().get("NFVO_PROJECT_ID"));
             properties.put("NFVO_IP", System.getenv().get("NFVO_IP"));
             properties.put("NFVO_PORT", System.getenv().get("NFVO_PORT"));
             properties.put("NFVO_VERSION", System.getenv().get("NFVO_VERSION"));

@@ -21,6 +21,7 @@ function showConfiguration {
     echo -e "\tNFVO_VERSION=$NFVO_VERSION"
     echo -e "\tNFVO_USERNAME=$NFVO_USERNAME"
     echo -e "\tNFVO_PASSWORD=$NFVO_PASSWORD"
+    echo -e "\tNFVO_PROJECT_ID=$NFVO_PROJECT_ID"
 
 }
 
@@ -30,6 +31,7 @@ function checkEnvironmentVariables {
     checkEnvironmentVariable NFVO_VERSION
     checkEnvironmentVariable NFVO_USERNAME
     checkEnvironmentVariable NFVO_PASSWORD
+    checkEnvironmentVariable NFVO_PROJECT_ID
 }
 
 function checkEnvironmentVariable {

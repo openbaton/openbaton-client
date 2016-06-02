@@ -12,8 +12,8 @@ public class VNFFGRestAgent extends AbstractRestAgent<VNFForwardingGraphDescript
 	 * Create a VNFFG requester with a given url path
 	 *
 	 */
-	public VNFFGRestAgent(String username, String password, String nfvoIp, String nfvoPort, String path, String version) {
-		super(username, password, nfvoIp, nfvoPort, path, version, VNFForwardingGraphDescriptor.class);
+	public VNFFGRestAgent(String username, String password, String projectId, String nfvoIp, String nfvoPort, String path, String version) {
+		super(username, password, projectId, nfvoIp, nfvoPort, path, version, VNFForwardingGraphDescriptor.class);
 	}
 
 
