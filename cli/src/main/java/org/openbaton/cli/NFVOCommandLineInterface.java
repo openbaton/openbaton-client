@@ -134,61 +134,26 @@ public class NFVOCommandLineInterface {
             }
 
             if (find > 0) { //correct comand
-
-                if (args.length >= 5) {
-                    System.out.println("Error: too many arguments");
+                if (args.length == 1 && args[0].equalsIgnoreCase("help")) {  // case: ./openbaton.sh help
                     usage();
-                    exit(1);
-                } else if (args.length == 4) { // four parameters
-                    s = args[0] + " " + args[1] + " " + args[2] + " " + args[3];
-                } else if (args.length == 3) //three parameters
-                {
-                    s = args[0] + " " + args[1] + " " + args[2];
-                    /*if (!args[1].endsWith("Descriptor") || !args[1].endsWith("Dependency")) {
-                        System.out.println("Error: too many arguments");
-                        exit(1);
-                    }*/
-
-                } else if (args.length == 2) //two parameters
-                {
-                    if (args[1].equalsIgnoreCase("help")) {
-                        helpUsage(args[0]);
-                        exit(0);
-                    }else if (args[0].endsWith("All")) {
-                        System.out.println("Error: too many arguments");
-                        exit(1);
-                    }
-
-                    s = args[0] + " " + args[1];
-                    if (args[0].contains("update")) {
-                        System.out.println("Error: no id or object passed");
-                        exit(1);
-                    }
-
-                    if (args[0].contains("NetworkServiceDescriptor-delete") && !args[0].endsWith("NetworkServiceDescriptor-delete")) {
-                        System.out.println("Error: no id of the Descriptor or the Object");
-                        exit(1);
-                    }
-
-                } else if (args.length == 1) {
-                    s = args[0];
-                    if (s.equalsIgnoreCase("help")) {
-                        usage();
-                        exit(0);
-                    } else if (s.contains("delete") || s.endsWith("ById") || s.contains("get")) {
-                        System.out.println("Error: no id passed");
-                        exit(1);
-                    } else if (s.contains("create")) {
-                        System.out.println("Error: no object or id passed");
-                        exit(1);
-                    }else if (s.contains("update")) {
-                        System.out.println("Error: no id and/or object passed");
-                        exit(1);
-                    }else if(s.contains("exit")) {
-                        exit(0);
-                    }
-
+                    exit(0);
                 }
+
+                if (args[args.length-1].equalsIgnoreCase("help")) {  // case: ./openbaton.sh [command] help
+                    helpUsage(args[0]);
+                    exit(0);
+                }
+
+                if (args.length != 1 && args[0].equalsIgnoreCase("help")) {  // case: ./openbaton.sh help something...
+                    System.out.println("Type the following to get help for the usage of a command: \n./openbaton.sh [command] help");
+                    exit(1);
+                }
+                s = args[0];
+                for (int i=1; i<args.length; i++) {
+                    s+=" ";
+                    s+=args[i];
+                }
+
                 //execute comand
                 try {
                     String result = PrintFormat.printResult(args[0],executeCommand(s));
