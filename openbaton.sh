@@ -41,7 +41,7 @@ function checkEnvironmentVariable {
 }
 
 function execute {
-    java -jar -Dlog4j.logging.org.openbaton=DEBUG "cli/build/libs/cli-all-$_version.jar" $*
+    java -jar -DrootLevel="$_level" "cli/build/libs/cli-all-$_version.jar" $*
 }
 
 ##
@@ -56,7 +56,7 @@ while getopts “hlcd” OPTION
                 exit 1
                  ;;
              d)
-                 _level=debug
+                 _level=DEBUG
                  ;;
              l)
                 execute help
