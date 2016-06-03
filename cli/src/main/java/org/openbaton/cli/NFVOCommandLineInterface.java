@@ -10,6 +10,7 @@ import jline.console.completer.FileNameCompleter;
 import jline.console.completer.StringsCompleter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
+import org.openbaton.catalogue.mano.descriptor.VNFDependency;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
 import org.openbaton.catalogue.mano.record.VNFCInstance;
@@ -321,6 +322,8 @@ public class NFVOCommandLineInterface {
         if (command.getClazz().equals(NetworkServiceDescriptor.class)) {
             if (command.getMethod().getName().equals("createVNFD"))
                 command.setClazz(VirtualNetworkFunctionDescriptor.class);
+            if (command.getMethod().getName().equals("createVNFDependency"))
+                command.setClazz(VNFDependency.class);
         }
     }
 
