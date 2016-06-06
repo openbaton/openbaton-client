@@ -1,6 +1,5 @@
 package org.openbaton.sdk.api.rest;
 
-import org.openbaton.catalogue.security.Project;
 import org.openbaton.catalogue.security.User;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 

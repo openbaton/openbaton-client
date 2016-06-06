@@ -138,6 +138,24 @@ public final class NFVORequestor {
         return factory.getVNFPackageAgent();
     }
 
+    /**
+     * Gets the Project requester
+     *
+     * @return projectRequest; The (final) static Project requester
+     */
+    public ProjectAgent getProjectAgent() {
+        return factory.getProjectAgent();
+    }
+
+    /**
+     * Gets the User requester
+     *
+     * @return userRequest; The (final) static User requester
+     */
+    public UserAgent getUserAgent() {
+        return factory.getUserAgent();
+    }
+
     public AbstractRestAgent abstractRestAgent(Class clazz, String path){
         return factory.getAbstractAgent(clazz, path);
     }

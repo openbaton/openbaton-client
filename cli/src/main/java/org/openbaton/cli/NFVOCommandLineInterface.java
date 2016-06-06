@@ -351,6 +351,8 @@ public class NFVOCommandLineInterface {
         getMethods(nfvo.getVirtualNetworkFunctionDescriptorAgent());
         getMethods(nfvo.getVirtualLinkAgent());
         getMethods(nfvo.getVNFPackageAgent());
+        getMethods(nfvo.getProjectAgent());
+        getMethods(nfvo.getUserAgent());
     }
 
     private static void getMethods(AbstractRestAgent agent) {

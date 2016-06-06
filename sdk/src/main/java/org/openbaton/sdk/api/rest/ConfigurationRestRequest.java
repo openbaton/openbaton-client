@@ -1,5 +1,6 @@
 package org.openbaton.sdk.api.rest;
 
+import org.openbaton.catalogue.mano.common.ScalingAction;
 import org.openbaton.catalogue.nfvo.Configuration;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 

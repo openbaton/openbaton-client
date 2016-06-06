@@ -21,6 +21,8 @@ public class RequestFactory {
     private static VNFFGRestAgent vNFFGRequest = null;
     private static EventAgent eventAgent = null;
     private static VNFPackageAgent vnfPackageAgent = null;
+    private static ProjectAgent projectAgent = null;
+    private static UserAgent userAgent = null;
     private static String username;
     private static String password;
     private static String projectId;
@@ -116,6 +118,20 @@ public class RequestFactory {
             vnfPackageAgent = new VNFPackageAgent(username, password, projectId, nfvoIp, nfvoPort, propertyReader.getVNFPackageUrl(), version);
         }
         return vnfPackageAgent;
+    }
+
+    public ProjectAgent getProjectAgent() {
+        if (projectAgent == null) {
+            projectAgent = new ProjectAgent(username, password, projectId, nfvoIp, nfvoPort, propertyReader.getProjectUrl(), version);
+        }
+        return projectAgent;
+    }
+
+    public UserAgent getUserAgent() {
+        if (userAgent == null) {
+            userAgent = new UserAgent(username, password, projectId, nfvoIp, nfvoPort, propertyReader.getUserUrl(), version);
+        }
+        return userAgent;
     }
 
     public AbstractRestAgent getAbstractAgent(Class clazz, String path) {

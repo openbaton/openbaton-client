@@ -146,4 +146,22 @@ public class PropertyReader {
     public String getRestVirtualNetworkFunctionDescriptorUrl() {
         return sdkProperties.getProperty("restVirtualNetworkFunctionDescriptorPath");
     }
+
+    /**
+     * Gets the vnfPackage Url path
+     *
+     * @return the vnfPackage Url path property
+     */
+    public String getProjectUrl() {
+        return sdkProperties.getProperty("restProjectPath");
+    }
+
+    /**
+     * Gets the vnfPackage Url path
+     *
+     * @return the vnfPackage Url path property
+     */
+    public String getUserUrl() {
+        return sdkProperties.getProperty("restUserPath");
+    }
 }
