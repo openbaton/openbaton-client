@@ -141,4 +141,9 @@ public final class NFVORequestor {
     public AbstractRestAgent abstractRestAgent(Class clazz, String path){
         return factory.getAbstractAgent(clazz, path);
     }
+
+    public void setProjectId(String projectId){
+        factory.setProjectId(projectId);
+    }
+
 }

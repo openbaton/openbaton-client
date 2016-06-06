@@ -28,6 +28,10 @@ public class RequestFactory {
     private final String nfvoIp;
     private final String version;
 
+    static public void setProjectId(String projectId){
+        RequestFactory.projectId = projectId;
+    }
+
     private RequestFactory(String username, String password, String projectId,  String nfvoIp, String nfvoPort, String version) {
         this.username = username;
         this.password = password;
