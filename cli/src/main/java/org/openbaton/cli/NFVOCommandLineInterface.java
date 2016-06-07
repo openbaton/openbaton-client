@@ -14,6 +14,8 @@ import org.openbaton.catalogue.mano.descriptor.VNFDependency;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
 import org.openbaton.catalogue.mano.record.VNFCInstance;
+import org.openbaton.catalogue.mano.record.VNFRecordDependency;
+import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 import org.openbaton.cli.exceptions.CommandLineException;
 import org.openbaton.cli.model.Command;
 import org.openbaton.cli.util.PrintFormat;
@@ -32,7 +34,6 @@ import java.util.*;
 
 /**
  * Created by lto on 14/07/15.
- *
  */
 public class NFVOCommandLineInterface {
 
@@ -140,7 +141,7 @@ public class NFVOCommandLineInterface {
                     exit(0);
                 }
 
-                if (args[args.length-1].equalsIgnoreCase("help")) {  // case: ./openbaton.sh [command] help
+                if (args[args.length - 1].equalsIgnoreCase("help")) {  // case: ./openbaton.sh [command] help
                     helpUsage(args[0]);
                     exit(0);
                 }
@@ -150,14 +151,14 @@ public class NFVOCommandLineInterface {
                     exit(1);
                 }
                 s = args[0];
-                for (int i=1; i<args.length; i++) {
-                    s+=" ";
-                    s+=args[i];
+                for (int i = 1; i < args.length; i++) {
+                    s += " ";
+                    s += args[i];
                 }
 
                 //execute comand
                 try {
-                    String result = PrintFormat.printResult(args[0],executeCommand(s));
+                    String result = PrintFormat.printResult(args[0], executeCommand(s));
                     System.out.println(result);
                     exit(0);
 
@@ -166,8 +167,7 @@ public class NFVOCommandLineInterface {
                     if (log.isDebugEnabled())
                         ce.getCause().printStackTrace();
                     exit(1);
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                     log.error("Error while invoking command");
                     exit(1);
@@ -211,7 +211,7 @@ public class NFVOCommandLineInterface {
         }
     }
 
-    private static Command validateParametersAndGetCommand(String line) throws CommandLineException{
+    private static Command validateParametersAndGetCommand(String line) throws CommandLineException {
         StringTokenizer st = new StringTokenizer(line);
         String commandName = "";
         if (st.hasMoreTokens())
@@ -293,7 +293,7 @@ public class NFVOCommandLineInterface {
                 try {
                     casted = command.getClazz().cast(gson.fromJson(file, command.getClazz()));
                 } catch (JsonParseException je) {
-                    throw new CommandLineException("The provided json file could not be cast to an object of type "+command.getClazz().getSimpleName(), je.getCause());
+                    throw new CommandLineException("The provided json file could not be cast to an object of type " + command.getClazz().getSimpleName(), je.getCause());
                 }
                 log.trace("Parameter added is: " + casted);
                 params.add(casted);
@@ -318,6 +318,12 @@ public class NFVOCommandLineInterface {
         if (command.getClazz().equals(NetworkServiceRecord.class)) {
             if (command.getMethod().getName().equals("createVNFCInstance"))
                 command.setClazz(VNFCInstance.class);
+            if (command.getMethod().getName().equals("createVNFR"))
+                command.setClazz(VirtualNetworkFunctionRecord.class);
+            if (command.getMethod().getName().equals("postVNFDependency"))
+                command.setClazz(VNFRecordDependency.class);
+            if (command.getMethod().getName().equals("updateVNFDependency"))
+                command.setClazz(VNFRecordDependency.class);
         }
         if (command.getClazz().equals(NetworkServiceDescriptor.class)) {
             if (command.getMethod().getName().equals("createVNFD"))
@@ -393,9 +399,9 @@ public class NFVOCommandLineInterface {
                 if (!superMethodOverridden) {
                     helpCommandMap.put(replacement + "-" + superMethod.getName(), superMethod.getAnnotation(Help.class).help().replace("{#}", replacement));
                     Command command = new Command(agent, superMethod, superMethod.getParameterTypes(), clazz);
-                    if (commandMap.containsKey(replacement+"-"+superMethod.getName())) {
-                        commandMap.get(replacement+"-"+superMethod.getName()).add(command);
-                    } else{
+                    if (commandMap.containsKey(replacement + "-" + superMethod.getName())) {
+                        commandMap.get(replacement + "-" + superMethod.getName()).add(command);
+                    } else {
                         LinkedList commandList = new LinkedList();
                         commandList.add(command);
                         commandMap.put(replacement + "-" + superMethod.getName(), commandList);
@@ -409,9 +415,9 @@ public class NFVOCommandLineInterface {
                 Command command = new Command(agent, method, method.getParameterTypes(), clazz);
                 helpCommandMap.put(replacement + "-" + method.getName(), method.getAnnotation(Help.class).help());
                 // check if key is already in map
-                if (commandMap.containsKey(replacement+"-"+method.getName())) {
-                    commandMap.get(replacement+"-"+method.getName()).add(command);
-                } else{
+                if (commandMap.containsKey(replacement + "-" + method.getName())) {
+                    commandMap.get(replacement + "-" + method.getName()).add(command);
+                } else {
                     LinkedList commandList = new LinkedList();
                     commandList.add(command);
                     commandMap.put(replacement + "-" + method.getName(), commandList);

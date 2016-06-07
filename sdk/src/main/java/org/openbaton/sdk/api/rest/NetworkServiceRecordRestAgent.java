@@ -113,9 +113,9 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
      *
      */
     @Help(help = "Get all the VirtualNetworkFunctionRecord dependencies of NetworkServiceRecord with specific id")
-    public List<VNFDependency> getVNFDependencies(final String idNSR) throws SDKException {
+    public List<VNFRecordDependency> getVNFDependencies(final String idNSR) throws SDKException {
         String url = idNSR + "/vnfdependencies";
-        return Arrays.asList((VNFDependency[]) requestGetAll(url, VNFDependency.class));
+        return Arrays.asList((VNFRecordDependency[]) requestGetAll(url, VNFRecordDependency.class));
 
     }
 
@@ -123,9 +123,9 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
      *
      */
     @Help(help = "Get the VirtualNetworkFunctionRecord Dependency of a NetworkServiceRecord with specific id")
-    public VNFDependency getVNFDependency(final String idNSR, final String id_vnfd) throws SDKException {
-        String url = idNSR + "/vnfdependencies" + "/" + id_vnfd;
-        return (VNFDependency) requestGetWithStatusAccepted(url, VNFDependency.class);
+    public VNFRecordDependency getVNFDependency(final String idNSR, final String id_vnfrdep) throws SDKException {
+        String url = idNSR + "/vnfdependencies" + "/" + id_vnfrdep;
+        return (VNFRecordDependency) requestGet(url, VNFRecordDependency.class);
     }
 
     /**
@@ -151,8 +151,8 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
      *
      */
     @Help(help = "Update the VirtualNetworkFunctionRecord Dependency of a NetworkServiceRecord with specific id")
-    public VNFRecordDependency updateVNFDependency(final String idNSR, final String id_vnfd, final VNFRecordDependency vnfDependency) throws SDKException {
-        String url = idNSR + "/vnfdependencies" + "/" + id_vnfd;
+    public VNFRecordDependency updateVNFDependency(final String idNSR, final String id_vnfrDep, final VNFRecordDependency vnfDependency) throws SDKException {
+        String url = idNSR + "/vnfdependencies" + "/" + id_vnfrDep;
         return (VNFRecordDependency) requestPut(url, vnfDependency);
     }
 

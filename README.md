@@ -214,10 +214,29 @@ Navigate into the project's root directory and execute *source nfvo.properties*.
   ```sh
      $ openbaton.sh NetworkServiceRecord-deleteVirtualNetworkFunctionRecord id-network-service-record id-vnfr
   ```
+  
+* **createVNFDependency**                                      
+  * Create a VirtualNetworkFunctionRecord Dependency of a NetworkServiceRecord with specific id
+  ```sh
+   $ openbaton.sh NetworkServiceRecord-createVNFDependency id-network-service-record file.json
+  ```
+  
 * **deleteVNFDependency**                                      
-  * Delete the Virtual Network Function Record Dependency of a Network Service Record with specific id
+  * Delete the VirtualNetworkFunctionRecord Dependency of a NetworkServiceRecord with specific id
   ```sh
    $ openbaton.sh NetworkServiceRecord-deleteVNFDependency id-network-service-record id-vnfdependency
+  ```
+  
+* **getVNFDependencies**                                      
+  * Get all the VirtualNetworkFunctionRecord Dependencies of a NetworkServiceRecord with specific id
+  ```sh
+   $ openbaton.sh NetworkServiceRecord-getVNFDependencies id-network-service-record
+  ```
+  
+* **getVNFDependency**                                      
+  * Get the VirtualNetworkFunctionRecord Dependency of a NetworkServiceRecord with specific id
+  ```sh
+   $ openbaton.sh NetworkServiceRecord-getVNFDependency id-network-service-record id-vnfdependency
   ```
   
 *  **createVNFCInstance**                                      
