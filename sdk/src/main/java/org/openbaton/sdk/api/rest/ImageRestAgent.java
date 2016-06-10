@@ -14,8 +14,8 @@ public class ImageRestAgent extends AbstractRestAgent<NFVImage> {
      *
      *
      */
-    public ImageRestAgent(String username, String password, String projectId, String nfvoIp, String nfvoPort, String path, String version) {
-        super(username, password, projectId, nfvoIp, nfvoPort, path, version, NFVImage.class);
+    public ImageRestAgent(String username, String password, String projectId, boolean sslEnabled, String nfvoIp, String nfvoPort, String path, String version) {
+        super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version, NFVImage.class);
     }
 
 }

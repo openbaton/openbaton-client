@@ -13,8 +13,8 @@ public class VirtualNetworkFunctionDescriptorRestAgent extends AbstractRestAgent
      *
      * @param nfvoIp the url path used for the api requests
      */
-    public VirtualNetworkFunctionDescriptorRestAgent(String username, String password, String projectId, String nfvoIp, String nfvoPort, String path, String version) {
-        super(username, password, projectId, nfvoIp, nfvoPort, path, version, VirtualNetworkFunctionDescriptor.class);
+    public VirtualNetworkFunctionDescriptorRestAgent(String username, String password, String projectId, boolean sslEnabled, String nfvoIp, String nfvoPort, String path, String version) {
+        super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version, VirtualNetworkFunctionDescriptor.class);
     }
 
 }

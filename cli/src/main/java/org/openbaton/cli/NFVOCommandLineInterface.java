@@ -2,13 +2,11 @@ package org.openbaton.cli;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import com.google.gson.stream.MalformedJsonException;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 import jline.console.completer.FileNameCompleter;
 import jline.console.completer.StringsCompleter;
-import org.apache.commons.lang3.ArrayUtils;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
@@ -23,15 +21,20 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
  * Created by lto on 14/07/15.
- *
  */
 public class NFVOCommandLineInterface {
 
@@ -95,7 +98,8 @@ public class NFVOCommandLineInterface {
         System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
     }
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws IOException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 
         ConsoleReader reader = getConsoleReader();
         Properties properties = new Properties();
@@ -104,11 +108,12 @@ public class NFVOCommandLineInterface {
         getProperty(reader, properties, "NFVO_USERNAME", "admin");
         getProperty(reader, properties, "NFVO_PASSWORD", "openbaton");
         getProperty(reader, properties, "NFVO_PROJECT_ID", "default");
+        getProperty(reader, properties, "NFVO_SSL_ENABLED", "true");
         getProperty(reader, properties, "NFVO_IP", "127.0.0.1");
-        getProperty(reader, properties, "NFVO_PORT", "8080");
+        getProperty(reader, properties, "NFVO_PORT", "8443");
         getProperty(reader, properties, "NFVO_VERSION", VERSION);
 
-        NFVORequestor nfvo = new NFVORequestor(properties.getProperty("NFVO_USERNAME"), properties.getProperty("NFVO_PASSWORD"), properties.getProperty("NFVO_PROJECT_ID"), properties.getProperty("NFVO_IP"), properties.getProperty("NFVO_PORT"), properties.getProperty("NFVO_VERSION"));
+        NFVORequestor nfvo = new NFVORequestor(properties.getProperty("NFVO_USERNAME"), properties.getProperty("NFVO_PASSWORD"), properties.getProperty("NFVO_PROJECT_ID"), Boolean.parseBoolean(properties.getProperty("NFVO_SSL_ENABLED")), properties.getProperty("NFVO_IP"), properties.getProperty("NFVO_PORT"), properties.getProperty("NFVO_VERSION"));
 
         fillCommands(nfvo);
 
@@ -140,7 +145,7 @@ public class NFVOCommandLineInterface {
                     exit(0);
                 }
 
-                if (args[args.length-1].equalsIgnoreCase("help")) {  // case: ./openbaton.sh [command] help
+                if (args[args.length - 1].equalsIgnoreCase("help")) {  // case: ./openbaton.sh [command] help
                     helpUsage(args[0]);
                     exit(0);
                 }
@@ -150,14 +155,14 @@ public class NFVOCommandLineInterface {
                     exit(1);
                 }
                 s = args[0];
-                for (int i=1; i<args.length; i++) {
-                    s+=" ";
-                    s+=args[i];
+                for (int i = 1; i < args.length; i++) {
+                    s += " ";
+                    s += args[i];
                 }
 
                 //execute comand
                 try {
-                    String result = PrintFormat.printResult(args[0],executeCommand(s));
+                    String result = PrintFormat.printResult(args[0], executeCommand(s));
                     System.out.println(result);
                     exit(0);
 
@@ -166,8 +171,7 @@ public class NFVOCommandLineInterface {
                     if (log.isDebugEnabled())
                         ce.getCause().printStackTrace();
                     exit(1);
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                     log.error("Error while invoking command");
                     exit(1);
@@ -211,7 +215,7 @@ public class NFVOCommandLineInterface {
         }
     }
 
-    private static Command validateParametersAndGetCommand(String line) throws CommandLineException{
+    private static Command validateParametersAndGetCommand(String line) throws CommandLineException {
         StringTokenizer st = new StringTokenizer(line);
         String commandName = "";
         if (st.hasMoreTokens())
@@ -293,7 +297,7 @@ public class NFVOCommandLineInterface {
                 try {
                     casted = command.getClazz().cast(gson.fromJson(file, command.getClazz()));
                 } catch (JsonParseException je) {
-                    throw new CommandLineException("The provided json file could not be cast to an object of type "+command.getClazz().getSimpleName(), je.getCause());
+                    throw new CommandLineException("The provided json file could not be cast to an object of type " + command.getClazz().getSimpleName(), je.getCause());
                 }
                 log.trace("Parameter added is: " + casted);
                 params.add(casted);
@@ -351,8 +355,8 @@ public class NFVOCommandLineInterface {
         getMethods(nfvo.getVirtualNetworkFunctionDescriptorAgent());
         getMethods(nfvo.getVirtualLinkAgent());
         getMethods(nfvo.getVNFPackageAgent());
-        getMethods(nfvo.getProjectAgent());
-        getMethods(nfvo.getUserAgent());
+//        getMethods(nfvo.getProjectAgent());
+//        getMethods(nfvo.getUserAgent());
     }
 
     private static void getMethods(AbstractRestAgent agent) {
@@ -393,9 +397,9 @@ public class NFVOCommandLineInterface {
                 if (!superMethodOverridden) {
                     helpCommandMap.put(replacement + "-" + superMethod.getName(), superMethod.getAnnotation(Help.class).help().replace("{#}", replacement));
                     Command command = new Command(agent, superMethod, superMethod.getParameterTypes(), clazz);
-                    if (commandMap.containsKey(replacement+"-"+superMethod.getName())) {
-                        commandMap.get(replacement+"-"+superMethod.getName()).add(command);
-                    } else{
+                    if (commandMap.containsKey(replacement + "-" + superMethod.getName())) {
+                        commandMap.get(replacement + "-" + superMethod.getName()).add(command);
+                    } else {
                         LinkedList commandList = new LinkedList();
                         commandList.add(command);
                         commandMap.put(replacement + "-" + superMethod.getName(), commandList);
@@ -409,9 +413,9 @@ public class NFVOCommandLineInterface {
                 Command command = new Command(agent, method, method.getParameterTypes(), clazz);
                 helpCommandMap.put(replacement + "-" + method.getName(), method.getAnnotation(Help.class).help());
                 // check if key is already in map
-                if (commandMap.containsKey(replacement+"-"+method.getName())) {
-                    commandMap.get(replacement+"-"+method.getName()).add(command);
-                } else{
+                if (commandMap.containsKey(replacement + "-" + method.getName())) {
+                    commandMap.get(replacement + "-" + method.getName()).add(command);
+                } else {
                     LinkedList commandList = new LinkedList();
                     commandList.add(command);
                     commandMap.put(replacement + "-" + method.getName(), commandList);
@@ -437,6 +441,7 @@ public class NFVOCommandLineInterface {
             properties.put("NFVO_USERNAME", System.getenv().get("NFVO_USERNAME"));
             properties.put("NFVO_PASSWORD", System.getenv().get("NFVO_PASSWORD"));
             properties.put("NFVO_PROJECT_ID", System.getenv().get("NFVO_PROJECT_ID"));
+            properties.put("NFVO_SSL_ENABLED", System.getenv().get("NFVO_SSL_ENABLED"));
             properties.put("NFVO_IP", System.getenv().get("NFVO_IP"));
             properties.put("NFVO_PORT", System.getenv().get("NFVO_PORT"));
             properties.put("NFVO_VERSION", System.getenv().get("NFVO_VERSION"));
