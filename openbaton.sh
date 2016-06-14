@@ -22,6 +22,7 @@ function showConfiguration {
     echo -e "\tNFVO_USERNAME=$NFVO_USERNAME"
     echo -e "\tNFVO_PASSWORD=$NFVO_PASSWORD"
     echo -e "\tNFVO_PROJECT_ID=$NFVO_PROJECT_ID"
+    echo -e "\tNFVO_SSL_ENABLED=$NFVO_SSL_ENABLED"
 
 }
 
@@ -32,6 +33,7 @@ function checkEnvironmentVariables {
     checkEnvironmentVariable NFVO_USERNAME
     checkEnvironmentVariable NFVO_PASSWORD
     checkEnvironmentVariable NFVO_PROJECT_ID
+    checkEnvironmentVariable NFVO_SSL_ENABLED
 }
 
 function checkEnvironmentVariable {
