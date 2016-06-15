@@ -107,6 +107,7 @@ public abstract class RestRequest {
      */
     public String requestPost(final String id) throws SDKException {
         CloseableHttpResponse response = null;
+        HttpPost httpPost = null;
         try {
             log.debug("baseUrl: " + baseUrl);
             log.debug("id: " + baseUrl + "/" + id);
@@ -120,7 +121,7 @@ public abstract class RestRequest {
 
             // call the api here
             log.debug("Executing post on: " + this.baseUrl + "/" + id);
-            HttpPost httpPost = new HttpPost(this.baseUrl + "/" + id);
+            httpPost = new HttpPost(this.baseUrl + "/" + id);
             httpPost.setHeader(new BasicHeader("accept", "application/json"));
             httpPost.setHeader(new BasicHeader("Content-Type", "application/json"));
             httpPost.setHeader(new BasicHeader("project-id", projectId));
@@ -138,17 +139,25 @@ public abstract class RestRequest {
             response.close();
             log.trace("received: " + result);
 
+            httpPost.releaseConnection();
             return result;
         } catch (IOException e) {
             // catch request exceptions here
             log.error(e.getMessage(), e);
+            if (httpPost != null)
+                httpPost.releaseConnection();
             throw new SDKException("Could not http-post or open the object properly", e);
         } catch (SDKException e) {
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
+                if (httpPost != null)
+                    httpPost.releaseConnection();
                 return requestPost(id);
-            } else
+            } else {
+                if (httpPost != null)
+                    httpPost.releaseConnection();
                 throw new SDKException("Status is " + response.getStatusLine().getStatusCode());
+            }
         }
     }
 
@@ -166,6 +175,7 @@ public abstract class RestRequest {
 
     public Serializable requestPost(final String id, final Serializable object) throws SDKException {
         CloseableHttpResponse response = null;
+        HttpPost httpPost = null;
         try {
             log.trace("Object is: " + object);
             String fileJSONNode = mapper.toJson(object);
@@ -182,7 +192,7 @@ public abstract class RestRequest {
 
             // call the api here
             log.debug("Executing post on: " + this.baseUrl + "/" + id);
-            HttpPost httpPost = new HttpPost(this.baseUrl + "/" + id);
+            httpPost = new HttpPost(this.baseUrl + "/" + id);
             httpPost.setHeader(new BasicHeader("accept", "application/json"));
             httpPost.setHeader(new BasicHeader("Content-Type", "application/json"));
             httpPost.setHeader(new BasicHeader("project-id", projectId));
@@ -198,7 +208,6 @@ public abstract class RestRequest {
             String result = "";
             if (response.getEntity() != null)
                 result = EntityUtils.toString(response.getEntity());
-            response.close();
 
             if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_NO_CONTENT) {
                 JsonParser jsonParser = new JsonParser();
@@ -209,17 +218,26 @@ public abstract class RestRequest {
                 log.trace("Casting it into: " + object.getClass());
                 return mapper.fromJson(result, object.getClass());
             }
+            response.close();
+            httpPost.releaseConnection();
             return null;
         } catch (IOException e) {
             // catch request exceptions here
             log.error(e.getMessage(), e);
+            if (httpPost != null)
+                httpPost.releaseConnection();
             throw new SDKException("Could not http-post or open the object properly", e);
         } catch (SDKException e) {
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
+                if (httpPost != null)
+                    httpPost.releaseConnection();
                 return requestPost(id);
-            } else
+            } else {
+                if (httpPost != null)
+                    httpPost.releaseConnection();
                 throw new SDKException("Status is " + response.getStatusLine().getStatusCode());
+            }
         }
     }
 
@@ -232,6 +250,7 @@ public abstract class RestRequest {
      */
     public VNFPackage requestPostPackage(final File f) throws SDKException {
         CloseableHttpResponse response = null;
+        HttpPost httpPost = null;
 
         try {
             try {
@@ -241,7 +260,7 @@ public abstract class RestRequest {
                 throw new SDKException("Could not get token", e);
             }
             log.debug("Executing post on " + baseUrl);
-            HttpPost httpPost = new HttpPost(this.baseUrl);
+            httpPost = new HttpPost(this.baseUrl);
             httpPost.setHeader(new BasicHeader("accept", "multipart/form-data"));
             httpPost.setHeader(new BasicHeader("project-id", projectId));
             if (token != null)
@@ -254,8 +273,10 @@ public abstract class RestRequest {
 
             response = httpClient.execute(httpPost);
         } catch (ClientProtocolException e) {
+            httpPost.releaseConnection();
             throw new SDKException("Could not create VNFPackage from file " + f.getName(), e);
         } catch (IOException e) {
+            httpPost.releaseConnection();
             throw new SDKException("Could not create VNFPackage from file " + f.getName(), e);
         }
 
@@ -278,8 +299,10 @@ public abstract class RestRequest {
             log.trace("received: " + result);
 
             log.trace("Casting it into: " + VNFPackage.class);
+            httpPost.releaseConnection();
             return mapper.fromJson(result, VNFPackage.class);
         }
+        httpPost.releaseConnection();
         return null;
     }
 
@@ -301,6 +324,7 @@ public abstract class RestRequest {
      */
     public void requestDelete(final String id) throws SDKException {
         CloseableHttpResponse response = null;
+        HttpDelete httpDelete = null;
         try {
             log.debug("baseUrl: " + baseUrl);
             log.debug("id: " + baseUrl + "/" + id);
@@ -314,7 +338,7 @@ public abstract class RestRequest {
 
             // call the api here
             log.info("Executing delete on: " + this.baseUrl + "/" + id);
-            HttpDelete httpDelete = new HttpDelete(this.baseUrl + "/" + id);
+            httpDelete = new HttpDelete(this.baseUrl + "/" + id);
             httpDelete.setHeader(new BasicHeader("project-id", projectId));
             if (token != null)
                 httpDelete.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
@@ -323,18 +347,25 @@ public abstract class RestRequest {
 
             // check response status
             checkStatus(response, HttpURLConnection.HTTP_NO_CONTENT);
+            httpDelete.releaseConnection();
             // return the response of the request
 
         } catch (IOException e) {
             // catch request exceptions here
             log.error(e.getMessage(), e);
+            if (httpDelete != null)
+                httpDelete.releaseConnection();
             throw new SDKException("Could not http-delete", e);
         } catch (SDKException e) {
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
+                if (httpDelete != null)
+                    httpDelete.releaseConnection();
                 requestDelete(id);
                 return;
             }
+            if (httpDelete != null)
+                httpDelete.releaseConnection();
             throw new SDKException("Could not http-delete or the api response was wrong", e);
         }
     }
@@ -361,6 +392,7 @@ public abstract class RestRequest {
 
     private Object requestGetAll(String url, Class type, final Integer httpStatus) throws SDKException {
         CloseableHttpResponse response = null;
+        HttpGet httpGet = null;
         try {
             try {
                 checkToken();
@@ -371,7 +403,7 @@ public abstract class RestRequest {
 
             // call the api here
             log.debug("Executing get on: " + url);
-            HttpGet httpGet = new HttpGet(url);
+            httpGet = new HttpGet(url);
             httpGet.setHeader(new BasicHeader("project-id", projectId));
             if (token != null)
                 httpGet.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
@@ -389,6 +421,7 @@ public abstract class RestRequest {
             if (response.getEntity() != null)
                 result = EntityUtils.toString(response.getEntity());
             response.close();
+            httpGet.releaseConnection();
             log.trace("result is: " + result);
 
             Class<?> aClass = Array.newInstance(type, 3).getClass();
@@ -400,18 +433,26 @@ public abstract class RestRequest {
         } catch (IOException e) {
             // catch request exceptions here
             log.error(e.getMessage(), e);
+            if (httpGet != null)
+                httpGet.releaseConnection();
             throw new SDKException("Could not http-get", e);
         } catch (SDKException e) {
             if (response != null) {
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                     token = null;
+                    if (httpGet != null)
+                        httpGet.releaseConnection();
                     return requestGetAll(url, type, httpStatus);
                 } else {
                     log.error(e.getMessage(), e);
+                    if (httpGet != null)
+                        httpGet.releaseConnection();
                     throw new SDKException("Could not authorize", e);
                 }
             } else {
                 log.error(e.getMessage(), e);
+                if (httpGet != null)
+                    httpGet.releaseConnection();
                 throw e;
             }
         }
@@ -429,6 +470,7 @@ public abstract class RestRequest {
      */
     private Object requestGetWithStatus(final String url, final Integer httpStatus, Class type) throws SDKException {
         CloseableHttpResponse response = null;
+        HttpGet httpGet = null;
         try {
             try {
                 checkToken();
@@ -439,7 +481,7 @@ public abstract class RestRequest {
 
             // call the api here
             log.debug("Executing get on: " + url);
-            HttpGet httpGet = new HttpGet(url);
+            httpGet = new HttpGet(url);
             httpGet.setHeader(new BasicHeader("project-id", projectId));
             if (token != null)
                 httpGet.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
@@ -457,6 +499,7 @@ public abstract class RestRequest {
             if (response.getEntity() != null)
                 result = EntityUtils.toString(response.getEntity());
             response.close();
+            httpGet.releaseConnection();
             log.trace("result is: " + result);
 
             JsonParser jsonParser = new JsonParser();
@@ -470,20 +513,31 @@ public abstract class RestRequest {
         } catch (IOException e) {
             // catch request exceptions here
             log.error(e.getMessage(), e);
+            if (httpGet != null)
+                httpGet.releaseConnection();
             throw new SDKException("Could not http-get", e);
         } catch (SDKException e) {
             if (response != null) {
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                     token = null;
+                    if (httpGet != null)
+                        httpGet.releaseConnection();
                     return requestGetWithStatus(url, httpStatus, type);
                 } else {
                     log.error(e.getMessage(), e);
+                    if (httpGet != null)
+                        httpGet.releaseConnection();
                     throw new SDKException("Could not authorize", e);
                 }
             } else {
                 log.error(e.getMessage(), e);
+                if (httpGet != null)
+                    httpGet.releaseConnection();
                 throw e;
             }
+        } finally {
+            if (httpGet != null)
+                httpGet.releaseConnection();
         }
     }
 
@@ -508,6 +562,7 @@ public abstract class RestRequest {
      */
     public Serializable requestPut(final String id, final Serializable object) throws SDKException {
         CloseableHttpResponse response = null;
+        HttpPut httpPut = null;
         try {
             log.trace("Object is: " + object);
             String fileJSONNode = mapper.toJson(object);
@@ -521,7 +576,7 @@ public abstract class RestRequest {
 
             // call the api here
             log.debug("Executing put on: " + this.baseUrl + "/" + id);
-            HttpPut httpPut = new HttpPut(this.baseUrl + "/" + id);
+            httpPut = new HttpPut(this.baseUrl + "/" + id);
             httpPut.setHeader(new BasicHeader("accept", "application/json"));
             httpPut.setHeader(new BasicHeader("Content-Type", "application/json"));
             httpPut.setHeader(new BasicHeader("project-id", projectId));
@@ -539,6 +594,8 @@ public abstract class RestRequest {
                 result = EntityUtils.toString(response.getEntity());
 
             if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_NO_CONTENT) {
+                response.close();
+                httpPut.releaseConnection();
                 JsonParser jsonParser = new JsonParser();
                 JsonElement jsonElement = jsonParser.parse(result);
                 result = mapper.toJson(jsonElement);
@@ -548,17 +605,28 @@ public abstract class RestRequest {
                 return mapper.fromJson(result, object.getClass());
             }
             response.close();
+            httpPut.releaseConnection();
             return null;
         } catch (IOException e) {
             // catch request exceptions here
             log.error(e.getMessage(), e);
+            if (httpPut != null)
+                httpPut.releaseConnection();
             throw new SDKException("Could not http-put or the api response was wrong or open the object properly", e);
         } catch (SDKException e) {
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
+                if (httpPut != null)
+                    httpPut.releaseConnection();
                 return requestPut(id, object);
-            } else
+            } else {
+                if (httpPut != null)
+                    httpPut.releaseConnection();
                 throw new SDKException("Could not http-put or the api response was wrong or open the object properly", e);
+            }
+        } finally {
+            if (httpPut != null)
+                httpPut.releaseConnection();
         }
     }
 
@@ -590,13 +658,14 @@ public abstract class RestRequest {
 
         httpPost.setEntity(new UrlEncodedFormEntity(parametersBody, StandardCharsets.UTF_8));
 
-        org.apache.http.HttpResponse response = null;
+        CloseableHttpResponse response = null;
         log.debug("httpPost is: " + httpPost.toString());
         response = httpClient.execute(httpPost);
-
         String responseString = null;
         responseString = EntityUtils.toString(response.getEntity());
         int statusCode = response.getStatusLine().getStatusCode();
+        response.close();
+        httpPost.releaseConnection();
         log.trace(statusCode + ": " + responseString);
 
         if (statusCode != 200) {
@@ -641,7 +710,7 @@ public abstract class RestRequest {
                 new String[]{"TLSv1"}, null, new NoopHostnameVerifier());
 
         Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
-                .<ConnectionSocketFactory> create().register("https", sslConnectionSocketFactory)
+                .<ConnectionSocketFactory>create().register("https", sslConnectionSocketFactory)
                 .build();
 
         return HttpClientBuilder.create().setDefaultRequestConfig(config)
