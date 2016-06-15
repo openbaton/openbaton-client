@@ -2,13 +2,11 @@ package org.openbaton.cli;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import com.google.gson.stream.MalformedJsonException;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
 import jline.console.completer.FileNameCompleter;
 import jline.console.completer.StringsCompleter;
-import org.apache.commons.lang3.ArrayUtils;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VNFDependency;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
@@ -26,10 +24,16 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -97,7 +101,8 @@ public class NFVOCommandLineInterface {
         System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
     }
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws IOException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 
         ConsoleReader reader = getConsoleReader();
         Properties properties = new Properties();
@@ -105,11 +110,13 @@ public class NFVOCommandLineInterface {
         readEnvVars(properties);
         getProperty(reader, properties, "NFVO_USERNAME", "admin");
         getProperty(reader, properties, "NFVO_PASSWORD", "openbaton");
+        getProperty(reader, properties, "NFVO_PROJECT_ID", "default");
+        getProperty(reader, properties, "NFVO_SSL_ENABLED", "true");
         getProperty(reader, properties, "NFVO_IP", "127.0.0.1");
-        getProperty(reader, properties, "NFVO_PORT", "8080");
+        getProperty(reader, properties, "NFVO_PORT", "8443");
         getProperty(reader, properties, "NFVO_VERSION", VERSION);
 
-        NFVORequestor nfvo = new NFVORequestor(properties.getProperty("NFVO_USERNAME"), properties.getProperty("NFVO_PASSWORD"), properties.getProperty("NFVO_IP"), properties.getProperty("NFVO_PORT"), properties.getProperty("NFVO_VERSION"));
+        NFVORequestor nfvo = new NFVORequestor(properties.getProperty("NFVO_USERNAME"), properties.getProperty("NFVO_PASSWORD"), properties.getProperty("NFVO_PROJECT_ID"), Boolean.parseBoolean(properties.getProperty("NFVO_SSL_ENABLED")), properties.getProperty("NFVO_IP"), properties.getProperty("NFVO_PORT"), properties.getProperty("NFVO_VERSION"));
 
         fillCommands(nfvo);
 
@@ -359,6 +366,8 @@ public class NFVOCommandLineInterface {
         getMethods(nfvo.getVirtualNetworkFunctionDescriptorAgent());
         getMethods(nfvo.getVirtualLinkAgent());
         getMethods(nfvo.getVNFPackageAgent());
+//        getMethods(nfvo.getProjectAgent());
+//        getMethods(nfvo.getUserAgent());
     }
 
     private static void getMethods(AbstractRestAgent agent) {
@@ -442,6 +451,8 @@ public class NFVOCommandLineInterface {
         try {
             properties.put("NFVO_USERNAME", System.getenv().get("NFVO_USERNAME"));
             properties.put("NFVO_PASSWORD", System.getenv().get("NFVO_PASSWORD"));
+            properties.put("NFVO_PROJECT_ID", System.getenv().get("NFVO_PROJECT_ID"));
+            properties.put("NFVO_SSL_ENABLED", System.getenv().get("NFVO_SSL_ENABLED"));
             properties.put("NFVO_IP", System.getenv().get("NFVO_IP"));
             properties.put("NFVO_PORT", System.getenv().get("NFVO_PORT"));
             properties.put("NFVO_VERSION", System.getenv().get("NFVO_VERSION"));

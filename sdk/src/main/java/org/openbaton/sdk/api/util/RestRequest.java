@@ -2,31 +2,44 @@ package org.openbaton.sdk.api.util;
 
 
 import com.google.gson.*;
-import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
+import org.openbaton.catalogue.nfvo.VNFPackage;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import javax.net.ssl.SSLContext;
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -42,20 +55,32 @@ public abstract class RestRequest {
     protected Gson mapper;
     private String username;
     private String password;
+    private String projectId;
+    private boolean sslEnabled;
     private String authStr = "openbatonOSClient" + ":" + "secret";
     private String encoding = Base64.encodeBase64String(authStr.getBytes());
     private final String provider;
     private String token = null;
     private String bearerToken = null;
 
+    private CloseableHttpClient httpClient;
+    private RequestConfig config = RequestConfig.custom()
+            .setConnectionRequestTimeout(10000).setConnectTimeout(10000).build();
+
     /**
      * Create a request with a given url path
      */
-    public RestRequest(String username, String password, final String nfvoIp, String nfvoPort, String path, String version) {
-        this.baseUrl = "http://" + nfvoIp + ":" + nfvoPort + "/api/v" + version + path;
-        this.provider = "http://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
+    public RestRequest(String username, String password, String projectId, boolean sslEnabled, final String nfvoIp, String nfvoPort, String path, String version) {
+        if (sslEnabled) {
+            this.baseUrl = "https://" + nfvoIp + ":" + nfvoPort + "/api/v" + version + path;
+            this.provider = "https://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
+        } else {
+            this.baseUrl = "http://" + nfvoIp + ":" + nfvoPort + "/api/v" + version + path;
+            this.provider = "http://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
+        }
         this.username = username;
         this.password = password;
+        this.projectId = projectId;
 
         GsonBuilder builder = new GsonBuilder();
         /*builder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
@@ -63,59 +88,76 @@ public abstract class RestRequest {
                 return new Date(json.getAsJsonPrimitive().getAsLong());
             }
         });*/
-        this.mapper = builder.create();
+        this.mapper = builder.setPrettyPrinting().create();
+
+        if (sslEnabled)
+            this.httpClient = getHttpClientForSsl();
+        else
+            this.httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config)
+                    .setConnectionManager(new PoolingHttpClientConnectionManager()).build();
 
     }
 
     /**
      * Does the POST Request
+     *
      * @param id
      * @return String
      * @throws SDKException
      */
     public String requestPost(final String id) throws SDKException {
-        HttpResponse<JsonNode> jsonResponse = null;
+        CloseableHttpResponse response = null;
+        HttpPost httpPost = null;
         try {
-
             log.debug("baseUrl: " + baseUrl);
-            log.debug("id: " + baseUrl + id);
+            log.debug("id: " + baseUrl + "/" + id);
 
-            checkToken();
+            try {
+                checkToken();
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                throw new SDKException("Could not get token", e);
+            }
 
             // call the api here
-            log.debug("Executing post on: " + this.baseUrl + id);
+            log.debug("Executing post on: " + this.baseUrl + "/" + id);
+            httpPost = new HttpPost(this.baseUrl + "/" + id);
+            httpPost.setHeader(new BasicHeader("accept", "application/json"));
+            httpPost.setHeader(new BasicHeader("Content-Type", "application/json"));
+            httpPost.setHeader(new BasicHeader("project-id", projectId));
             if (token != null)
-                jsonResponse = Unirest.post(this.baseUrl + id)
-                        .header("accept", "application/json")
-                        .header("Content-Type", "application/json")
-                        .header("Authorization", bearerToken.replaceAll("\"", ""))
-                        .asJson();
-            else
-                jsonResponse = Unirest.post(this.baseUrl + id)
-                        .header("accept", "application/json")
-                        .header("Content-Type", "application/json")
-                        .asJson();
-//            check response status
-            checkStatus(jsonResponse, HttpURLConnection.HTTP_CREATED);
+                httpPost.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+
+            response = httpClient.execute(httpPost);
+
+            // check response status
+            checkStatus(response, HttpURLConnection.HTTP_CREATED);
             // return the response of the request
-            String result = jsonResponse.getBody().toString();
+            String result = "";
+            if (response.getEntity() != null)
+                result = EntityUtils.toString(response.getEntity());
+            response.close();
             log.trace("received: " + result);
 
+            httpPost.releaseConnection();
             return result;
         } catch (IOException e) {
             // catch request exceptions here
             log.error(e.getMessage(), e);
+            if (httpPost != null)
+                httpPost.releaseConnection();
             throw new SDKException("Could not http-post or open the object properly", e);
-        } catch (UnirestException e) {
-            // catch request exceptions here
-            log.error(e.getMessage(), e);
-            throw new SDKException("Could not http-post or open the object properly", e);
-
         } catch (SDKException e) {
-            if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
+                if (httpPost != null)
+                    httpPost.releaseConnection();
                 return requestPost(id);
-            } else throw new SDKException("Status is " + jsonResponse.getStatus());
+            } else {
+                if (httpPost != null)
+                    httpPost.releaseConnection();
+                throw new SDKException("Status is " + response.getStatusLine().getStatusCode());
+            }
         }
     }
 
@@ -127,72 +169,141 @@ public abstract class RestRequest {
      * @return a string containing the response content
      */
     public Serializable requestPost(final Serializable object) throws SDKException {
-    	return requestPost("",object);
+        return requestPost("", object);
     }
-    
-    
-    public Serializable requestPost(final String id,final Serializable object) throws SDKException {
-        HttpResponse<JsonNode> jsonResponse = null;
+
+
+    public Serializable requestPost(final String id, final Serializable object) throws SDKException {
+        CloseableHttpResponse response = null;
+        HttpPost httpPost = null;
         try {
             log.trace("Object is: " + object);
-         
             String fileJSONNode = mapper.toJson(object);
-
             log.trace("sending: " + fileJSONNode.toString());
-            log.trace("baseUrl: " + baseUrl + "/" +id);
+            log.debug("baseUrl: " + baseUrl);
+            log.debug("id: " + baseUrl + "/" + id);
 
-            checkToken();
+            try {
+                checkToken();
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                throw new SDKException("Could not get token", e);
+            }
 
             // call the api here
-            log.debug("Executing post on: " + this.baseUrl + "/" +id);
+            log.debug("Executing post on: " + this.baseUrl + "/" + id);
+            httpPost = new HttpPost(this.baseUrl + "/" + id);
+            httpPost.setHeader(new BasicHeader("accept", "application/json"));
+            httpPost.setHeader(new BasicHeader("Content-Type", "application/json"));
+            httpPost.setHeader(new BasicHeader("project-id", projectId));
             if (token != null)
-                jsonResponse = Unirest.post(this.baseUrl + "/" +id)
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", bearerToken.replaceAll("\"", ""))
-                    .body(fileJSONNode)
-                    .asJson();
-            else
-                jsonResponse = Unirest.post(this.baseUrl + "/" +id)
-                        .header("accept", "application/json")
-                        .header("Content-Type", "application/json")
-                        .body(fileJSONNode)
-                        .asJson();
-//            check response status
-            checkStatus(jsonResponse, HttpURLConnection.HTTP_CREATED);
-            // return the response of the request
-            String result2 = jsonResponse.getBody().toString();
-            log.trace("received2: " + result2);
+                httpPost.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+            httpPost.setEntity(new StringEntity(fileJSONNode));
 
-            if (jsonResponse.getStatus() != HttpURLConnection.HTTP_NO_CONTENT) {
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                JsonParser jp = new JsonParser();
-                JsonElement je = jp.parse(jsonResponse.getBody().toString());
-                String result = gson.toJson(je);
+            response = httpClient.execute(httpPost);
+
+            // check response status
+            checkStatus(response, HttpURLConnection.HTTP_CREATED);
+            // return the response of the request
+            String result = "";
+            if (response.getEntity() != null)
+                result = EntityUtils.toString(response.getEntity());
+
+            if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_NO_CONTENT) {
+                JsonParser jsonParser = new JsonParser();
+                JsonElement jsonElement = jsonParser.parse(result);
+                result = mapper.toJson(jsonElement);
                 log.trace("received: " + result);
 
-
                 log.trace("Casting it into: " + object.getClass());
-//            return mapper.readValue(jsonResponse.getBody().toString(), object.getClass());
-
                 return mapper.fromJson(result, object.getClass());
             }
+            response.close();
+            httpPost.releaseConnection();
             return null;
         } catch (IOException e) {
             // catch request exceptions here
             log.error(e.getMessage(), e);
-            throw new SDKException("Could not http-post or open the object properly", e);
-        } catch (UnirestException e) {
-            // catch request exceptions here
-            log.error(e.getMessage(), e);
+            if (httpPost != null)
+                httpPost.releaseConnection();
             throw new SDKException("Could not http-post or open the object properly", e);
         } catch (SDKException e) {
-            if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
-                return requestPost(object);
-            } else
-                throw new SDKException("Status is " + jsonResponse.getStatus(), e);
+                if (httpPost != null)
+                    httpPost.releaseConnection();
+                return requestPost(id);
+            } else {
+                if (httpPost != null)
+                    httpPost.releaseConnection();
+                throw new SDKException("Status is " + response.getStatusLine().getStatusCode());
+            }
         }
+    }
+
+    /**
+     * Used to upload tar files to the NFVO for creating VNFPackages.
+     *
+     * @param f the tar file containing the VNFPackage
+     * @return the created VNFPackage object
+     * @throws SDKException
+     */
+    public VNFPackage requestPostPackage(final File f) throws SDKException {
+        CloseableHttpResponse response = null;
+        HttpPost httpPost = null;
+
+        try {
+            try {
+                checkToken();
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                throw new SDKException("Could not get token", e);
+            }
+            log.debug("Executing post on " + baseUrl);
+            httpPost = new HttpPost(this.baseUrl);
+            httpPost.setHeader(new BasicHeader("accept", "multipart/form-data"));
+            httpPost.setHeader(new BasicHeader("project-id", projectId));
+            if (token != null)
+                httpPost.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+
+            MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
+            multipartEntityBuilder.addBinaryBody("file", f);
+            httpPost.setEntity(multipartEntityBuilder.build());
+
+
+            response = httpClient.execute(httpPost);
+        } catch (ClientProtocolException e) {
+            httpPost.releaseConnection();
+            throw new SDKException("Could not create VNFPackage from file " + f.getName(), e);
+        } catch (IOException e) {
+            httpPost.releaseConnection();
+            throw new SDKException("Could not create VNFPackage from file " + f.getName(), e);
+        }
+
+        // check response status
+        checkStatus(response, HttpURLConnection.HTTP_OK);
+        // return the response of the request
+        String result = "";
+        if (response.getEntity() != null)
+            try {
+                result = EntityUtils.toString(response.getEntity());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_NO_CONTENT) {
+            JsonParser jsonParser = new JsonParser();
+            JsonElement jsonElement = jsonParser.parse(result);
+            result = mapper.toJson(jsonElement);
+            log.debug("Uploaded the VNFPackage");
+            log.trace("received: " + result);
+
+            log.trace("Casting it into: " + VNFPackage.class);
+            httpPost.releaseConnection();
+            return mapper.fromJson(result, VNFPackage.class);
+        }
+        httpPost.releaseConnection();
+        return null;
     }
 
     private void checkToken() throws IOException, SDKException {
@@ -212,38 +323,53 @@ public abstract class RestRequest {
      * @param id the id path used for the api request
      */
     public void requestDelete(final String id) throws SDKException {
-        HttpResponse<JsonNode> jsonResponse = null;
+        CloseableHttpResponse response = null;
+        HttpDelete httpDelete = null;
         try {
-            // call the api here
-            checkToken();
-            log.debug("Executing delete on: " + this.baseUrl + "/" + id);
-            if (token != null)
-                jsonResponse = Unirest.delete(this.baseUrl + "/" + id)
-                    .header("Authorization", bearerToken.replaceAll("\"", ""))
-                    .asJson();
-            else
-                jsonResponse = Unirest.delete(this.baseUrl + "/" + id).asJson();
-//            check response status
-            checkStatus(jsonResponse, HttpURLConnection.HTTP_NO_CONTENT);
+            log.debug("baseUrl: " + baseUrl);
+            log.debug("id: " + baseUrl + "/" + id);
 
-        } catch (UnirestException e) {
+            try {
+                checkToken();
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                throw new SDKException("Could not get token", e);
+            }
+
+            // call the api here
+            log.info("Executing delete on: " + this.baseUrl + "/" + id);
+            httpDelete = new HttpDelete(this.baseUrl + "/" + id);
+            httpDelete.setHeader(new BasicHeader("project-id", projectId));
+            if (token != null)
+                httpDelete.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+
+            response = httpClient.execute(httpDelete);
+
+            // check response status
+            checkStatus(response, HttpURLConnection.HTTP_NO_CONTENT);
+            httpDelete.releaseConnection();
+            // return the response of the request
+
+        } catch (IOException e) {
             // catch request exceptions here
-            throw new SDKException("Could not http-delete or the api response was wrong", e);
+            log.error(e.getMessage(), e);
+            if (httpDelete != null)
+                httpDelete.releaseConnection();
+            throw new SDKException("Could not http-delete", e);
         } catch (SDKException e) {
-            // catch request exceptions here
-            if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
+                if (httpDelete != null)
+                    httpDelete.releaseConnection();
                 requestDelete(id);
                 return;
             }
+            if (httpDelete != null)
+                httpDelete.releaseConnection();
             throw new SDKException("Could not http-delete or the api response was wrong", e);
-
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-            throw new SDKException("Could not get token", e);
         }
     }
-    
+
 
     /**
      * Executes a http get with to a given id
@@ -253,68 +379,80 @@ public abstract class RestRequest {
      */
     public Object requestGet(final String id, Class type) throws SDKException {
         String url = this.baseUrl;
-        if (id != null){
+        if (id != null) {
             url += "/" + id;
             return requestGetWithStatus(url, null, type);
-        }
-        else return requestGetAll(url, type, null);
+        } else return requestGetAll(url, type, null);
     }
 
     protected Object requestGetAll(String url, Class type) throws SDKException {
         url = this.baseUrl + "/" + url;
         return requestGetAll(url, type, null);
     }
+
     private Object requestGetAll(String url, Class type, final Integer httpStatus) throws SDKException {
-        HttpResponse<JsonNode> jsonResponse = null;
+        CloseableHttpResponse response = null;
+        HttpGet httpGet = null;
         try {
-            // call the api here
             try {
                 checkToken();
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
                 throw new SDKException("Could not get token", e);
             }
-            log.debug("Executing get on: " + url);
 
+            // call the api here
+            log.debug("Executing get on: " + url);
+            httpGet = new HttpGet(url);
+            httpGet.setHeader(new BasicHeader("project-id", projectId));
             if (token != null)
-                jsonResponse = Unirest.get(url)
-                        .header("Authorization", bearerToken.replaceAll("\"", ""))
-                        .asJson();
-            else
-                jsonResponse = Unirest.get(url).asJson();
+                httpGet.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+
+            response = httpClient.execute(httpGet);
 
             // check response status
             if (httpStatus != null) {
-                checkStatus(jsonResponse, httpStatus);
+                checkStatus(response, httpStatus);
             } else {
-                checkStatus(jsonResponse, HttpURLConnection.HTTP_OK);
+                checkStatus(response, HttpURLConnection.HTTP_OK);
             }
             // return the response of the request
-            log.trace("result is: " + jsonResponse.getBody().toString());
-
-            //log.trace("result is: " + result);
+            String result = "";
+            if (response.getEntity() != null)
+                result = EntityUtils.toString(response.getEntity());
+            response.close();
+            httpGet.releaseConnection();
+            log.trace("result is: " + result);
 
             Class<?> aClass = Array.newInstance(type, 3).getClass();
             log.trace("class is: " + aClass);
-            Object[] o = (Object[]) mapper.fromJson(jsonResponse.getBody().toString(), aClass);
+            Object[] o = (Object[]) mapper.fromJson(result, aClass);
             log.trace("deserialized is: " + o);
 
             return o;
-
-        } catch (UnirestException e) {
+        } catch (IOException e) {
             // catch request exceptions here
-            throw new SDKException("Could not http-get properly", e);
+            log.error(e.getMessage(), e);
+            if (httpGet != null)
+                httpGet.releaseConnection();
+            throw new SDKException("Could not http-get", e);
         } catch (SDKException e) {
-            if (jsonResponse != null) {
-                if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
+            if (response != null) {
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                     token = null;
+                    if (httpGet != null)
+                        httpGet.releaseConnection();
                     return requestGetAll(url, type, httpStatus);
                 } else {
                     log.error(e.getMessage(), e);
+                    if (httpGet != null)
+                        httpGet.releaseConnection();
                     throw new SDKException("Could not authorize", e);
                 }
-            }else {
+            } else {
                 log.error(e.getMessage(), e);
+                if (httpGet != null)
+                    httpGet.releaseConnection();
                 throw e;
             }
         }
@@ -331,56 +469,75 @@ public abstract class RestRequest {
      * @return a string containing the response content
      */
     private Object requestGetWithStatus(final String url, final Integer httpStatus, Class type) throws SDKException {
-        HttpResponse<JsonNode> jsonResponse = null;
+        CloseableHttpResponse response = null;
+        HttpGet httpGet = null;
         try {
-            // call the api here
             try {
                 checkToken();
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
                 throw new SDKException("Could not get token", e);
-
             }
-            log.debug("Executing get on: " +url);
 
+            // call the api here
+            log.debug("Executing get on: " + url);
+            httpGet = new HttpGet(url);
+            httpGet.setHeader(new BasicHeader("project-id", projectId));
             if (token != null)
-                jsonResponse = Unirest.get(url)
-                    .header("Authorization", bearerToken.replaceAll("\"", ""))
-                    .asJson();
-            else
-                jsonResponse = Unirest.get(url).asJson();
+                httpGet.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+
+            response = httpClient.execute(httpGet);
 
             // check response status
             if (httpStatus != null) {
-                checkStatus(jsonResponse, httpStatus);
+                checkStatus(response, httpStatus);
             } else {
-                checkStatus(jsonResponse, HttpURLConnection.HTTP_OK);
+                checkStatus(response, HttpURLConnection.HTTP_OK);
             }
             // return the response of the request
-            log.trace("result is: " + jsonResponse.getBody().toString());
-
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            JsonParser jp = new JsonParser();
-            JsonElement je = jp.parse(jsonResponse.getBody().toString());
-            String result = gson.toJson(je);
+            String result = "";
+            if (response.getEntity() != null)
+                result = EntityUtils.toString(response.getEntity());
+            response.close();
+            httpGet.releaseConnection();
             log.trace("result is: " + result);
 
+            JsonParser jsonParser = new JsonParser();
+            JsonElement jsonElement = jsonParser.parse(result);
+            result = mapper.toJson(jsonElement);
+            log.trace("result is: " + result);
             Class<?> aClass = Array.newInstance(type, 1).getClass();
             log.trace("class is: " + aClass);
 
-            return mapper.fromJson(jsonResponse.getBody().toString(), type);
-
-        } catch (UnirestException e) {
+            return mapper.fromJson(result, type);
+        } catch (IOException e) {
             // catch request exceptions here
-            throw new SDKException("Could not http-get properly", e);
+            log.error(e.getMessage(), e);
+            if (httpGet != null)
+                httpGet.releaseConnection();
+            throw new SDKException("Could not http-get", e);
         } catch (SDKException e) {
-            if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
-                token = null;
-                return requestGetWithStatus(url, httpStatus, type);
+            if (response != null) {
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+                    token = null;
+                    if (httpGet != null)
+                        httpGet.releaseConnection();
+                    return requestGetWithStatus(url, httpStatus, type);
+                } else {
+                    log.error(e.getMessage(), e);
+                    if (httpGet != null)
+                        httpGet.releaseConnection();
+                    throw new SDKException("Could not authorize", e);
+                }
             } else {
                 log.error(e.getMessage(), e);
-                throw new SDKException("Could not authorize", e);
+                if (httpGet != null)
+                    httpGet.releaseConnection();
+                throw e;
             }
+        } finally {
+            if (httpGet != null)
+                httpGet.releaseConnection();
         }
     }
 
@@ -404,68 +561,89 @@ public abstract class RestRequest {
      * @return a string containing the response content
      */
     public Serializable requestPut(final String id, final Serializable object) throws SDKException {
-        HttpResponse<JsonNode> jsonResponse = null;
+        CloseableHttpResponse response = null;
+        HttpPut httpPut = null;
         try {
-            JsonNode fileJSONNode = getJsonNode(object);
+            log.trace("Object is: " + object);
+            String fileJSONNode = mapper.toJson(object);
+
             try {
                 checkToken();
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
                 throw new SDKException("Could not get token", e);
             }
+
             // call the api here
             log.debug("Executing put on: " + this.baseUrl + "/" + id);
+            httpPut = new HttpPut(this.baseUrl + "/" + id);
+            httpPut.setHeader(new BasicHeader("accept", "application/json"));
+            httpPut.setHeader(new BasicHeader("Content-Type", "application/json"));
+            httpPut.setHeader(new BasicHeader("project-id", projectId));
             if (token != null)
-                jsonResponse = Unirest.put(this.baseUrl + "/" + id)
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", bearerToken.replaceAll("\"", ""))
-                    .body(fileJSONNode)
-                    .asJson();
-            else
-                jsonResponse = Unirest.put(this.baseUrl + "/" + id)
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .body(fileJSONNode)
-                    .asJson();
+                httpPut.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+            httpPut.setEntity(new StringEntity(fileJSONNode));
 
-//          check response status
-            checkStatus(jsonResponse, HttpURLConnection.HTTP_ACCEPTED);
+            response = httpClient.execute(httpPut);
 
+            // check response status
+            checkStatus(response, HttpURLConnection.HTTP_ACCEPTED);
             // return the response of the request
-            return mapper.fromJson(jsonResponse.getBody().toString(), object.getClass());
+            String result = "";
+            if (response.getEntity() != null)
+                result = EntityUtils.toString(response.getEntity());
 
+            if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_NO_CONTENT) {
+                response.close();
+                httpPut.releaseConnection();
+                JsonParser jsonParser = new JsonParser();
+                JsonElement jsonElement = jsonParser.parse(result);
+                result = mapper.toJson(jsonElement);
+                log.trace("received: " + result);
+
+                log.trace("Casting it into: " + object.getClass());
+                return mapper.fromJson(result, object.getClass());
+            }
+            response.close();
+            httpPut.releaseConnection();
+            return null;
         } catch (IOException e) {
             // catch request exceptions here
-            throw new SDKException("Could not http-put or the api response was wrong or open the object properly", e);
-        } catch (UnirestException e) {
-            // catch request exceptions here
+            log.error(e.getMessage(), e);
+            if (httpPut != null)
+                httpPut.releaseConnection();
             throw new SDKException("Could not http-put or the api response was wrong or open the object properly", e);
         } catch (SDKException e) {
-            // catch request exceptions here
-            if (jsonResponse.getStatus() == HttpStatus.SC_UNAUTHORIZED) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
                 token = null;
+                if (httpPut != null)
+                    httpPut.releaseConnection();
                 return requestPut(id, object);
+            } else {
+                if (httpPut != null)
+                    httpPut.releaseConnection();
+                throw new SDKException("Could not http-put or the api response was wrong or open the object properly", e);
             }
-            throw new SDKException("Could not http-put or the api response was wrong or open the object properly", e);
+        } finally {
+            if (httpPut != null)
+                httpPut.releaseConnection();
         }
     }
 
     /**
      * Check wether a json repsonse has the right http status. If not, an SDKException is thrown.
      *
-     * @param jsonResponse the http json response
+     * @param httpResponse the http response
      * @param httpStatus   the (desired) http status of the repsonse
      */
-    private void checkStatus(HttpResponse<JsonNode> jsonResponse, final int httpStatus) throws SDKException {
-        if (jsonResponse.getStatus() != httpStatus) {
-            log.debug("Status expected: " + httpStatus + " obtained: " + jsonResponse.getStatus());
+    private void checkStatus(CloseableHttpResponse httpResponse, final int httpStatus) throws SDKException {
+        if (httpResponse.getStatusLine().getStatusCode() != httpStatus) {
+            System.out.println("Status expected: " + httpStatus + " obtained: " + httpResponse.getStatusLine().getStatusCode());
             throw new SDKException("Received wrong API HTTPStatus");
         }
     }
 
     private void getAccessToken() throws IOException, SDKException {
-        HttpClient httpClient = HttpClientBuilder.create().build();
 
         HttpPost httpPost = new HttpPost(provider);
 
@@ -480,13 +658,14 @@ public abstract class RestRequest {
 
         httpPost.setEntity(new UrlEncodedFormEntity(parametersBody, StandardCharsets.UTF_8));
 
-        org.apache.http.HttpResponse response = null;
+        CloseableHttpResponse response = null;
         log.debug("httpPost is: " + httpPost.toString());
         response = httpClient.execute(httpPost);
-
         String responseString = null;
         responseString = EntityUtils.toString(response.getEntity());
         int statusCode = response.getStatusLine().getStatusCode();
+        response.close();
+        httpPost.releaseConnection();
         log.trace(statusCode + ": " + responseString);
 
         if (statusCode != 200) {
@@ -501,14 +680,44 @@ public abstract class RestRequest {
             log.trace(token);
             bearerToken = "Bearer " + token;
             this.token = token;
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             String error = jobj.get("error").getAsString();
-            if (error.equals("invalid_grant")){
+            if (error.equals("invalid_grant")) {
                 throw new SDKException("Error during authentication: " + jobj.get("error_description").getAsString(), e);
             }
         }
 
     }
+
+    private CloseableHttpClient getHttpClientForSsl() {
+        SSLContext sslContext = null;
+        try {
+            sslContext = SSLContexts.custom().loadTrustMaterial(null,
+                    new TrustSelfSignedStrategy()).build();
+        } catch (NoSuchAlgorithmException e) {
+            log.error("Could not initialize the HttpClient for SSL connections");
+            log.error(e.getMessage(), e);
+        } catch (KeyManagementException e) {
+            log.error("Could not initialize the HttpClient for SSL connections");
+            log.error(e.getMessage(), e);
+        } catch (KeyStoreException e) {
+            log.error("Could not initialize the HttpClient for SSL connections");
+            log.error(e.getMessage(), e);
+        }
+
+        // necessary to trust self signed certificates
+        SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext,
+                new String[]{"TLSv1"}, null, new NoopHostnameVerifier());
+
+        Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
+                .<ConnectionSocketFactory>create().register("https", sslConnectionSocketFactory)
+                .build();
+
+        return HttpClientBuilder.create().setDefaultRequestConfig(config)
+                .setConnectionManager(new PoolingHttpClientConnectionManager(socketFactoryRegistry))
+                .setSSLSocketFactory(sslConnectionSocketFactory).build();
+    }
+
 
     private class ParseComError implements Serializable {
         String error_description;

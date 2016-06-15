@@ -23,8 +23,8 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
      *
      * @param path the url path used for the api requests
      */
-    public NetworkServiceRecordRestAgent(String username, String password, String nfvoIp, String nfvoPort, String path, String version) {
-        super(username, password, nfvoIp, nfvoPort, path, version, NetworkServiceRecord.class);
+    public NetworkServiceRecordRestAgent(String username, String password, String projectId, boolean sslEnabled, String nfvoIp, String nfvoPort, String path, String version) {
+        super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version, NetworkServiceRecord.class);
     }
 
     @Help(help = "Create NetworkServiceRecord from NetworkServiceDescriptor id")

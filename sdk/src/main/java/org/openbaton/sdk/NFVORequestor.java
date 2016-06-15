@@ -6,7 +6,7 @@ import org.openbaton.sdk.api.rest.*;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
- * OpenBaton api requestor. Can be extended with security features to provide instances only only to granted requestors.
+ * OpenBaton api requestor.
  * The Class is implemented in a static way to avoid any dependencies to spring and to create a corresponding small lib size.
  */
 public final class NFVORequestor {
@@ -14,22 +14,44 @@ public final class NFVORequestor {
 
     private static RequestFactory factory;
 
-    public NFVORequestor(String version){
-        this.factory = RequestFactory.getInstance(null,null, "localhost", "8080", version);
+    /**
+     * The public constructor for an NFVORequestor to a NFVO which runs on localhost port 8443 and uses SSL
+     * @param username
+     * @param password
+     * @param projectId
+     * @param version
+     */
+    public NFVORequestor(String username, String password, String projectId, String version) {
+        this.factory = RequestFactory.getInstance(username,password, projectId, true, "localhost", "8443", version);
     }
 
     /**
-     * The public constructor taking as params
+     * The public constructor for an NFVORequestor to a NFVO which runs on localhost and depending whether ssl is enabled or not the port will be chosen as 8443 or 8080
      * @param username
      * @param password
+     * @param projectId
+     * @param sslEnabled
      * @param version
      */
-    public NFVORequestor(String username, String password, String version) {
-        this.factory = RequestFactory.getInstance(username,password, "localhost", "8080", version);
+    public NFVORequestor(String username, String password, String projectId, boolean sslEnabled, String version) {
+        if (sslEnabled)
+            this.factory = RequestFactory.getInstance(username,password, projectId, sslEnabled, "localhost", "8443", version);
+        else
+            this.factory = RequestFactory.getInstance(username,password, projectId, sslEnabled, "localhost", "8080", version);
     }
 
-    public NFVORequestor(String username, String password, String nfvoIp, String nfvoPort, String version) {
-        this.factory = RequestFactory.getInstance(username,password, nfvoIp, nfvoPort, version);
+    /**
+     * The public constructor for an NFVORequestor
+     * @param username
+     * @param password
+     * @param projectId
+     * @param sslEnabled
+     * @param nfvoIp
+     * @param nfvoPort
+     * @param version
+     */
+    public NFVORequestor(String username, String password, String projectId, boolean sslEnabled, String nfvoIp, String nfvoPort, String version) {
+        this.factory = RequestFactory.getInstance(username,password, projectId, sslEnabled, nfvoIp, nfvoPort, version);
     }
 
     /**
@@ -132,7 +154,30 @@ public final class NFVORequestor {
         return factory.getVNFPackageAgent();
     }
 
+    /**
+     * Gets the Project requester
+     *
+     * @return projectRequest; The (final) static Project requester
+     */
+    public ProjectAgent getProjectAgent() {
+        return factory.getProjectAgent();
+    }
+
+    /**
+     * Gets the User requester
+     *
+     * @return userRequest; The (final) static User requester
+     */
+    public UserAgent getUserAgent() {
+        return factory.getUserAgent();
+    }
+
     public AbstractRestAgent abstractRestAgent(Class clazz, String path){
         return factory.getAbstractAgent(clazz, path);
     }
+
+    public void setProjectId(String projectId){
+        factory.setProjectId(projectId);
+    }
+
 }

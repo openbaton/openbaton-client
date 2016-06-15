@@ -44,7 +44,7 @@ public class SdkTest {
     @Ignore
     public void createTest() throws SDKException, FileNotFoundException {
 
-        NFVORequestor requestor = new NFVORequestor("1");
+        NFVORequestor requestor = new NFVORequestor("admin", "openbaton", "default", "1");
 
         vimInstance = createVimInstance();
         res = (VimInstance) requestor.abstractRestAgent(VimInstance.class,"/datacenters").create(vimInstance);
