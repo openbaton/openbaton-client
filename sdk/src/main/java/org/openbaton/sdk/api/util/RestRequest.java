@@ -16,6 +16,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContexts;
@@ -89,7 +90,8 @@ public abstract class RestRequest {
         if (sslEnabled)
             this.httpClient = getHttpClientForSsl();
         else
-            this.httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+            this.httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config)
+                    .setConnectionManager(new PoolingHttpClientConnectionManager()).build();
 
     }
 
@@ -636,6 +638,7 @@ public abstract class RestRequest {
                 new String[]{"TLSv1"}, null, new NoopHostnameVerifier());
 
         return HttpClientBuilder.create().setDefaultRequestConfig(config)
+                .setConnectionManager(new PoolingHttpClientConnectionManager())
                 .setSSLSocketFactory(sslConnectionSocketFactory).build();
     }
 
