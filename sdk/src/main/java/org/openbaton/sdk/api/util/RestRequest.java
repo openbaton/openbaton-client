@@ -6,6 +6,7 @@ import com.mashape.unirest.http.JsonNode;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -59,6 +60,8 @@ public abstract class RestRequest {
     private String bearerToken = null;
 
     private CloseableHttpClient httpClient;
+    private RequestConfig config = RequestConfig.custom()
+            .setConnectionRequestTimeout(10000).setConnectTimeout(10000).build();
 
     /**
      * Create a request with a given url path
@@ -86,7 +89,7 @@ public abstract class RestRequest {
         if (sslEnabled)
             this.httpClient = getHttpClientForSsl();
         else
-            this.httpClient = HttpClientBuilder.create().build();
+            this.httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 
     }
 
@@ -305,7 +308,7 @@ public abstract class RestRequest {
             }
 
             // call the api here
-            log.debug("Executing delete on: " + this.baseUrl + "/" + id);
+            log.info("Executing delete on: " + this.baseUrl + "/" + id);
             HttpDelete httpDelete = new HttpDelete(this.baseUrl + "/" + id);
             httpDelete.setHeader(new BasicHeader("project-id", projectId));
             if (token != null)
@@ -632,7 +635,8 @@ public abstract class RestRequest {
         SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext,
                 new String[]{"TLSv1"}, null, new NoopHostnameVerifier());
 
-        return HttpClientBuilder.create().setSSLSocketFactory(sslConnectionSocketFactory).build();
+        return HttpClientBuilder.create().setDefaultRequestConfig(config)
+                .setSSLSocketFactory(sslConnectionSocketFactory).build();
     }
 
 
