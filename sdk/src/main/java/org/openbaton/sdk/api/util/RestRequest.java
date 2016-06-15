@@ -9,6 +9,9 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -637,8 +640,12 @@ public abstract class RestRequest {
         SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext,
                 new String[]{"TLSv1"}, null, new NoopHostnameVerifier());
 
+        Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
+                .<ConnectionSocketFactory> create().register("https", sslConnectionSocketFactory)
+                .build();
+
         return HttpClientBuilder.create().setDefaultRequestConfig(config)
-                .setConnectionManager(new PoolingHttpClientConnectionManager())
+                .setConnectionManager(new PoolingHttpClientConnectionManager(socketFactoryRegistry))
                 .setSSLSocketFactory(sslConnectionSocketFactory).build();
     }
 
