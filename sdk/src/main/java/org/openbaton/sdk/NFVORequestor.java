@@ -180,4 +180,7 @@ public final class NFVORequestor {
         factory.setProjectId(projectId);
     }
 
+    public String getProjectId() {
+        return factory.getProjectId();
+    }
 }

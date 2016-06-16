@@ -9,6 +9,8 @@ public class RequestFactory {
     private static final String SDK_PROPERTIES_FILE = "sdk.api.properties";
     private static final PropertyReader propertyReader = new PropertyReader(SDK_PROPERTIES_FILE);
     private static RequestFactory instance;
+
+
     // create the requester here, maybe shift this to a manager
     private static ConfigurationRestRequest configurationRequest = null;
     private static ImageRestAgent imageRequest = null;
@@ -22,6 +24,8 @@ public class RequestFactory {
     private static VNFPackageAgent vnfPackageAgent = null;
     private static ProjectAgent projectAgent = null;
     private static UserAgent userAgent = null;
+
+
     private static String username;
     private static String password;
     private static String projectId;
@@ -30,11 +34,39 @@ public class RequestFactory {
     private final String nfvoIp;
     private final String version;
 
-    static public void setProjectId(String projectId){
+    static public void setProjectId(String projectId) {
         RequestFactory.projectId = projectId;
+        if (configurationRequest != null)
+            configurationRequest.setProjectId(projectId);
+        if (imageRequest != null)
+            imageRequest.setProjectId(projectId);
+        if (networkServiceDescriptorRequest != null)
+            networkServiceDescriptorRequest.setProjectId(projectId);
+        if (networkServiceRecordRequest != null)
+            networkServiceRecordRequest.setProjectId(projectId);
+        if (vimInstanceRequest != null)
+            vimInstanceRequest.setProjectId(projectId);
+        if (vnfPackageAgent != null)
+            vnfPackageAgent.setProjectId(projectId);
+        if (virtualNetworkFunctionDescriptorRequest != null)
+            virtualNetworkFunctionDescriptorRequest.setProjectId(projectId);
+        if (projectAgent != null)
+            projectAgent.setProjectId(projectId);
+        if (userAgent != null)
+            userAgent.setProjectId(projectId);
+        if (eventAgent != null)
+            eventAgent.setProjectId(projectId);
+        if (virtualLinkRequest != null)
+            virtualLinkRequest.setProjectId(projectId);
+        if (vNFFGRequest != null)
+            vNFFGRequest.setProjectId(projectId);
     }
 
-    private RequestFactory(String username, String password, String projectId, boolean sslEnabled,  String nfvoIp, String nfvoPort, String version) {
+    public static String getProjectId() {
+        return projectId;
+    }
+
+    private RequestFactory(String username, String password, String projectId, boolean sslEnabled, String nfvoIp, String nfvoPort, String version) {
         this.username = username;
         this.password = password;
         this.projectId = projectId;
@@ -44,16 +76,16 @@ public class RequestFactory {
         this.version = version;
     }
 
-    public static RequestFactory getInstance(String username, String password, String projectId, boolean sslEnabled,  String nfvoIp, String nfvoPort, String version) {
+    public static RequestFactory getInstance(String username, String password, String projectId, boolean sslEnabled, String nfvoIp, String nfvoPort, String version) {
         if (instance == null) {
-            return new RequestFactory(username, password, projectId, sslEnabled,  nfvoIp, nfvoPort, version);
+            return new RequestFactory(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version);
         } else
             return instance;
     }
 
     public ConfigurationRestRequest getConfigurationAgent() {
         if (configurationRequest == null) {
-            configurationRequest = new ConfigurationRestRequest(username, password, projectId, sslEnabled, propertyReader.getRestConfigurationUrl(),nfvoIp, nfvoPort, version);
+            configurationRequest = new ConfigurationRestRequest(username, password, projectId, sslEnabled, propertyReader.getRestConfigurationUrl(), nfvoIp, nfvoPort, version);
         }
         return configurationRequest;
     }

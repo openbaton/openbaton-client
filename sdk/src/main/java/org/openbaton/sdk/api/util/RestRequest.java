@@ -55,6 +55,15 @@ public abstract class RestRequest {
     protected Gson mapper;
     private String username;
     private String password;
+
+    public String getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
+    }
+
     private String projectId;
     private boolean sslEnabled;
     private String authStr = "openbatonOSClient" + ":" + "secret";
