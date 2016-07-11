@@ -5,19 +5,17 @@ package org.openbaton.cli.exceptions;
  */
 public class CommandLineException extends Exception {
 
-    public CommandLineException() {
-    }
+  public CommandLineException() {}
 
-    public CommandLineException (String message) {
-        super(message);
-    }
+  public CommandLineException(String message) {
+    super(message);
+  }
 
-    public CommandLineException (Throwable cause) {
-        super(cause);
-    }
+  public CommandLineException(Throwable cause) {
+    super(cause);
+  }
 
-    public CommandLineException (String message, Throwable cause) {
-        super(message, cause);
-    }
-
+  public CommandLineException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

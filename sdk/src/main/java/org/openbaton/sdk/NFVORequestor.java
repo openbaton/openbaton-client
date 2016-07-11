@@ -1,186 +1,203 @@
 package org.openbaton.sdk;
 
-
-
 import org.openbaton.sdk.api.rest.*;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
- * OpenBaton api requestor.
- * The Class is implemented in a static way to avoid any dependencies to spring and to create a corresponding small lib size.
+ * OpenBaton api requestor. The Class is implemented in a static way to avoid any dependencies to
+ * spring and to create a corresponding small lib size.
  */
 public final class NFVORequestor {
 
+  private static RequestFactory factory;
 
-    private static RequestFactory factory;
+  /**
+   * The public constructor for an NFVORequestor to a NFVO which runs on localhost port 8443 and
+   * uses SSL
+   *
+   * @param username
+   * @param password
+   * @param projectId
+   * @param version
+   */
+  public NFVORequestor(String username, String password, String projectId, String version) {
+    this.factory =
+        RequestFactory.getInstance(
+            username, password, projectId, true, "localhost", "8443", version);
+  }
 
-    /**
-     * The public constructor for an NFVORequestor to a NFVO which runs on localhost port 8443 and uses SSL
-     * @param username
-     * @param password
-     * @param projectId
-     * @param version
-     */
-    public NFVORequestor(String username, String password, String projectId, String version) {
-        this.factory = RequestFactory.getInstance(username,password, projectId, true, "localhost", "8443", version);
-    }
+  /**
+   * The public constructor for an NFVORequestor to a NFVO which runs on localhost and depending
+   * whether ssl is enabled or not the port will be chosen as 8443 or 8080
+   *
+   * @param username
+   * @param password
+   * @param projectId
+   * @param sslEnabled
+   * @param version
+   */
+  public NFVORequestor(
+      String username, String password, String projectId, boolean sslEnabled, String version) {
+    if (sslEnabled)
+      this.factory =
+          RequestFactory.getInstance(
+              username, password, projectId, sslEnabled, "localhost", "8443", version);
+    else
+      this.factory =
+          RequestFactory.getInstance(
+              username, password, projectId, sslEnabled, "localhost", "8080", version);
+  }
 
-    /**
-     * The public constructor for an NFVORequestor to a NFVO which runs on localhost and depending whether ssl is enabled or not the port will be chosen as 8443 or 8080
-     * @param username
-     * @param password
-     * @param projectId
-     * @param sslEnabled
-     * @param version
-     */
-    public NFVORequestor(String username, String password, String projectId, boolean sslEnabled, String version) {
-        if (sslEnabled)
-            this.factory = RequestFactory.getInstance(username,password, projectId, sslEnabled, "localhost", "8443", version);
-        else
-            this.factory = RequestFactory.getInstance(username,password, projectId, sslEnabled, "localhost", "8080", version);
-    }
+  /**
+   * The public constructor for an NFVORequestor
+   *
+   * @param username
+   * @param password
+   * @param projectId
+   * @param sslEnabled
+   * @param nfvoIp
+   * @param nfvoPort
+   * @param version
+   */
+  public NFVORequestor(
+      String username,
+      String password,
+      String projectId,
+      boolean sslEnabled,
+      String nfvoIp,
+      String nfvoPort,
+      String version) {
+    this.factory =
+        RequestFactory.getInstance(
+            username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version);
+  }
 
-    /**
-     * The public constructor for an NFVORequestor
-     * @param username
-     * @param password
-     * @param projectId
-     * @param sslEnabled
-     * @param nfvoIp
-     * @param nfvoPort
-     * @param version
-     */
-    public NFVORequestor(String username, String password, String projectId, boolean sslEnabled, String nfvoIp, String nfvoPort, String version) {
-        this.factory = RequestFactory.getInstance(username,password, projectId, sslEnabled, nfvoIp, nfvoPort, version);
-    }
+  /**
+   * Gets the configuration requester
+   *
+   * @return configurationRequest: The (final) static configuration requester
+   */
+  public ConfigurationRestRequest getConfigurationAgent() {
+    return factory.getConfigurationAgent();
+  }
 
-    /**
-     * Gets the configuration requester
-     *
-     * @return configurationRequest: The (final) static configuration requester
-     */
-    public ConfigurationRestRequest getConfigurationAgent() {
-        return factory.getConfigurationAgent();
-    }
+  /**
+   * Gets the image requester
+   *
+   * @return image: The (final) static image requester
+   */
+  public ImageRestAgent getImageAgent() {
+    return factory.getImageAgent();
+  }
 
-    /**
-     * Gets the image requester
-     *
-     * @return image: The (final) static image requester
-     */
-    public ImageRestAgent getImageAgent() {
-        return factory.getImageAgent();
-    }
+  /**
+   * Gets the networkServiceDescriptor requester
+   *
+   * @return networkServiceDescriptorRequest: The (final) static networkServiceDescriptor requester
+   */
+  public NetworkServiceDescriptorRestAgent getNetworkServiceDescriptorAgent() {
+    return factory.getNetworkServiceDescriptorAgent();
+  }
 
-    /**
-     * Gets the networkServiceDescriptor requester
-     *
-     * @return networkServiceDescriptorRequest: The (final) static networkServiceDescriptor requester
-     */
-    public NetworkServiceDescriptorRestAgent getNetworkServiceDescriptorAgent() {
-        return factory.getNetworkServiceDescriptorAgent();
-    }
+  /**
+   * Gets the networkServiceDescriptor requester
+   *
+   * @return networkServiceDescriptorRequest: The (final) static networkServiceDescriptor requester
+   */
+  public VirtualNetworkFunctionDescriptorRestAgent getVirtualNetworkFunctionDescriptorAgent() {
+    return factory.getVirtualNetworkFunctionDescriptorAgent();
+  }
 
-    /**
-     * Gets the networkServiceDescriptor requester
-     *
-     * @return networkServiceDescriptorRequest: The (final) static networkServiceDescriptor requester
-     */
-    public VirtualNetworkFunctionDescriptorRestAgent getVirtualNetworkFunctionDescriptorAgent() {
-        return factory.getVirtualNetworkFunctionDescriptorAgent();
-    }
+  /**
+   * Gets the networkServiceRecord requester
+   *
+   * @return networkServiceRecordRequest: The (final) static networkServiceRecord requester
+   */
+  public NetworkServiceRecordRestAgent getNetworkServiceRecordAgent() {
+    return factory.getNetworkServiceRecordAgent();
+  }
 
-    /**
-     * Gets the networkServiceRecord requester
-     *
-     * @return networkServiceRecordRequest: The (final) static networkServiceRecord requester
-     */
+  /**
+   * Gets the vimInstance requester
+   *
+   * @return vimInstanceRequest: The (final) static vimInstance requester
+   */
+  public VimInstanceRestAgent getVimInstanceAgent() {
+    return factory.getVimInstanceAgent();
+  }
 
-    public NetworkServiceRecordRestAgent getNetworkServiceRecordAgent() {
-        return factory.getNetworkServiceRecordAgent();
-    }
+  /**
+   * Gets the virtualLink requester
+   *
+   * @return virtualLinkRequest: The (final) static virtualLink requester
+   */
+  public VirtualLinkRestAgent getVirtualLinkAgent() {
+    return factory.getVirtualLinkAgent();
+  }
 
-    /**
-     * Gets the vimInstance requester
-     *
-     * @return vimInstanceRequest: The (final) static vimInstance requester
-     */
-    public VimInstanceRestAgent getVimInstanceAgent() {
-        return factory.getVimInstanceAgent();
-    }
+  /**
+   * Gets the VirtualNetworkFunctionDescriptor requester
+   *
+   * @return vnfdRequest; The (final) static VirtualNetworkFunctionDescriptor requester
+   */
+  public VirtualNetworkFunctionDescriptorRestAgent getVirtualNetworkFunctionDescriptorRestAgent() {
+    return factory.getVirtualNetworkFunctionDescriptorAgent();
+  }
 
-    /**
-     * Gets the virtualLink requester
-     *
-     * @return virtualLinkRequest: The (final) static virtualLink requester
-     */
-    public VirtualLinkRestAgent getVirtualLinkAgent() {
-        return factory.getVirtualLinkAgent();
-    }
+  /**
+   * Gets the VNFFG requester
+   *
+   * @return vNFFGRequest: The (final) static vNFFG requester
+   */
+  public VNFFGRestAgent getVNFFGAgent() {
+    return factory.getVNFForwardingGraphAgent();
+  }
 
-    /**
-     * Gets the VirtualNetworkFunctionDescriptor requester
-     *
-     * @return vnfdRequest; The (final) static VirtualNetworkFunctionDescriptor requester
-     */
-    public VirtualNetworkFunctionDescriptorRestAgent getVirtualNetworkFunctionDescriptorRestAgent() {
-        return factory.getVirtualNetworkFunctionDescriptorAgent();
-    }
+  /**
+   * Gets the Event requester
+   *
+   * @return eventRequest; The (final) static Event requester
+   */
+  public EventAgent getEventAgent() {
+    return factory.getEventAgent();
+  }
 
-    /**
-     * Gets the VNFFG requester
-     *
-     * @return vNFFGRequest: The (final) static vNFFG requester
-     */
-    public VNFFGRestAgent getVNFFGAgent() {
-        return factory.getVNFForwardingGraphAgent();
-    }
+  /**
+   * Gets the VNFPackage requester
+   *
+   * @return vnfPackageRequest; The (final) static VNFPackage requester
+   */
+  public VNFPackageAgent getVNFPackageAgent() {
+    return factory.getVNFPackageAgent();
+  }
 
-    /**
-     * Gets the Event requester
-     *
-     * @return eventRequest; The (final) static Event requester
-     */
-    public EventAgent getEventAgent() {
-        return factory.getEventAgent();
-    }
+  /**
+   * Gets the Project requester
+   *
+   * @return projectRequest; The (final) static Project requester
+   */
+  public ProjectAgent getProjectAgent() {
+    return factory.getProjectAgent();
+  }
 
-    /**
-     * Gets the VNFPackage requester
-     *
-     * @return vnfPackageRequest; The (final) static VNFPackage requester
-     */
-    public VNFPackageAgent getVNFPackageAgent() {
-        return factory.getVNFPackageAgent();
-    }
+  /**
+   * Gets the User requester
+   *
+   * @return userRequest; The (final) static User requester
+   */
+  public UserAgent getUserAgent() {
+    return factory.getUserAgent();
+  }
 
-    /**
-     * Gets the Project requester
-     *
-     * @return projectRequest; The (final) static Project requester
-     */
-    public ProjectAgent getProjectAgent() {
-        return factory.getProjectAgent();
-    }
+  public AbstractRestAgent abstractRestAgent(Class clazz, String path) {
+    return factory.getAbstractAgent(clazz, path);
+  }
 
-    /**
-     * Gets the User requester
-     *
-     * @return userRequest; The (final) static User requester
-     */
-    public UserAgent getUserAgent() {
-        return factory.getUserAgent();
-    }
+  public void setProjectId(String projectId) {
+    factory.setProjectId(projectId);
+  }
 
-    public AbstractRestAgent abstractRestAgent(Class clazz, String path){
-        return factory.getAbstractAgent(clazz, path);
-    }
-
-    public void setProjectId(String projectId){
-        factory.setProjectId(projectId);
-    }
-
-    public String getProjectId() {
-        return factory.getProjectId();
-    }
+  public String getProjectId() {
+    return factory.getProjectId();
+  }
 }

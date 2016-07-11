@@ -8,12 +8,30 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
  */
 public class VimInstanceRestAgent extends AbstractRestAgent<VimInstance> {
 
-	/**
-	 * Create a VimInstance requester with a given url path
-	 * @param username
-	 * @param password
-	 */
-	public VimInstanceRestAgent(String username, String password, String projectId, boolean sslEnabled, String nfvoIp, String nfvoPort, String path, String version) {
-		super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version, VimInstance.class);
-	}
+  /**
+   * Create a VimInstance requester with a given url path
+   *
+   * @param username
+   * @param password
+   */
+  public VimInstanceRestAgent(
+      String username,
+      String password,
+      String projectId,
+      boolean sslEnabled,
+      String nfvoIp,
+      String nfvoPort,
+      String path,
+      String version) {
+    super(
+        username,
+        password,
+        projectId,
+        sslEnabled,
+        nfvoIp,
+        nfvoPort,
+        path,
+        version,
+        VimInstance.class);
+  }
 }

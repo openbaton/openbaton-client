@@ -5,7 +5,15 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 public class UserAgent extends AbstractRestAgent<User> {
 
-    public UserAgent(String username, String password, String projectId, boolean sslEnabled, String nfvoIp, String nfvoPort, String path, String version) {
-        super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version, User.class);
-    }
+  public UserAgent(
+      String username,
+      String password,
+      String projectId,
+      boolean sslEnabled,
+      String nfvoIp,
+      String nfvoPort,
+      String path,
+      String version) {
+    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version, User.class);
+  }
 }

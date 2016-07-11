@@ -8,13 +8,28 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
  */
 public class VNFFGRestAgent extends AbstractRestAgent<VNFForwardingGraphDescriptor> {
 
-	/**
-	 * Create a VNFFG requester with a given url path
-	 *
-	 */
-	public VNFFGRestAgent(String username, String password, String projectId, boolean sslEnabled, String nfvoIp, String nfvoPort, String path, String version) {
-		super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version, VNFForwardingGraphDescriptor.class);
-	}
-
-
+  /**
+   * Create a VNFFG requester with a given url path
+   *
+   */
+  public VNFFGRestAgent(
+      String username,
+      String password,
+      String projectId,
+      boolean sslEnabled,
+      String nfvoIp,
+      String nfvoPort,
+      String path,
+      String version) {
+    super(
+        username,
+        password,
+        projectId,
+        sslEnabled,
+        nfvoIp,
+        nfvoPort,
+        path,
+        version,
+        VNFForwardingGraphDescriptor.class);
+  }
 }
