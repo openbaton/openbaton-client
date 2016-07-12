@@ -1,22 +1,21 @@
-# Openbaton Client
+# OpenBaton Client
 
-## Overview
-Openbaton Client provides a command-line client, which enables you to access the project API through easy-to-use commands. 
-For example, Openbaton Client provides the creation of a new Vim instance.
+OpenBaton Client contains the OpenBaton sdk and the OpenBaton command-line interface. 
+The sdk provides methods to access the RESTful NFVO API. 
+The command-line interface enables you to use the OpenBaton SDK via the command-line. 
 
-You can run the commands from the command line. 
-Openbaton APIs are RESTful APIs, and use the HTTP protocol. 
-
-They include methods, URIs, media types, and response codes.
-Openbaton APIs are open-source Java clients, and can run on Linux or Mac OS X systems. 
+## Project Structure
+The project contains the two modules *cli* and *sdk*. 
 
 ## Install the Openbaton Client
 Git clone the project. Navigate into the root directory of the project and execute *./gradlew build*.
 
+## Use the command-line interface
+
 ### Set the required environment variables
 Navigate into the project's root directory and execute *source nfvo.properties*. A dialog appears and will ask you for some properties. 
 
-## Openbaton Client usage
+### Openbaton command-line usage
     
     run a command: openbaton.sh command-name [arg-1] [arg-2] [arg-3]
     
@@ -381,3 +380,13 @@ Navigate into the project's root directory and execute *source nfvo.properties*.
   ```sh
    $ openbaton.sh VNFPackage-findById id-vnfPackage
   ```
+  
+  
+## Documentation
+[Command-line interface][cli-documentation]
+
+[SDK][sdk-documentation]
+
+
+[cli-documentation]:http://openbaton.github.io/documentation/nfvo-sdk/
+[sdk-documentation]:http://openbaton.github.io/documentation/nfvo-how-to-use-cli/

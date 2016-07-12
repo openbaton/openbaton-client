@@ -10,8 +10,8 @@ import java.lang.reflect.Method;
 public class Utils {
 
   /**
-   * Returns true if the two passed methods are equal. Methods are here regarded as equal if they
-   * take the same parameter types, return the same return type and share the same name.
+   * Returns true if the two passed methods are equal. Methods are in this case regarded as equal if
+   * they take the same parameter types, return the same return type and share the same name.
    *
    * @param m1
    * @param m2

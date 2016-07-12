@@ -15,13 +15,15 @@ import java.util.*;
 
 /**
  * Created by tce on 25.08.15.
+ *
+ * Used to print out the results of a cli command to the console.
  */
 public class PrintFormat {
 
   private static List<String[]> rows = new LinkedList<String[]>();
   public static Logger log = LoggerFactory.getLogger(PrintFormat.class);
 
-  public static String printResult(String comand, Object obj)
+  public static String printResult(String command, Object obj)
       throws InvocationTargetException, IllegalAccessException {
 
     List<Object> object = new ArrayList<Object>();
@@ -30,7 +32,7 @@ public class PrintFormat {
 
     if (obj == null) {
       //TODO
-      if (!comand.contains("delete")) {
+      if (!command.contains("delete")) {
         result = "Error: invalid command line";
       }
       return result;
@@ -46,7 +48,7 @@ public class PrintFormat {
 
     } else {
 
-      result = PrintTables(comand, object);
+      result = printTables(command, object);
     }
 
     return result;
@@ -89,27 +91,27 @@ public class PrintFormat {
     return buf.toString();
   }
 
-  public static boolean isCollection(Object ob) {
+  private static boolean isCollection(Object ob) {
     return ob instanceof List;
   }
 
-  public static String PrintTables(String comand, List<Object> object)
+  private static String printTables(String command, List<Object> object)
       throws InvocationTargetException, IllegalAccessException {
 
     String result = "";
 
-    if (comand.contains("Event")) {
+    if (command.contains("Event")) {
       result = showEvent(object);
-    } else if (comand.contains("create")
-        || comand.contains("update")
-        || comand.contains("ById")
-        || comand.endsWith("Dependency")
-        || comand.endsWith("Descriptor")
-        || comand.endsWith("getVirtualNetworkFunctionRecord")) {
+    } else if (command.contains("create")
+        || command.contains("update")
+        || command.contains("ById")
+        || command.endsWith("Dependency")
+        || command.endsWith("Descriptor")
+        || command.endsWith("getVirtualNetworkFunctionRecord")) {
       result = showObject(object);
 
     } else {
-      result = generalPrint(comand, object);
+      result = generalPrint(command, object);
     }
 
     return result;
@@ -133,14 +135,14 @@ public class PrintFormat {
     return result;
   }
 
-  public static String showObject(List<Object> object)
+  private static String showObject(List<Object> object)
       throws IllegalAccessException, InvocationTargetException {
     String result = "";
-    String firstline = "";
-    String secondline = "";
-    String[] rowproperty = new String[5000];
-    String[] rowvalue = new String[5000];
-    int rowcount = 0;
+    String firstLine = "";
+    String secondLine = "";
+    String[] rowProperty = new String[5000];
+    String[] rowValue = new String[5000];
+    int rowCount = 0;
 
     String fieldName = "";
     String fieldCheck = "";
@@ -149,9 +151,9 @@ public class PrintFormat {
     Field[] fieldSuper = object.get(0).getClass().getSuperclass().getDeclaredFields();
     Field[] field = ArrayUtils.addAll(fieldBase, fieldSuper);
 
-    rowproperty[rowcount] = "| PROPERTY";
-    rowvalue[rowcount] = "| VALUE";
-    rowcount++;
+    rowProperty[rowCount] = "| PROPERTY";
+    rowValue[rowCount] = "| VALUE";
+    rowCount++;
 
     for (int i = 0; i < field.length; i++) {
       Method[] methodBase = object.get(0).getClass().getDeclaredMethods();
@@ -168,13 +170,6 @@ public class PrintFormat {
               if (lvlDown instanceof Set
                   || lvlDown instanceof List
                   || lvlDown instanceof Iterable) {
-                //                            rowproperty[rowcount] = "| " + field[i].getName().toUpperCase();
-                //                            rowvalue[rowcount] = "|";
-                //                            rowcount++;
-                //
-                //                            rowproperty[rowcount] = "|";
-                //                            rowvalue[rowcount] = "|";
-                //                            rowcount++;
 
                 Set<Object> objectHash = new HashSet<Object>();
 
@@ -182,8 +177,7 @@ public class PrintFormat {
                     || methods[z].getName().contains("Source")
                     || methods[z].getName().contains("Target")) {
 
-                  Object obj2 = (Object) lvlDown;
-                  objectHash.add(obj2);
+                  objectHash.add(lvlDown);
 
                 } else {
                   objectHash = (Set<Object>) lvlDown;
@@ -197,15 +191,15 @@ public class PrintFormat {
                   String name = "";
                   String id = "";
 
-                  for (int r = 0; r < field2.length; r++) {
+                  for (Field aField2 : field2) {
                     Method[] methodBase2 = obj.getClass().getDeclaredMethods();
                     Method[] methodSuper2 = obj.getClass().getSuperclass().getDeclaredMethods();
                     Method[] methods2 = ArrayUtils.addAll(methodBase2, methodSuper2);
 
-                    for (int s = 0; s < methods2.length; s++) {
+                    for (Method aMethods2 : methods2) {
 
-                      if (methods2[s].getName().equalsIgnoreCase("get" + field2[r].getName())) {
-                        Object lvlDown2 = methods2[s].invoke(obj);
+                      if (aMethods2.getName().equalsIgnoreCase("get" + aField2.getName())) {
+                        Object lvlDown2 = aMethods2.invoke(obj);
                         if (lvlDown2 != null)
                           try {
 
@@ -213,26 +207,26 @@ public class PrintFormat {
                                 && !(lvlDown2 instanceof List)
                                 && !(lvlDown2 instanceof Iterable)) {
 
-                              if (methods2[s].getName().equalsIgnoreCase("getId")) {
-                                id = methods2[s].invoke(obj).toString();
+                              if (aMethods2.getName().equalsIgnoreCase("getId")) {
+                                id = aMethods2.invoke(obj).toString();
 
                                 fieldName = field[i].getName();
 
                                 if (!fieldCheck.equalsIgnoreCase(fieldName)) {
-                                  rowproperty[rowcount] = "| " + field[i].getName().toUpperCase();
-                                  rowvalue[rowcount] = "|";
-                                  rowcount++;
+                                  rowProperty[rowCount] = "| " + field[i].getName().toUpperCase();
+                                  rowValue[rowCount] = "|";
+                                  rowCount++;
 
-                                  rowproperty[rowcount] = "|";
-                                  rowvalue[rowcount] = "|";
-                                  rowcount++;
+                                  rowProperty[rowCount] = "|";
+                                  rowValue[rowCount] = "|";
+                                  rowCount++;
 
                                   fieldCheck = fieldName;
                                 }
                               }
 
-                              if (methods2[s].getName().equalsIgnoreCase("getName")) {
-                                name = methods2[s].invoke(obj).toString();
+                              if (aMethods2.getName().equalsIgnoreCase("getName")) {
+                                name = aMethods2.invoke(obj).toString();
                               }
                             }
 
@@ -244,39 +238,30 @@ public class PrintFormat {
                   }
 
                   if (id.length() > 0 || name.length() > 0) {
-                    rowcount--;
-                    rowproperty[rowcount] = "|";
+                    rowCount--;
+                    rowProperty[rowCount] = "|";
                     if (name.length() > 0) {
-                      rowvalue[rowcount] = "| id: " + id + " - name:  " + name;
+                      rowValue[rowCount] = "| id: " + id + " - name:  " + name;
                     } else if (id.length() > 0) {
-                      rowvalue[rowcount] = "| id: " + id;
+                      rowValue[rowCount] = "| id: " + id;
                     }
-                    rowcount++;
-                    rowproperty[rowcount] = "|";
-                    rowvalue[rowcount] = "|";
-                    rowcount++;
+                    rowCount++;
+                    rowProperty[rowCount] = "|";
+                    rowValue[rowCount] = "|";
+                    rowCount++;
                   }
-                  //                                else
-                  //                                {
-                  //                                    //rowcount--;
-                  //                                    rowproperty[rowcount] = "|";
-                  //                                    rowvalue[rowcount-1] = "| [ ]";
-                  //                                    rowcount++;
-                  //
-                  //                                }
-
                 }
 
               } else {
                 if (lvlDown instanceof String
                     || lvlDown instanceof Integer
                     || lvlDown instanceof Enum) {
-                  rowproperty[rowcount] = "| " + field[i].getName();
-                  rowvalue[rowcount] = "| " + lvlDown.toString();
-                  rowcount++;
-                  rowproperty[rowcount] = "|";
-                  rowvalue[rowcount] = "|";
-                  rowcount++;
+                  rowProperty[rowCount] = "| " + field[i].getName();
+                  rowValue[rowCount] = "| " + lvlDown.toString();
+                  rowCount++;
+                  rowProperty[rowCount] = "|";
+                  rowValue[rowCount] = "|";
+                  rowCount++;
                 }
               }
 
@@ -289,39 +274,35 @@ public class PrintFormat {
     }
 
     addRow("\n");
-    firstline = buildLine(rowproperty);
-    secondline = buildLine(rowvalue);
-    addRow(firstline, secondline, "+");
+    firstLine = buildLine(rowProperty);
+    secondLine = buildLine(rowValue);
+    addRow(firstLine, secondLine, "+");
 
-    for (int c = 0; c < rowcount; c++) {
-      addRow(rowproperty[c], rowvalue[c], "|");
+    for (int c = 0; c < rowCount; c++) {
+      addRow(rowProperty[c], rowValue[c], "|");
       if (c == 0) {
-        addRow(firstline, secondline, "+");
+        addRow(firstLine, secondLine, "+");
       }
     }
 
     //end
-    addRow(firstline, secondline, "+");
+    addRow(firstLine, secondLine, "+");
 
     result = printer();
 
     return result;
   }
 
-  public static String showEvent(List<Object> object)
+  private static String showEvent(List<Object> object)
       throws IllegalAccessException, InvocationTargetException {
 
     String result = "";
     String firstline = "";
-    String[] rowvalue = new String[500];
-    int rowcount = 0;
+    String[] rowValue = new String[500];
+    int rowCount = 0;
 
-    Field[] fieldBase = object.get(0).getClass().getDeclaredFields();
-    Field[] fieldSuper = object.get(0).getClass().getSuperclass().getDeclaredFields();
-    Field[] field = ArrayUtils.addAll(fieldBase, fieldSuper);
-
-    rowvalue[rowcount] = "| EVENT";
-    rowcount++;
+    rowValue[rowCount] = "| EVENT";
+    rowCount++;
 
     for (int i = 0; i < object.size(); i++) {
       Method[] methodBase = object.get(i).getClass().getDeclaredMethods();
@@ -331,18 +312,18 @@ public class PrintFormat {
       for (int z = 0; z < methods.length; z++) {
 
         if (methods[z].getName().equalsIgnoreCase("getEvent")) {
-          rowvalue[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
+          rowValue[rowCount] = "| " + methods[z].invoke(object.get(i)).toString();
         }
       }
-      rowcount++;
+      rowCount++;
     }
 
     addRow("\n");
-    firstline = buildLine(rowvalue);
+    firstline = buildLine(rowValue);
     addRow(firstline, "+");
 
-    for (int c = 0; c < rowcount; c++) {
-      addRow(rowvalue[c], "|");
+    for (int c = 0; c < rowCount; c++) {
+      addRow(rowValue[c], "|");
       if (c == 0) {
         addRow(firstline, "+");
       }
@@ -355,17 +336,17 @@ public class PrintFormat {
     return result;
   }
 
-  public static String generalPrint(String comand, List<Object> object)
+  private static String generalPrint(String comand, List<Object> object)
       throws IllegalAccessException, InvocationTargetException {
     String result = "";
-    String firstline = "";
-    String secondline = "";
-    String[] rowproperty = new String[500];
-    String[] rowvalue = new String[500];
-    int rowcount = 0;
+    String firstLine = "";
+    String secondLine = "";
+    String[] rowProperty = new String[500];
+    String[] rowValue = new String[500];
+    int rowCount = 0;
 
     if (comand.contains("VimInstance")) {
-      result = GeneralVimInstance.Print(object);
+      result = GeneralVimInstance.print(object);
 
     } else if (comand.contains("Image")
         || comand.contains("Configuration")
@@ -373,22 +354,18 @@ public class PrintFormat {
         || comand.contains("NetworkServiceRecord-findAll")
         || comand.contains("getVirtualNetworkFunctionRecords")) {
 
-      result = GeneralName.Print(object);
+      result = GeneralName.print(object);
 
     } else if (comand.contains("Record-getVNFDependencies")) {
 
-      result = GeneralTarget.Print(object);
+      result = GeneralTarget.print(object);
 
     } else {
 
-      Field[] fieldBase = object.get(0).getClass().getDeclaredFields();
-      Field[] fieldSuper = object.get(0).getClass().getSuperclass().getDeclaredFields();
-      Field[] field = ArrayUtils.addAll(fieldBase, fieldSuper);
+      rowProperty[rowCount] = "| ID";
+      rowValue[rowCount] = "| VERSION";
 
-      rowproperty[rowcount] = "| ID";
-      rowvalue[rowcount] = "| VERSION";
-
-      rowcount++;
+      rowCount++;
 
       for (int i = 0; i < object.size(); i++) {
         Method[] methodBase = object.get(i).getClass().getDeclaredMethods();
@@ -398,30 +375,30 @@ public class PrintFormat {
         for (int z = 0; z < methods.length; z++) {
 
           if (methods[z].getName().equalsIgnoreCase("getID")) {
-            rowproperty[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
+            rowProperty[rowCount] = "| " + methods[z].invoke(object.get(i)).toString();
           }
 
           if (methods[z].getName().equalsIgnoreCase("getVersion")) {
-            rowvalue[rowcount] = "| " + methods[z].invoke(object.get(i)).toString();
+            rowValue[rowCount] = "| " + methods[z].invoke(object.get(i)).toString();
           }
         }
-        rowcount++;
+        rowCount++;
       }
 
       addRow("\n");
-      firstline = buildLine(rowproperty);
-      secondline = buildLine(rowvalue);
-      addRow(firstline, secondline, "+");
+      firstLine = buildLine(rowProperty);
+      secondLine = buildLine(rowValue);
+      addRow(firstLine, secondLine, "+");
 
-      for (int c = 0; c < rowcount; c++) {
-        addRow(rowproperty[c], rowvalue[c], "|");
+      for (int c = 0; c < rowCount; c++) {
+        addRow(rowProperty[c], rowValue[c], "|");
         if (c == 0) {
-          addRow(firstline, secondline, "+");
+          addRow(firstLine, secondLine, "+");
         }
       }
 
       //end
-      addRow(firstline, secondline, "+");
+      addRow(firstLine, secondLine, "+");
 
       result = printer();
     }

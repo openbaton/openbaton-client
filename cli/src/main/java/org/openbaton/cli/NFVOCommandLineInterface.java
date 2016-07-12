@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2015 Fraunhofer FOKUS
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.openbaton.cli;
 
 import com.google.gson.Gson;
@@ -43,7 +59,6 @@ public class NFVOCommandLineInterface {
 
   private static Logger log = LoggerFactory.getLogger(NFVOCommandLineInterface.class);
 
-  private static final Character mask = '*';
   private static final String VERSION = "1";
 
   private final static LinkedHashMap<String, LinkedList<Command>> commandMap =
@@ -51,12 +66,13 @@ public class NFVOCommandLineInterface {
   private final static LinkedHashMap<String, String> helpCommandMap =
       new LinkedHashMap<String, String>() {
         {
-          put("help", "Print the usage");
-          //put("exit", "Exit the application");
-          //put("print properties", "print all the properties");
+          put("help", "print the usage");
         }
       };
 
+  /**
+   * Print out how to use the OpenBaton command line interface.
+   */
   public static void usage() {
 
     log.info(
@@ -80,6 +96,11 @@ public class NFVOCommandLineInterface {
     System.out.println("/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/");
   }
 
+  /**
+   * Print out how to use a specific command.
+   *
+   * @param s The command
+   */
   public static void helpUsage(String s) {
     for (Object entry : helpCommandMap.entrySet()) {
       String format = "%-80s%s%n";
@@ -277,17 +298,27 @@ public class NFVOCommandLineInterface {
           }
           pos++;
         }
-        if (paramTypeCorrect == true) break;
+        if (paramTypeCorrect) break;
       }
     }
 
-    if (paramTypeCorrect == false) throw new CommandLineException("Missing filepath parameter.");
+    if (!paramTypeCorrect) throw new CommandLineException("Missing filepath parameter.");
 
     if (command == null) throw new CommandLineException("Wrong number of parameters passed.");
 
     return command;
   }
 
+  /**
+   * Try to execute the user's command line input.
+   *
+   * @param line
+   * @return
+   * @throws InvocationTargetException
+   * @throws IllegalAccessException
+   * @throws FileNotFoundException
+   * @throws CommandLineException
+   */
   private static Object executeCommand(String line)
       throws InvocationTargetException, IllegalAccessException, FileNotFoundException,
           CommandLineException {
@@ -381,21 +412,32 @@ public class NFVOCommandLineInterface {
     return builder.toString();
   }
 
-  private static void fillCommands(NFVORequestor nfvo) {
-    getMethods(nfvo.getNetworkServiceRecordAgent());
-    getMethods(nfvo.getConfigurationAgent());
-    getMethods(nfvo.getImageAgent());
-    getMethods(nfvo.getEventAgent());
-    getMethods(nfvo.getVNFFGAgent());
-    getMethods(nfvo.getVimInstanceAgent());
-    getMethods(nfvo.getNetworkServiceDescriptorAgent());
-    getMethods(nfvo.getVirtualNetworkFunctionDescriptorAgent());
-    getMethods(nfvo.getVirtualLinkAgent());
-    getMethods(nfvo.getVNFPackageAgent());
-    //        getMethods(nfvo.getProjectAgent());
-    //        getMethods(nfvo.getUserAgent());
+  /**
+   * Fill the commandMap and helpCommandMap with the available commands from the sdk.
+   *
+   * @param nfvoRequestor
+   */
+  private static void fillCommands(NFVORequestor nfvoRequestor) {
+    getMethods(nfvoRequestor.getNetworkServiceRecordAgent());
+    getMethods(nfvoRequestor.getConfigurationAgent());
+    getMethods(nfvoRequestor.getImageAgent());
+    getMethods(nfvoRequestor.getEventAgent());
+    getMethods(nfvoRequestor.getVNFFGAgent());
+    getMethods(nfvoRequestor.getVimInstanceAgent());
+    getMethods(nfvoRequestor.getNetworkServiceDescriptorAgent());
+    getMethods(nfvoRequestor.getVirtualNetworkFunctionDescriptorAgent());
+    getMethods(nfvoRequestor.getVirtualLinkAgent());
+    getMethods(nfvoRequestor.getVNFPackageAgent());
+    //        getMethods(nfvoRequestor.getProjectAgent());
+    //        getMethods(nfvoRequestor.getUserAgent());
   }
 
+  /**
+   * Fill the commandMap and helpCommandMap with the available commands offered by a specific
+   * AbstractRestAgent from the sdk.
+   *
+   * @param agent
+   */
   private static void getMethods(AbstractRestAgent agent) {
     String className = agent.getClass().getSimpleName();
     log.trace(className);
@@ -484,17 +526,13 @@ public class NFVOCommandLineInterface {
       properties.put("NFVO_PORT", System.getenv().get("NFVO_PORT"));
       properties.put("NFVO_VERSION", System.getenv().get("NFVO_VERSION"));
     } catch (NullPointerException e) {
-      return;
     }
   }
 
   /**
-   * * * EXIT STATUS CODE
+   * Exit with the given status code.
    *
-   * @param status: *) 1XX Variable errors * *) 100: variable not found
-   * <p/>
-   * *) 8XX: reflection Errors * *) 801 ConsoleReader not able to read *) 9XX: Libraries Errors * *)
-   * 990 ConsoleReader not able to read * *) 999: ConsoleReader not created
+   * @param status
    */
   private static void exit(int status) {
     System.exit(status);
