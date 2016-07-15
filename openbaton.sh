@@ -34,7 +34,7 @@ function showConfiguration {
     echo "Using the following Environment Variables:"
     echo -e "\tNFVO_IP=$NFVO_IP"
     echo -e "\tNFVO_PORT=$NFVO_PORT"
-    echo -e "\tNFVO_VERSION=$NFVO_VERSION"
+    echo -e "\tNFVO_API_VERSION=$NFVO_API_VERSION"
     echo -e "\tNFVO_USERNAME=$NFVO_USERNAME"
     echo -e "\tNFVO_PASSWORD=$NFVO_PASSWORD"
     echo -e "\tNFVO_PROJECT_ID=$NFVO_PROJECT_ID"
@@ -45,7 +45,7 @@ function showConfiguration {
 function checkEnvironmentVariables {
     checkEnvironmentVariable NFVO_IP
     checkEnvironmentVariable NFVO_PORT
-    checkEnvironmentVariable NFVO_VERSION
+    checkEnvironmentVariable NFVO_API_VERSION
     checkEnvironmentVariable NFVO_USERNAME
     checkEnvironmentVariable NFVO_PASSWORD
     checkEnvironmentVariable NFVO_PROJECT_ID

@@ -144,7 +144,7 @@ public class NFVOCommandLineInterface {
     getProperty(reader, properties, "NFVO_SSL_ENABLED", "true");
     getProperty(reader, properties, "NFVO_IP", "127.0.0.1");
     getProperty(reader, properties, "NFVO_PORT", "8443");
-    getProperty(reader, properties, "NFVO_VERSION", VERSION);
+    getProperty(reader, properties, "NFVO_API_VERSION", VERSION);
 
     NFVORequestor nfvo =
         new NFVORequestor(
@@ -154,7 +154,7 @@ public class NFVOCommandLineInterface {
             Boolean.parseBoolean(properties.getProperty("NFVO_SSL_ENABLED")),
             properties.getProperty("NFVO_IP"),
             properties.getProperty("NFVO_PORT"),
-            properties.getProperty("NFVO_VERSION"));
+            properties.getProperty("NFVO_API_VERSION"));
 
     fillCommands(nfvo);
 
@@ -524,7 +524,7 @@ public class NFVOCommandLineInterface {
       properties.put("NFVO_SSL_ENABLED", System.getenv().get("NFVO_SSL_ENABLED"));
       properties.put("NFVO_IP", System.getenv().get("NFVO_IP"));
       properties.put("NFVO_PORT", System.getenv().get("NFVO_PORT"));
-      properties.put("NFVO_VERSION", System.getenv().get("NFVO_VERSION"));
+      properties.put("NFVO_API_VERSION", System.getenv().get("NFVO_API_VERSION"));
     } catch (NullPointerException e) {
     }
   }
