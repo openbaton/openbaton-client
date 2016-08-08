@@ -88,7 +88,7 @@ public abstract class RestRequest {
 
   private CloseableHttpClient httpClient;
   private RequestConfig config =
-      RequestConfig.custom().setConnectionRequestTimeout(10000).setConnectTimeout(10000).build();
+      RequestConfig.custom().setConnectionRequestTimeout(10000).setConnectTimeout(60000).build();
 
   /**
    * Create a request with a given url path
