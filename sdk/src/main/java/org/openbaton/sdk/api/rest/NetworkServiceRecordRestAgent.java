@@ -16,6 +16,7 @@
 
 package org.openbaton.sdk.api.rest;
 
+import com.google.gson.JsonObject;
 import org.openbaton.catalogue.mano.descriptor.VNFComponent;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
 import org.openbaton.catalogue.mano.record.PhysicalNetworkFunctionRecord;
@@ -25,7 +26,10 @@ import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -60,9 +64,16 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
   }
 
   @Help(help = "Create NetworkServiceRecord from NetworkServiceDescriptor id")
-  public NetworkServiceRecord create(final String id) throws SDKException {
-    String result = this.requestPost("/" + id);
-    return this.mapper.fromJson(result, NetworkServiceRecord.class);
+  public NetworkServiceRecord create(
+      final String id, HashMap<String, ArrayList<String>> vduVimInstances, ArrayList<String> keys)
+      throws SDKException {
+    HashMap<String, Serializable> jsonBody = new HashMap<>();
+    jsonBody.put("keys", keys);
+    jsonBody.put("vduVimInstance", vduVimInstances);
+    JsonObject json = new JsonObject();
+    json.add("vduVimInstances", mapper.toJsonTree(vduVimInstances));
+    json.add("keys", mapper.toJsonTree(keys));
+    return (NetworkServiceRecord) this.requestPost("/" + id, jsonBody, NetworkServiceRecord.class);
   }
 
   /**

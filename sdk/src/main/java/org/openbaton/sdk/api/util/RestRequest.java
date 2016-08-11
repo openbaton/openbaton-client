@@ -49,6 +49,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
@@ -243,6 +244,81 @@ public abstract class RestRequest {
 
         log.trace("Casting it into: " + object.getClass());
         return mapper.fromJson(result, object.getClass());
+      }
+      response.close();
+      httpPost.releaseConnection();
+      return null;
+    } catch (IOException e) {
+      // catch request exceptions here
+      log.error(e.getMessage(), e);
+      if (httpPost != null) httpPost.releaseConnection();
+      throw new SDKException("Could not http-post or open the object properly", e);
+    } catch (SDKException e) {
+      if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+        token = null;
+        if (httpPost != null) httpPost.releaseConnection();
+        return requestPost(id);
+      } else {
+        if (httpPost != null) httpPost.releaseConnection();
+        throw new SDKException("Status is " + response.getStatusLine().getStatusCode());
+      }
+    }
+  }
+
+  /**
+   * Executes a http post with to a given url, while serializing the object content as json. The
+   * type parameter specifies to which object type the post response should be mapped before
+   * returning it. This can be useful if the method's return type is not the same as the type of the
+   * object parameter.
+   *
+   * @param object the object content to be serialized as json
+   * @param type the object type to which the response should be mapped
+   * @return a string containing the response content
+   */
+  public Serializable requestPost(final String id, final Serializable object, final Type type)
+      throws SDKException {
+    CloseableHttpResponse response = null;
+    HttpPost httpPost = null;
+    try {
+      log.trace("Object is: " + object);
+      String fileJSONNode = mapper.toJson(object);
+      log.trace("sending: " + fileJSONNode.toString());
+      log.debug("baseUrl: " + baseUrl);
+      log.debug("id: " + baseUrl + "/" + id);
+
+      try {
+        checkToken();
+      } catch (IOException e) {
+        log.error(e.getMessage(), e);
+        throw new SDKException("Could not get token", e);
+      }
+
+      // call the api here
+      log.debug("Executing post on: " + this.baseUrl + "/" + id);
+      httpPost = new HttpPost(this.baseUrl + "/" + id);
+      httpPost.setHeader(new BasicHeader("accept", "application/json"));
+      httpPost.setHeader(new BasicHeader("Content-Type", "application/json"));
+      httpPost.setHeader(new BasicHeader("project-id", projectId));
+      if (token != null)
+        httpPost.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+      httpPost.setEntity(new StringEntity(fileJSONNode));
+
+      response = httpClient.execute(httpPost);
+
+      // check response status
+      checkStatus(response, HttpURLConnection.HTTP_CREATED);
+      // return the response of the request
+      String result = "";
+      if (response.getEntity() != null) result = EntityUtils.toString(response.getEntity());
+
+      if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_NO_CONTENT) {
+        JsonParser jsonParser = new JsonParser();
+        JsonElement jsonElement = jsonParser.parse(result);
+        result = mapper.toJson(jsonElement);
+        log.trace("received: " + result);
+
+        log.trace("Casting it into: " + type);
+        return mapper.fromJson(result, type);
       }
       response.close();
       httpPost.releaseConnection();

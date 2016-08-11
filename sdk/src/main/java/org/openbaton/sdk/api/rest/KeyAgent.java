@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-apply plugin: 'java'
-repositories {
-    mavenCentral()
-    maven {
-        url "http://get.openbaton.org:8081/nexus/content/groups/public"
-    }
-    //maven {url "http://mvnrepository.com/artifact/org.apache.httpcomponents"}
-}
-dependencies {
-    compile 'org.openbaton:catalogue:2.1.2-SNAPSHOT'
+package org.openbaton.sdk.api.rest;
 
-    compile 'org.slf4j:slf4j-api:1.7.12'
-    compile 'com.google.code.gson:gson:2.5'
-    compile 'com.mashape.unirest:unirest-java:1.4.5'
+import org.openbaton.catalogue.security.Key;
+import org.openbaton.sdk.api.util.AbstractRestAgent;
 
-    compile 'net.minidev:json-smart:2.2'
-    compile 'org.apache.httpcomponents:httpclient:4.5.2'
-    testCompile "junit:junit:4.12"
+/**
+ * OpenBaton key-related api requester.
+ */
+public class KeyAgent extends AbstractRestAgent<Key> {
 
+  public KeyAgent(
+      String username,
+      String password,
+      String projectId,
+      boolean sslEnabled,
+      String nfvoIp,
+      String nfvoPort,
+      String path,
+      String version) {
+    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version, Key.class);
+  }
 }
