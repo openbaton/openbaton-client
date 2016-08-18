@@ -43,6 +43,7 @@ public class RequestFactory {
   private static VNFPackageAgent vnfPackageAgent = null;
   private static ProjectAgent projectAgent = null;
   private static UserAgent userAgent = null;
+  private static KeyAgent keyAgent = null;
 
   private static String username;
   private static String password;
@@ -295,6 +296,22 @@ public class RequestFactory {
               version);
     }
     return userAgent;
+  }
+
+  public KeyAgent getKeyAgent() {
+    if (keyAgent == null) {
+      keyAgent =
+          new KeyAgent(
+              username,
+              password,
+              projectId,
+              sslEnabled,
+              nfvoIp,
+              nfvoPort,
+              propertyReader.getKeyUrl(),
+              version);
+    }
+    return keyAgent;
   }
 
   public AbstractRestAgent getAbstractAgent(Class clazz, String path) {

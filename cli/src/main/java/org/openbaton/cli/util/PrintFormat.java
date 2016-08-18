@@ -32,13 +32,15 @@ public class PrintFormat {
 
     if (obj == null) {
       //TODO
-      if (!command.contains("delete")) {
+      if (!command.contains("delete") && !command.contains("changePassword")) {
         result = "Error: invalid command line";
       }
       return result;
 
     } else if (isCollection(obj)) {
       object = (List<Object>) obj;
+    } else if (isString(obj)) {
+      return (String) obj;
     } else {
       object.add((Object) obj);
     }
@@ -95,6 +97,10 @@ public class PrintFormat {
     return ob instanceof List;
   }
 
+  private static boolean isString(Object ob) {
+    return ob instanceof String;
+  }
+
   private static String printTables(String command, List<Object> object)
       throws InvocationTargetException, IllegalAccessException {
 
@@ -107,7 +113,8 @@ public class PrintFormat {
         || command.contains("ById")
         || command.endsWith("Dependency")
         || command.endsWith("Descriptor")
-        || command.endsWith("getVirtualNetworkFunctionRecord")) {
+        || command.endsWith("getVirtualNetworkFunctionRecord")
+        || command.contains("ByName")) {
       result = showObject(object);
 
     } else {
@@ -352,7 +359,8 @@ public class PrintFormat {
         || comand.contains("Configuration")
         || comand.contains("NetworkServiceDescriptor-findAll")
         || comand.contains("NetworkServiceRecord-findAll")
-        || comand.contains("getVirtualNetworkFunctionRecords")) {
+        || comand.contains("getVirtualNetworkFunctionRecords")
+        || comand.contains("Key-findAll")) {
 
       result = GeneralName.print(object);
 

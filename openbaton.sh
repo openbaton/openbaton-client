@@ -61,7 +61,7 @@ function checkEnvironmentVariable {
 }
 
 function execute {
-    java -jar -DrootLevel="$_level" "cli/build/libs/cli-all-$_version.jar" $*
+    java -jar -DrootLevel="$_level" "cli/build/libs/cli-all-$_version.jar" ${1+"$@"}    # the symbol ${1+"$@"} to handle spaces in arguments correctly
 }
 
 ##
@@ -95,7 +95,7 @@ then
     exit 1
 else
     checkEnvironmentVariables
-    execute $*
+    execute ${1+"$@"}
 fi
 
 

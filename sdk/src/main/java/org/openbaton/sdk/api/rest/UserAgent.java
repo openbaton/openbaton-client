@@ -16,8 +16,14 @@
 
 package org.openbaton.sdk.api.rest;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.openbaton.catalogue.security.User;
+import org.openbaton.sdk.api.annotations.Help;
+import org.openbaton.sdk.api.exception.SDKException;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
+
+import java.util.HashMap;
 
 /**
  * OpenBaton user-related api requester.
@@ -34,5 +40,25 @@ public class UserAgent extends AbstractRestAgent<User> {
       String path,
       String version) {
     super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version, User.class);
+  }
+
+  @Override
+  @Deprecated
+  public User findById(String id) {
+    return null;
+  }
+
+  @Help(help = "Find a User by his name")
+  public User findByName(String name) throws SDKException {
+    return (User) requestGet(name, User.class);
+  }
+
+  @Help(help = "Change a user's password")
+  public void changePassword(String oldPassword, String newPassword) throws SDKException {
+    HashMap<String, String> requestBody = new HashMap<>();
+    requestBody.put("old_pwd", oldPassword);
+    requestBody.put("new_pwd", newPassword);
+
+    requestPut("changepwd", requestBody);
   }
 }

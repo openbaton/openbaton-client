@@ -205,6 +205,15 @@ public final class NFVORequestor {
     return factory.getUserAgent();
   }
 
+  /**
+   * Gets the Key requester
+   *
+   * @return keyRequest; The (final) static Key requester
+   */
+  public KeyAgent getKeyAgent() {
+    return factory.getKeyAgent();
+  }
+
   public AbstractRestAgent abstractRestAgent(Class clazz, String path) {
     return factory.getAbstractAgent(clazz, path);
   }

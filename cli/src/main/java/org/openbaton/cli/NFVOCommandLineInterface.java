@@ -17,6 +17,7 @@
 package org.openbaton.cli;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
@@ -170,8 +171,6 @@ public class NFVOCommandLineInterface {
       reader.setPrompt(
           "\u001B[135m" + properties.get("NFVO_USERNAME") + "@[\u001B[32mopen-baton\u001B[0m]~> ");
 
-      //input reader
-      String s = "";
       int find = 0;
 
       for (Object entry : helpCommandMap.entrySet()) {
@@ -199,15 +198,10 @@ public class NFVOCommandLineInterface {
               "Type the following to get help for the usage of a command: \n./openbaton.sh [command] help");
           exit(1);
         }
-        s = args[0];
-        for (int i = 1; i < args.length; i++) {
-          s += " ";
-          s += args[i];
-        }
 
         //execute comand
         try {
-          String result = PrintFormat.printResult(args[0], executeCommand(s));
+          String result = PrintFormat.printResult(args[0], executeCommand(args));
           System.out.println(result);
           exit(0);
 
@@ -262,16 +256,15 @@ public class NFVOCommandLineInterface {
     }
   }
 
-  private static Command validateParametersAndGetCommand(String line) throws CommandLineException {
-    StringTokenizer st = new StringTokenizer(line);
+  private static Command validateParametersAndGetCommand(String[] line)
+      throws CommandLineException {
+    Iterator<String> commandLineIterator = Arrays.asList(line).iterator();
     String commandName = "";
-    if (st.hasMoreTokens()) commandName = st.nextToken();
-
+    if (commandLineIterator.hasNext()) commandName = commandLineIterator.next();
     LinkedList<String> params = new LinkedList<>();
-    while (st.hasMoreTokens()) {
-      params.add(st.nextToken());
+    while (commandLineIterator.hasNext()) {
+      params.add(commandLineIterator.next());
     }
-
     LinkedList<Command> commandList = commandMap.get(commandName);
     if (commandList == null || commandList.size() == 0) {
       throw new CommandLineException("Command: " + commandName + " not found!");
@@ -288,7 +281,7 @@ public class NFVOCommandLineInterface {
         paramTypeCorrect = true;
         int pos = 0;
         for (Type t : command.getMethod().getParameterTypes()) {
-          if (!t.equals(String.class)) {
+          if (!t.equals(String.class) && !t.equals(HashMap.class) && !t.equals(ArrayList.class)) {
             try {
               File f = new File(params.get(pos));
               if (!f.exists()) paramTypeCorrect = false;
@@ -319,13 +312,13 @@ public class NFVOCommandLineInterface {
    * @throws FileNotFoundException
    * @throws CommandLineException
    */
-  private static Object executeCommand(String line)
+  private static Object executeCommand(String[] line)
       throws InvocationTargetException, IllegalAccessException, FileNotFoundException,
           CommandLineException {
-    StringTokenizer st = new StringTokenizer(line);
+    Iterator<String> commandLineIterator = Arrays.asList(line).iterator();
 
     // remove command to get just the parameters
-    if (st.hasMoreTokens()) st.nextToken();
+    if (commandLineIterator.hasNext()) commandLineIterator.next();
 
     Command command = validateParametersAndGetCommand(line);
     handleExceptionalCommandNames(command);
@@ -336,15 +329,23 @@ public class NFVOCommandLineInterface {
             + command.getParams());
 
     List<Object> params = new LinkedList<>();
+    Gson gson = new GsonBuilder().create();
     for (Type t : command.getParams()) {
       log.trace("type is: " + t);
       if (t.equals(String.class)) { //for instance an id
-        params.add(st.nextToken());
+        params.add(commandLineIterator.next());
+      } else if (t.equals(HashMap.class)) {
+        HashMap<String, Object> map = gson.fromJson(commandLineIterator.next(), HashMap.class);
+        log.debug("HashMap is: " + map.toString());
+        params.add(map);
+      } else if (t.equals(ArrayList.class)) {
+        ArrayList<String> arrayList = gson.fromJson(commandLineIterator.next(), ArrayList.class);
+        log.debug("ArrayList is: " + arrayList.toString());
+        params.add(arrayList);
       } else { // for instance waiting for an obj so passing a file
-        String pathname = st.nextToken();
+        String pathname = commandLineIterator.next();
         log.trace("the path is: " + pathname);
         File f = new File(pathname);
-        Gson gson = new Gson();
         FileInputStream fileInputStream = new FileInputStream(f);
         String file = getString(fileInputStream);
         log.trace(file);
@@ -428,8 +429,9 @@ public class NFVOCommandLineInterface {
     getMethods(nfvoRequestor.getVirtualNetworkFunctionDescriptorAgent());
     getMethods(nfvoRequestor.getVirtualLinkAgent());
     getMethods(nfvoRequestor.getVNFPackageAgent());
-    //        getMethods(nfvoRequestor.getProjectAgent());
-    //        getMethods(nfvoRequestor.getUserAgent());
+    getMethods(nfvoRequestor.getKeyAgent());
+    getMethods(nfvoRequestor.getProjectAgent());
+    getMethods(nfvoRequestor.getUserAgent());
   }
 
   /**

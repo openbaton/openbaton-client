@@ -206,7 +206,10 @@ public abstract class RestRequest {
     HttpPost httpPost = null;
     try {
       log.trace("Object is: " + object);
-      String fileJSONNode = mapper.toJson(object);
+      String fileJSONNode;
+      if (object instanceof String) fileJSONNode = (String) object;
+      else fileJSONNode = mapper.toJson(object);
+
       log.trace("sending: " + fileJSONNode.toString());
       log.debug("baseUrl: " + baseUrl);
       log.debug("id: " + baseUrl + "/" + id);
@@ -221,8 +224,10 @@ public abstract class RestRequest {
       // call the api here
       log.debug("Executing post on: " + this.baseUrl + "/" + id);
       httpPost = new HttpPost(this.baseUrl + "/" + id);
-      httpPost.setHeader(new BasicHeader("accept", "application/json"));
-      httpPost.setHeader(new BasicHeader("Content-Type", "application/json"));
+      if (!(object instanceof String)) {
+        httpPost.setHeader(new BasicHeader("accept", "application/json"));
+        httpPost.setHeader(new BasicHeader("Content-Type", "application/json"));
+      }
       httpPost.setHeader(new BasicHeader("project-id", projectId));
       if (token != null)
         httpPost.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
@@ -237,6 +242,7 @@ public abstract class RestRequest {
       if (response.getEntity() != null) result = EntityUtils.toString(response.getEntity());
 
       if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_NO_CONTENT) {
+        if (object instanceof String) return result;
         JsonParser jsonParser = new JsonParser();
         JsonElement jsonElement = jsonParser.parse(result);
         result = mapper.toJson(jsonElement);

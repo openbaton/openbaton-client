@@ -164,20 +164,29 @@ public class PropertyReader {
   }
 
   /**
-   * Gets the vnfPackage Url path
+   * Gets the Project Url path
    *
-   * @return the vnfPackage Url path property
+   * @return the Project Url path property
    */
   public String getProjectUrl() {
     return sdkProperties.getProperty("restProjectPath");
   }
 
   /**
-   * Gets the vnfPackage Url path
+   * Gets the User Url path
    *
-   * @return the vnfPackage Url path property
+   * @return the User Url path property
    */
   public String getUserUrl() {
     return sdkProperties.getProperty("restUserPath");
+  }
+
+  /**
+   * Gets the Key Url path
+   *
+   * @return the Key Url path property
+   */
+  public String getKeyUrl() {
+    return sdkProperties.getProperty("restKeyPath");
   }
 }
