@@ -47,14 +47,14 @@ public class RequestFactory {
 
   private static String username;
   private static String password;
-  private static String projectId;
+  private String projectId;
   private static boolean sslEnabled;
   private final String nfvoPort;
   private final String nfvoIp;
   private final String version;
 
-  static public void setProjectId(String projectId) {
-    RequestFactory.projectId = projectId;
+  public void setProjectId(String projectId) {
+    this.projectId = projectId;
     if (configurationRequest != null) configurationRequest.setProjectId(projectId);
     if (imageRequest != null) imageRequest.setProjectId(projectId);
     if (networkServiceDescriptorRequest != null)
@@ -71,7 +71,7 @@ public class RequestFactory {
     if (vNFFGRequest != null) vNFFGRequest.setProjectId(projectId);
   }
 
-  public static String getProjectId() {
+  public String getProjectId() {
     return projectId;
   }
 
@@ -85,7 +85,7 @@ public class RequestFactory {
       String version) {
     RequestFactory.username = username;
     RequestFactory.password = password;
-    RequestFactory.projectId = projectId;
+    this.projectId = projectId;
     RequestFactory.sslEnabled = sslEnabled;
     this.nfvoPort = nfvoPort;
     this.nfvoIp = nfvoIp;

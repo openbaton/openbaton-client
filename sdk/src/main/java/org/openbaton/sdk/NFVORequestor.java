@@ -25,7 +25,7 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
  */
 public final class NFVORequestor {
 
-  private static RequestFactory factory;
+  private RequestFactory factory;
 
   /**
    * The public constructor for an NFVORequestor to a NFVO which runs on localhost port 8443 and
@@ -219,10 +219,10 @@ public final class NFVORequestor {
   }
 
   public void setProjectId(String projectId) {
-    RequestFactory.setProjectId(projectId);
+    factory.setProjectId(projectId);
   }
 
   public String getProjectId() {
-    return RequestFactory.getProjectId();
+    return factory.getProjectId();
   }
 }
