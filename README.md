@@ -569,8 +569,8 @@ The Open Baton project provides community support through the Open Baton Public 
   <img src="https://raw.githubusercontent.com/openbaton/openbaton.github.io/master/images/fokus.png" width="250"/><img src="https://raw.githubusercontent.com/openbaton/openbaton.github.io/master/images/tu.png" width="150"/>
 
 [fokus-logo]: https://raw.githubusercontent.com/openbaton/openbaton.github.io/master/images/fokus.png
-[cli-documentation]:http://openbaton.github.io/documentation/nfvo-sdk/
-[sdk-documentation]:http://openbaton.github.io/documentation/nfvo-how-to-use-cli/
+[cli-documentation]:http://openbaton.github.io/documentation/nfvo-how-to-use-cli/
+[sdk-documentation]:http://openbaton.github.io/documentation/nfvo-sdk/
 [openbaton]: http://openbaton.org
 [openbaton-doc]: http://openbaton.org/documentation
 [openbaton-github]: http://github.org/openbaton
