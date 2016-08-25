@@ -19,6 +19,7 @@ source gradle.properties
 
 _version=${version}
 _level=INFO
+_openbaton_cli_jar="cli/build/libs/cli-all-$_version.jar"
 
 function usage {
     echo -e "Open-Baton\n"
@@ -61,14 +62,14 @@ function checkEnvironmentVariable {
 }
 
 function execute {
-    java -jar -DrootLevel="$_level" "cli/build/libs/cli-all-$_version.jar" ${1+"$@"}    # the symbol ${1+"$@"} to handle spaces in arguments correctly
+    java -jar -DrootLevel=$_level $_openbaton_cli_jar ${1+"$@"}    # the symbol ${1+"$@"} to handle spaces in arguments correctly
 }
 
 ##
 #   MAIN
 ##
 
-while getopts “hlcd” OPTION
+while getopts "hlcd" OPTION
     do
          case $OPTION in
              c)

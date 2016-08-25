@@ -1,0 +1,92 @@
+#!/bin/sh
+
+##########################
+#### General Settings ####
+##########################
+
+set -e
+set -u
+#set -x # only for DEBUG
+
+# Make available the functions defined in /lib/lsb/init-functions
+. /lib/lsb/init-functions
+
+# Set the soft limit for max open file desciptors
+ulimit -S -n 4096
+
+
+##########################
+#### Global Variables ####
+##########################
+
+USER="$(id -un 2>/dev/null || true)"
+
+OPENBATON_BASE=/usr
+
+OPENBATON_CLI_JAR=${OPENBATON_BASE}/lib/openbaton/cli/cli-all-*.jar
+
+OPENBATON_CLI_PROPERTIES_FILE=/etc/openbaton/cli/nfvo.properties
+OPENBATON_CLI_EXE=${OPENBATON_BASE}/bin/openbaton.sh  # TODO: change the name
+
+
+##############################
+#### Execution privileges ####
+##############################
+
+checkBinary () {
+    if command -v $1 >/dev/null 2>&1 ; then
+        log_success_msg "Checking for '$1'"
+        return 0
+    else
+        log_failure_msg "Checking for '$1'"
+        return 1
+    fi
+}
+
+_ex='sh -c'
+if [ "${USER}" != 'root' ]; then
+    if checkBinary sudo; then
+        _ex='sudo -E sh -c'
+    elif checkBinary su; then
+        _ex='su -c'
+    fi
+fi
+
+
+################################################
+#### Configure Open Baton NFVO installation ####
+################################################
+
+setCLIJarFolder () {
+    export OPENBATON_CLI_JAR=${OPENBATON_CLI_JAR}
+    export OPENBATON_CLI_EXE=${OPENBATON_CLI_EXE}
+    $_ex "sed -i "s@_openbaton_cli_jar=.*@_openbaton_cli_jar=${OPENBATON_CLI_JAR}@g" ${OPENBATON_CLI_EXE}"
+}
+
+
+##############
+#### MAIN ####
+##############
+
+fixOpenbatonExe () {
+    export OPENBATON_CLI_EXE=${OPENBATON_CLI_EXE}
+    $_ex "sed -i \"s@source gradle.properties@#source gradle.properties@g\" ${OPENBATON_CLI_EXE}"
+}
+
+configure () {
+    log_success_msg "Configuring Open Baton CLI installation .."
+
+    setCLIJarFolder
+    $_ex "chmod a+x ${OPENBATON_CLI_EXE}"
+    
+    # Temporary fix TODO: do it properly
+    fixOpenbatonExe
+
+    log_success_msg "Open Baton CLI installation completed"
+    
+    log_success_msg "To configure the CLI for your Open Baton installation type the following command and provide the inputs required."
+    log_success_msg "source ${OPENBATON_CLI_PROPERTIES_FILE}"
+}
+
+
+configure

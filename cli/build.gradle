@@ -14,6 +14,36 @@
  * limitations under the License.
  */
 
+
+//#### debian ####
+
+plugins {
+    id "nebula.os-package" version "2.2.6"
+}
+apply from: './gradle/gradle/command.line.helper.gradle'
+apply from: './gradle/gradle/git.helpers.gradle'
+
+project.ext {
+    //------------------------------------------------//
+    /**
+     * Application Related Version
+     */
+    applicationVersion = version
+
+    applicationRelease = isApplicationRelease()
+    applicationDate = new Date()
+    applicationRevision = getRevision()
+
+    applicationVersionSnapshot = (!applicationRelease) ? ".${asUTC(applicationDate, 'yyyyMMdd')}.git${applicationRevision}" : ""
+    applicationVersionFull = "${applicationVersion}${applicationVersionSnapshot}"
+    //------------------------------------------------//
+}
+
+apply from: 'gradle/gradle/packaging.vimplugin.debian.gradle'
+
+//################
+
+
 repositories {
     mavenCentral()
     maven {
