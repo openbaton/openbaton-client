@@ -15,6 +15,7 @@
  */
 
 ext {
+    versionJar = version
     debianApplicationVersionFull = "${applicationVersionFull}".replaceAll("-", ".")
     openbatonInstallDir = "/opt/openbaton"
 }
@@ -36,10 +37,9 @@ task makedeb(type: Deb, dependsOn: [jar, build]) {
 
     postInstall file('gradle/gradle/scripts/debian/postinst')
 
-
     // Copy files from "from path" to "into path"
     //from('./build/libs/')                                               { into '/usr/lib/openbaton/cli' }      // all jar files
-    from("./build/libs/cli-all-${applicationVersionFull}" + ".jar")     { into '/usr/lib/openbaton/cli' }      // only cli-all jar file
+    from("./build/libs/cli-all-${versionJar}" + ".jar")     { into '/usr/lib/openbaton/cli' }      // only cli-all jar file
     from('../nfvo.properties')                                          { into '/etc/openbaton/cli' }          // properties needed to run the CLI
     from('../openbaton.sh')                                             { into '/usr/bin/'}                    // executable to run the CLI
 }
