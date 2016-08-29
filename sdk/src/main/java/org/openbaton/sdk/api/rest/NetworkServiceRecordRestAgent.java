@@ -18,10 +18,8 @@ package org.openbaton.sdk.api.rest;
 
 import com.google.gson.JsonObject;
 import org.openbaton.catalogue.mano.descriptor.VNFComponent;
-import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
-import org.openbaton.catalogue.mano.record.PhysicalNetworkFunctionRecord;
-import org.openbaton.catalogue.mano.record.VNFRecordDependency;
-import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
+import org.openbaton.catalogue.mano.record.*;
+import org.openbaton.catalogue.nfvo.messages.Interfaces.NFVMessage;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
@@ -105,6 +103,55 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
       throws SDKException {
     String url = id + "/vnfrecords" + "/" + id_vnf;
     requestDelete(url);
+  }
+
+  @Help(help = "create VNFCInstance in standby")
+  public void createVNFCInstanceInStandby(
+      final String idNSR, final String idVNF, final String idVdu, final VNFComponent component)
+      throws SDKException {
+    String url = idNSR + "/vnfrecords/" + idVNF + "/vdunits/" + idVdu + "/vnfcinstances/standby";
+    requestPost(url, component);
+  }
+
+  @Help(help = "switch to standby")
+  public void switchToStandby(
+      final String idNSR,
+      final String idVNF,
+      final String idVdu,
+      final String idVnfc,
+      final VNFCInstance failedVnfcInstance)
+      throws SDKException {
+    String url =
+        idNSR
+            + "/vnfrecords/"
+            + idVNF
+            + "/vdunits/"
+            + idVdu
+            + "/vnfcinstances/"
+            + idVnfc
+            + "/switchtostandby";
+    requestPost(url, failedVnfcInstance);
+  }
+
+  // Actually only HEAL action is supported
+  @Help(help = "Execute a specific action specified in the nfvMessage")
+  public void postAction(
+      final String idNSR,
+      final String idVNF,
+      final String idVdu,
+      final String idVnfc,
+      final NFVMessage nfvMessage)
+      throws SDKException {
+    String url =
+        idNSR
+            + "/vnfrecords/"
+            + idVNF
+            + "/vdunits/"
+            + idVdu
+            + "/vnfcinstances/"
+            + idVnfc
+            + "/actions";
+    requestPost(url, nfvMessage);
   }
 
   /**
