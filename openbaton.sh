@@ -23,7 +23,7 @@ _openbaton_cli_jar="cli/build/libs/cli-all-$_version.jar"
 
 function usage {
     echo -e "Open-Baton\n"
-    echo -e "Usage:\n\t ./openbaton.sh [option] comand [command] [command]\n\t"
+    echo -e "Usage:\n\t ./openbaton.sh [option] command [command] [command]\n\t"
     echo -e "where option is"
     echo -e "\t\t * -c show configuration"
     echo -e "\t\t * -d activate debug mode"
