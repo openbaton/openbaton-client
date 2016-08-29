@@ -6,6 +6,23 @@ mainClassName = 'org.openbaton.cli.NFVOCommandLineInterface'
 startScripts {
     doLast {
         def unixFile = file getUnixScript()
+
+        def unixTextTmp = ""
+        def unixText = unixFile.text
+        def unixDaemonScript = new File("${rootProject.projectDir}/cli/gradle/gradle/scripts/openbaton-client.pscript").text
+
+        String execLine = ""
+        unixText.readLines().each {
+            line ->
+                if (line.startsWith("exec")) {
+                    unixTextTmp += unixDaemonScript;
+                    execLine = line;
+                } else {
+                    unixTextTmp += line + '\n'
+                }
+        }
+        unixFile.text = unixTextTmp
+        unixFile.text = unixFile.text.replace("### EXECUTE COMMAND","  "+execLine)
         unixFile.renameTo("${startScripts.outputDir}/openbaton-client")
     }
 }
