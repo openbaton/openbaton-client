@@ -63,7 +63,10 @@ project.ext {
     applicationVersionDebian = "1";
 
     //------------------------------------------------//
+
+
 }
+
 subprojects {
 
     apply plugin: 'java'
@@ -103,6 +106,8 @@ subprojects {
         integrationCompile sourceSets.test.output
     }
 }
+
+
 
 repositories {
     mavenCentral()
