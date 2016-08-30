@@ -335,13 +335,37 @@ public class NFVOCommandLineInterface {
       if (t.equals(String.class)) { //for instance an id
         params.add(commandLineIterator.next());
       } else if (t.equals(HashMap.class)) {
-        HashMap<String, Object> map = gson.fromJson(commandLineIterator.next(), HashMap.class);
-        log.debug("HashMap is: " + map.toString());
-        params.add(map);
+        String pathname = commandLineIterator.next();
+        log.trace("the path is: " + pathname);
+        File f = new File(pathname);
+        FileInputStream fileInputStream = new FileInputStream(f);
+        String file = getString(fileInputStream);
+        log.trace(file);
+        HashMap casted;
+        try {
+          casted = gson.fromJson(file, HashMap.class);
+        } catch (JsonParseException je) {
+          throw new CommandLineException(
+              "The provided json file could not be cast to a HashMap ", je.getCause());
+        }
+        log.trace("Parameter added is: " + casted);
+        params.add(casted);
       } else if (t.equals(ArrayList.class)) {
-        ArrayList<String> arrayList = gson.fromJson(commandLineIterator.next(), ArrayList.class);
-        log.debug("ArrayList is: " + arrayList.toString());
-        params.add(arrayList);
+        String pathname = commandLineIterator.next();
+        log.trace("the path is: " + pathname);
+        File f = new File(pathname);
+        FileInputStream fileInputStream = new FileInputStream(f);
+        String file = getString(fileInputStream);
+        log.trace(file);
+        ArrayList casted;
+        try {
+          casted = gson.fromJson(file, ArrayList.class);
+        } catch (JsonParseException je) {
+          throw new CommandLineException(
+              "The provided json file could not be cast to an ArrayList ", je.getCause());
+        }
+        log.trace("Parameter added is: " + casted);
+        params.add(casted);
       } else { // for instance waiting for an obj so passing a file
         String pathname = commandLineIterator.next();
         log.trace("the path is: " + pathname);
