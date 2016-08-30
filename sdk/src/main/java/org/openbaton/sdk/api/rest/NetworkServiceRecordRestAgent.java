@@ -64,7 +64,10 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
 
   @Help(help = "Create NetworkServiceRecord from NetworkServiceDescriptor id")
   public NetworkServiceRecord create(
-          final String id, HashMap<String, ArrayList<String>> vduVimInstances, ArrayList<String> keys, HashMap<String, Configuration> configurations)
+      final String id,
+      HashMap<String, ArrayList<String>> vduVimInstances,
+      ArrayList<String> keys,
+      HashMap<String, Configuration> configurations)
       throws SDKException {
     HashMap<String, Serializable> jsonBody = new HashMap<>();
     jsonBody.put("keys", keys);
