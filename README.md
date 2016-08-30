@@ -174,7 +174,7 @@ Navigate into the project's root directory and execute *source nfvo.properties*.
 The three arguments after the NSD id can be used to specify the VIM on which a VDU should be deployed, the keypairs that shall be used to deploy the NSR and configuration parameters for the VNFRs.  
 If you want to specify the VIM to use for a particular VDU you can pass a file containing a map like this:
   ```json
-   {"vdu1Name":[vim1,vim2,vim3], "vdu2Name":[vim1]}
+   {"vdu1Name":["vim1","vim2","vim3"], "vdu2Name":["vim1"]}
   ```
 
 In this case the VDU named vdu2Name would be deployed on vim1 and the VDU named vdu1Name randomly on one of the VIMs vim1, vim2 or vim3.  
