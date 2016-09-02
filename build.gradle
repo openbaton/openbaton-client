@@ -119,7 +119,8 @@ repositories {
 dependencies {
     //compile 'org.slf4j:slf4j-simple:1.7.12'
     //compile 'org.slf4j:slf4j-log4j12:1.7.12'
-    compile 'org.openbaton:catalogue:2.1.2'
+    compile 'org.openbaton:catalogue:2.1.3'
+
 }
 
 project(':sdk') {
