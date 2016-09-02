@@ -275,6 +275,19 @@ Of course you do not have to specify VIMs, keys and configurations. If you do no
   $ openbaton.sh NetworkServiceRecord-deleteVNFCInstance id-network-service-record id-virtual-network-function-record
   ```
   
+*  **startVNFCInstance**
+  
+  * Start a VNFCInstance specified by it's id
+  ```sh
+  $ openbaton.sh NetworkServiceRecord-startVNFCInstance id-nsr id-vnfr id-vdu id-vnfcinstance
+  ```
+  
+*  **stopVNFCInstance**
+    
+  * Stop a VNFCInstance specified by it's id
+  ```sh
+  $ openbaton.sh NetworkServiceRecord-stopVNFCInstance id-nsr id-vnfr id-vdu id-vnfcinstance
+  ```
   
   ### **User Subcommands**
 *  **create**
