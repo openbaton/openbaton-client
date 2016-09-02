@@ -282,6 +282,56 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
+   * Starts the specified VNFC Instance
+   *
+   * @param nsrId
+   * @param vnfId
+   * @param vduId
+   * @param vnfciId
+   * @throws SDKException
+   */
+  @Help(help = "Start the specified VNFC Instance")
+  public void startVNFCInstance(
+      final String nsrId, final String vnfId, final String vduId, final String vnfciId)
+      throws SDKException {
+    String url =
+        nsrId
+            + "/vnfrecords/"
+            + vnfId
+            + "/vdunits/"
+            + vduId
+            + "/vnfcinstances/"
+            + vnfciId
+            + "/start";
+    requestPost(url);
+  }
+
+  /**
+   * Stops the specified VNFC Instance
+   *
+   * @param nsrId
+   * @param vnfId
+   * @param vduId
+   * @param vnfciId
+   * @throws SDKException
+   */
+  @Help(help = "Stop the specified VNFC Instance")
+  public void stopVNFCInstance(
+      final String nsrId, final String vnfId, final String vduId, final String vnfciId)
+      throws SDKException {
+    String url =
+        nsrId
+            + "/vnfrecords/"
+            + vnfId
+            + "/vdunits/"
+            + vduId
+            + "/vnfcinstances/"
+            + vnfciId
+            + "/stop";
+    requestPost(url);
+  }
+
+  /**
    * Returns the set of PhysicalNetworkFunctionRecord into a NSD with id
    *
    * @param idNSR : The id of NSD

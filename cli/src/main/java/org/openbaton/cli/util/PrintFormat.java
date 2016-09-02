@@ -32,7 +32,10 @@ public class PrintFormat {
 
     if (obj == null) {
       //TODO
-      if (!command.contains("delete") && !command.contains("changePassword")) {
+      if (!command.contains("delete")
+          && !command.contains("changePassword")
+          && !command.contains("startVNFCInstance")
+          && !command.contains("stopVNFCInstance")) {
         result = "Error: invalid command line";
       }
       return result;
