@@ -25,28 +25,17 @@ plugins {
     id 'net.researchgate.release' version '2.1.2'
     id "com.github.sherter.google-java-format" version "0.3.2"
 }
+apply from: 'gradle/gradle/nexus.upload.plugin.gradle'
 
-release {
-    failOnCommitNeeded = true
-    failOnPublishNeeded = true
-    failOnSnapshotDependencies = true
-    failOnUnversionedFiles = true
-    failOnUpdateNeeded = true
-    revertOnFail = true
-    preCommitText = ''
-    preTagCommitMessage = 'Pre-tag commit: '
-    tagCommitMessage = 'Creating tag: '
-    newVersionCommitMessage = 'New version commit: '
-    tagTemplate = '${version}'
-    versionPropertyFile = 'gradle.properties'
-    versionProperties = []
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+
+    repositories {
+        mavenCentral()
+    }
 }
-
-
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'eclipse'
-
 project.ext {
     //------------------------------------------------//
     /**
@@ -56,23 +45,11 @@ project.ext {
     springBootVersion = '1.2.5.RELEASE'
     //------------------------------------------------//
     //------------------------------------------------//
-    /**
-     * Application Related Version
-     */
-    applicationVersion = "0.6-alpha"
-    applicationVersionDebian = "1";
-
-    //------------------------------------------------//
-
-
 }
 
+
 subprojects {
-
     apply plugin: 'java'
-    apply plugin: 'maven'
-
-    group = 'org.openbaton'
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
@@ -104,77 +81,6 @@ subprojects {
 
     dependencies {
         integrationCompile sourceSets.test.output
-    }
-}
-
-
-
-repositories {
-    mavenCentral()
-    maven {
-        url "http://193.175.132.176:8081/nexus/content/groups/public"
-    }
-}
-
-dependencies {
-    //compile 'org.slf4j:slf4j-simple:1.7.12'
-    //compile 'org.slf4j:slf4j-log4j12:1.7.12'
-    compile 'org.openbaton:catalogue:2.1.3'
-
-}
-
-project(':sdk') {
-    apply plugin: 'com.bmuschko.nexus'
-
-//    dependencies {
-//        compile 'org.slf4j:slf4j-simple:1.7.12'
-//    }
-
-    modifyPom {
-        project {
-            name 'OpenBaton'
-            description 'Openbaton libraries for almost everything'
-            url 'http://openbaton.github.io'
-            inceptionYear '2015'
-            scm {
-                url 'http://openbaton.github.io'
-                connection ''
-                developerConnection 'https://github.com/openbaton'
-            }
-
-            licenses {
-                license {
-                    name 'The Apache Software License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    distribution 'repo'
-                }
-            }
-
-            developers {
-                developer {
-                    id 'lto'
-                    name 'Lorenzo Tomasini'
-                    email 'lorenzo.tomasini@fokus.fraunhofer.de'
-                }
-                developer {
-                    id 'gca'
-                    name 'Giuseppe Carella'
-                    email 'giuseppe.carella@fokus.fraunhofer.de'
-                }
-            }
-        }
-    }
-
-    extraArchive {
-        sources = true
-        tests = false
-        javadoc = true
-    }
-
-    nexus {
-        sign = false
-        repositoryUrl = 'http://get.openbaton.org:8081/nexus/content/repositories/thirdparty/'
-        snapshotRepositoryUrl = 'http://get.openbaton.org:8081/nexus/content/repositories/snapshots/'
     }
 }
 
