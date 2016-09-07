@@ -306,7 +306,7 @@ public class NFVOCommandLineInterface {
    * Try to execute the user's command line input.
    *
    * @param line
-   * @return
+   * @return the object returned by the execution of the command line input
    * @throws InvocationTargetException
    * @throws IllegalAccessException
    * @throws FileNotFoundException

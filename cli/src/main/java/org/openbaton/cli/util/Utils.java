@@ -15,7 +15,7 @@ public class Utils {
    *
    * @param m1
    * @param m2
-   * @return
+   * @return true if method m1 and method m2 are considered equal for our case
    */
   public static boolean methodsAreEqual(Method m1, Method m2) {
     if (!m1.getName().equals(m2.getName())) return false;

@@ -260,13 +260,16 @@ public abstract class RestRequest {
       if (httpPost != null) httpPost.releaseConnection();
       throw new SDKException("Could not http-post or open the object properly", e);
     } catch (SDKException e) {
-      if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+      if (response != null
+          && response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
         token = null;
         if (httpPost != null) httpPost.releaseConnection();
         return requestPost(id);
-      } else {
+      } else if (response != null) {
         if (httpPost != null) httpPost.releaseConnection();
         throw new SDKException("Status is " + response.getStatusLine().getStatusCode());
+      } else {
+        throw e;
       }
     }
   }
@@ -761,22 +764,30 @@ public abstract class RestRequest {
     httpPost.releaseConnection();
     log.trace(statusCode + ": " + responseString);
 
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
     if (statusCode != 200) {
-      ParseComError error = new Gson().fromJson(responseString, ParseComError.class);
+      JsonObject error = gson.fromJson(responseString, JsonObject.class);
+
+      JsonElement detailMessage = error.get("detailMessage");
+      if (detailMessage == null) detailMessage = error.get("errorMessage");
+      if (detailMessage == null) detailMessage = error.get("message");
+      if (detailMessage == null) detailMessage = error.get("description");
+      if (detailMessage == null) detailMessage = error.get("errorDescription");
+
       log.error(
           "Status Code ["
               + statusCode
               + "]: Error signing-in ["
-              + error.error
-              + "] - "
-              + error.error_description);
+              + (detailMessage != null ? detailMessage.getAsString() : "no error description")
+              + "]");
+
+      if (detailMessage == null) log.error("Got Error from server: \n" + gson.toJson(error));
       throw new SDKException(
           "Status Code ["
               + statusCode
               + "]: Error signing-in ["
-              + error.error
-              + "] - "
-              + error.error_description);
+              + (detailMessage != null ? detailMessage.getAsString() : "no error description")
+              + "]");
     }
     JsonObject jobj = new Gson().fromJson(responseString, JsonObject.class);
     log.trace("JsonTokeAccess is: " + jobj.toString());

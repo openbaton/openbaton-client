@@ -69,6 +69,7 @@ public class RequestFactory {
     if (eventAgent != null) eventAgent.setProjectId(projectId);
     if (virtualLinkRequest != null) virtualLinkRequest.setProjectId(projectId);
     if (vNFFGRequest != null) vNFFGRequest.setProjectId(projectId);
+    if (keyAgent != null) keyAgent.setProjectId(projectId);
   }
 
   public String getProjectId() {
