@@ -445,7 +445,6 @@ public class NFVOCommandLineInterface {
   private static void fillCommands(NFVORequestor nfvoRequestor) {
     getMethods(nfvoRequestor.getNetworkServiceRecordAgent());
     getMethods(nfvoRequestor.getConfigurationAgent());
-    getMethods(nfvoRequestor.getImageAgent());
     getMethods(nfvoRequestor.getEventAgent());
     getMethods(nfvoRequestor.getVNFFGAgent());
     getMethods(nfvoRequestor.getVimInstanceAgent());
