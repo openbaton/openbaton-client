@@ -26,7 +26,7 @@ OPENBATON_BASE=/usr
 OPENBATON_CLI_JAR=${OPENBATON_BASE}/lib/openbaton/cli/cli-all-*.jar
 
 OPENBATON_CLI_PROPERTIES_FILE=/etc/openbaton/cli/nfvo.properties
-OPENBATON_CLI_EXE=${OPENBATON_BASE}/bin/openbaton.sh  # TODO: change the name
+OPENBATON_CLI_EXE=${OPENBATON_BASE}/bin/openbaton
 
 
 ##############################
