@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 dependencies {
-    compile 'org.openbaton:catalogue:2.2.1-SNAPSHOT'
+    compile 'org.openbaton:catalogue:3.0.0-RC1'
 
     compile 'org.slf4j:slf4j-api:1.7.12'
 
