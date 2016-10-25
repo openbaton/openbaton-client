@@ -31,7 +31,6 @@ public class RequestFactory {
 
   // create the requester here, maybe shift this to a manager
   private static ConfigurationRestRequest configurationRequest = null;
-  private static ImageRestAgent imageRequest = null;
   private static NetworkServiceDescriptorRestAgent networkServiceDescriptorRequest = null;
   private static NetworkServiceRecordRestAgent networkServiceRecordRequest = null;
   private static VimInstanceRestAgent vimInstanceRequest = null;
@@ -56,7 +55,6 @@ public class RequestFactory {
   public void setProjectId(String projectId) {
     this.projectId = projectId;
     if (configurationRequest != null) configurationRequest.setProjectId(projectId);
-    if (imageRequest != null) imageRequest.setProjectId(projectId);
     if (networkServiceDescriptorRequest != null)
       networkServiceDescriptorRequest.setProjectId(projectId);
     if (networkServiceRecordRequest != null) networkServiceRecordRequest.setProjectId(projectId);
@@ -121,22 +119,6 @@ public class RequestFactory {
               version);
     }
     return configurationRequest;
-  }
-
-  public ImageRestAgent getImageAgent() {
-    if (imageRequest == null) {
-      imageRequest =
-          new ImageRestAgent(
-              username,
-              password,
-              projectId,
-              sslEnabled,
-              nfvoIp,
-              nfvoPort,
-              propertyReader.getRestImageUrl(),
-              version);
-    }
-    return imageRequest;
   }
 
   public NetworkServiceDescriptorRestAgent getNetworkServiceDescriptorAgent() {

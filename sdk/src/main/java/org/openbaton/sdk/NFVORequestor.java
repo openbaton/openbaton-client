@@ -98,15 +98,6 @@ public final class NFVORequestor {
   }
 
   /**
-   * Gets the image requester
-   *
-   * @return image: The (final) static image requester
-   */
-  public ImageRestAgent getImageAgent() {
-    return factory.getImageAgent();
-  }
-
-  /**
    * Gets the networkServiceDescriptor requester
    *
    * @return networkServiceDescriptorRequest: The (final) static networkServiceDescriptor requester
