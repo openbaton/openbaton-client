@@ -22,28 +22,23 @@ import com.google.gson.GsonBuilder;
 
 import org.junit.Ignore;
 import org.junit.Test;
-
-import org.openbaton.catalogue.mano.common.DeploymentFlavour;
-
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualDeploymentUnit;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.PhysicalNetworkFunctionRecord;
 import org.openbaton.catalogue.mano.record.VNFRecordDependency;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
-import org.openbaton.catalogue.nfvo.*;
-
-import org.openbaton.sdk.api.exception.SDKException;
+import org.openbaton.catalogue.nfvo.Location;
+import org.openbaton.catalogue.nfvo.VimInstance;
+import org.openbaton.catalogue.security.Project;
 import org.openbaton.sdk.NFVORequestor;
-import org.openbaton.sdk.api.rest.EventAgent;
+import org.openbaton.sdk.api.exception.SDKException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  * Created by lto on 03/07/15.
@@ -54,38 +49,89 @@ public class SdkTest {
   private VimInstance vimInstance;
   private VimInstance res;
   private final static String descriptorFileName =
-      "../../descriptors/network_service_descriptors/NetworkServiceDescriptor-with-dependencies.json";
+      "/opt/fokus-repo/descriptors/network_service_descriptors/NetworkServiceDescriptor-iperf-single.json";
 
   @Test
   @Ignore
-  public void createTest() throws SDKException, FileNotFoundException {
+  public void createTest() throws FileNotFoundException {
+    GsonBuilder gsonBuilder = new GsonBuilder().setPrettyPrinting();
+    Gson gson = gsonBuilder.create();
+    NFVORequestor requestor =
+        new NFVORequestor("admin", "openbaton", "", false, "localhost", "8080", "1");
 
-    NFVORequestor requestor = new NFVORequestor("admin", "openbaton", "default", "1");
+    String projectId = null;
+    try {
+      for (Project project : requestor.getProjectAgent().findAll()) {
+        if (project.getName().equals("default")) {
+          projectId = project.getId();
+        }
+      }
+    } catch (SDKException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+      System.exit(1);
+    }
+    requestor.setProjectId(projectId);
 
+    /**
+     * VimInsance
+     */
     vimInstance = createVimInstance();
-    res =
-        (VimInstance)
-            requestor.abstractRestAgent(VimInstance.class, "/datacenters").create(vimInstance);
-    log.debug("Result is: " + res);
 
-    //        NetworkServiceDescriptor networkServiceDescriptor = createNetworkServiceDescriptor();
-    GsonBuilder gsonBuilder = new GsonBuilder();
-    Gson mapper = gsonBuilder.create();
+    //    System.out.println(gson.toJson(vimInstance));
+    try {
+      vimInstance = requestor.getVimInstanceAgent().create(vimInstance);
+    } catch (SDKException e) {
+      e.printStackTrace();
+      System.err.println("Reason: " + e.getReason());
+      System.exit(1);
+    }
+    log.debug("Result is: " + vimInstance);
+
+    /**
+     * Descriptors
+     */
     NetworkServiceDescriptor networkServiceDescriptor =
-        mapper.fromJson(new FileReader(descriptorFileName), NetworkServiceDescriptor.class);
-    log.debug("Sending: " + networkServiceDescriptor);
-    NetworkServiceDescriptor res2 =
-        requestor.getNetworkServiceDescriptorAgent().create(networkServiceDescriptor);
-    log.debug("DESCRIPTOR: " + res2);
+        gson.fromJson(new FileReader(descriptorFileName), NetworkServiceDescriptor.class);
+    log.debug("Sending: " + networkServiceDescriptor.getName());
+    NetworkServiceDescriptor res2 = null;
+    try {
+      res2 = requestor.getNetworkServiceDescriptorAgent().create(networkServiceDescriptor);
+    } catch (SDKException e) {
+      e.printStackTrace();
+      System.err.println("rEason: " + e.getReason());
+      System.exit(2);
+    }
+    System.out.println("DESCRIPTOR: " + res2);
 
-    EventAgent eventAgent = requestor.getEventAgent();
-    EventEndpoint eventEndpoint = new EventEndpoint();
-    eventEndpoint.setType(EndpointType.REST);
-    eventEndpoint.setEndpoint("http://localhost:8082/callme");
-    eventEndpoint.setEvent(Action.INSTANTIATE_FINISH);
-    eventEndpoint.setNetworkServiceId("idhere");
-    EventEndpoint endpoint = eventAgent.create(eventEndpoint);
-    eventAgent.delete(endpoint.getName());
+    try {
+      requestor.getNetworkServiceDescriptorAgent().delete(res2.getId());
+    } catch (SDKException e) {
+      e.printStackTrace();
+      System.err.println("rEason: " + e.getReason());
+      System.exit(2);
+    }
+
+    try {
+      requestor.getVimInstanceAgent().delete(vimInstance.getId());
+    } catch (SDKException e) {
+      e.printStackTrace();
+      System.err.println("rEason: " + e.getReason());
+      System.exit(2);
+    }
+    /**
+     * Event
+     */
+
+    //    EventAgent eventAgent = requestor.getEventAgent();
+    //    EventEndpoint eventEndpoint = new EventEndpoint();
+    //    eventEndpoint.setType(EndpointType.REST);
+    //    eventEndpoint.setEndpoint("http://localhost:8082/callme");
+    //    eventEndpoint.setEvent(Action.INSTANTIATE_FINISH);
+    //    eventEndpoint.setNetworkServiceId("idhere");
+    //    EventEndpoint endpoint = eventAgent.create(eventEndpoint);
+    //    eventAgent.delete(endpoint.getName());
 
     //SECURITY//
 
@@ -191,51 +237,18 @@ public class SdkTest {
 
   private VimInstance createVimInstance() {
     VimInstance vimInstance = new VimInstance();
-    vimInstance.setName("vim-instance");
+    vimInstance.setName("vim-instance-test");
     vimInstance.setType("test");
-    vimInstance.setNetworks(
-        new HashSet<Network>() {
-          {
-            Network network = new Network();
-            network.setExtId("ext_id");
-            network.setName("network_name");
-            List<Subnet> subnets = new ArrayList<Subnet>();
-            Subnet subnet = new Subnet();
-            subnet.setName("subnet name");
-            subnet.setCidr("cidrs");
-            subnets.add(subnet);
-            network.setSubnets(new HashSet<Subnet>());
-            add(network);
-          }
-        });
-    vimInstance.setFlavours(
-        new HashSet<DeploymentFlavour>() {
-          {
-            DeploymentFlavour deploymentFlavour = new DeploymentFlavour();
-            deploymentFlavour.setExtId("ext_id_1");
-            deploymentFlavour.setFlavour_key("flavor_name");
-            add(deploymentFlavour);
+    vimInstance.setAuthUrl("test.de");
+    vimInstance.setPassword("password");
+    vimInstance.setUsername("username");
+    vimInstance.setActive(true);
+    Location location = new Location();
+    location.setName("location");
+    location.setLatitude("0");
+    location.setLongitude("0");
+    vimInstance.setLocation(location);
 
-            deploymentFlavour = new DeploymentFlavour();
-            deploymentFlavour.setExtId("ext_id_2");
-            deploymentFlavour.setFlavour_key("m1.tiny");
-            add(deploymentFlavour);
-          }
-        });
-    vimInstance.setImages(
-        new HashSet<NFVImage>() {
-          {
-            NFVImage image = new NFVImage();
-            image.setExtId("ext_id_1");
-            image.setName("ubuntu-14.04-server-cloudimg-amd64-disk1");
-            add(image);
-
-            image = new NFVImage();
-            image.setExtId("ext_id_2");
-            image.setName("image_name_1");
-            add(image);
-          }
-        });
     return vimInstance;
   }
 

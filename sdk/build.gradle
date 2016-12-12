@@ -14,8 +14,18 @@
  * limitations under the License.
  *
  */
+
+test {
+    testLogging {
+        // Make sure output from
+        // standard out or error is shown
+        // in Gradle output.
+        showStandardStreams = true
+    }
+}
+
 dependencies {
-    compile 'org.openbaton:catalogue:3.0.0-RC1'
+    compile 'org.openbaton:catalogue:3.0.0'
 
     compile 'org.slf4j:slf4j-api:1.7.12'
 
@@ -27,5 +37,6 @@ dependencies {
 
     compile 'org.apache.httpcomponents:httpclient:4.5.2'
 
+    testCompile 'org.slf4j:slf4j-api:1.7.12'
     testCompile "junit:junit:4.12"
 }

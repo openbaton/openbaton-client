@@ -70,7 +70,10 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
     File f = new File(filePath);
     if (f == null || !f.exists()) {
       log.error("No package: " + f.getName() + " found!");
-      throw new SDKException("No package: " + f.getName() + " found!");
+      throw new SDKException(
+          "No package: " + f.getName() + " found!",
+          new StackTraceElement[0],
+          "File " + filePath + " not existing");
     }
     return requestPostPackage(f);
   }
