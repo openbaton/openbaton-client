@@ -1,0 +1,61 @@
+/*
+ * Copyright (c) 2016 Open Baton (http://www.openbaton.org)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+ext {
+    debianApplicationVersionFull = "${applicationVersionFull}".replaceAll("-", ".")
+
+    baseName = 'openbaton'
+    componentName = "cli"
+    fullName = "${baseName}-${componentName}"
+    propertiesDir = '/etc/openbaton'
+    baseBinaryDir = '/usr/lib/openbaton'
+    jarSubpathName = "${componentName}".replaceAll("-", "/")
+}
+
+task makedeb(type: Deb, dependsOn: [jar, build]) { 
+    packageName = (applicationRelease) ? "${fullName}" : "${fullName}-nightly"
+    version = debianApplicationVersionFull
+    //release = 1 
+    priority = 'optional'
+    arch = 'all'
+    maintainer = 'Open Baton Team <dev@openbaton.org>'
+    vendor = 'Open Source (Implemented by Fraunhofer FOKUS and TUB)'
+    license = 'Apache 2.0 License'
+    url = 'http://openbaton.github.io/index.html'
+    summary = 'Open Baton Command Line Interface (CLI)'
+    packageDescription = 'The Open Baton CLI is a feature of the Open Baton project, which is an ETSI compliant implementation of a NFV Management and Orchestration (MANO). It allows to use the Open Baton NFVO\'s API and send commands to it.'
+
+    requires('openjdk-7-jre')
+
+    preInstall file('gradle/gradle/scripts/debian/preinst')
+    postInstall file('gradle/gradle/scripts/debian/postinst')
+
+    // Copy files from "from path" to "into path"
+    from('../nfvo.properties') {                                                                                // properties file
+        into "${propertiesDir}"
+        rename("nfvo.properties", "${fullName}.properties")        
+    }
+    //from('./build/libs/')                                             { into '/usr/lib/openbaton/cli' }       // all jar files
+    from("./build/libs/cli-all-${version}" + ".jar") {                                                          // jar file (only cli-all file)
+        into "${baseBinaryDir}/${jarSubpathName}"
+        rename("(.*)","${fullName}-${version}.jar")
+    }
+    from('../openbaton.sh') {                                                                                   // executable to run the CLI
+        into '/usr/bin/'
+        rename("openbaton.sh", "openbaton")
+    }
+}

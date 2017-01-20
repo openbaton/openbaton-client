@@ -40,7 +40,7 @@ project.ext {
     //------------------------------------------------//
 }
 
-apply from: 'gradle/gradle/packaging.vimplugin.debian.gradle'
+apply from: 'gradle/gradle/packaging.cli.debian.gradle'
 apply from: 'gradle/gradle/distribution.gradle'
 //################
 

@@ -17,6 +17,10 @@
 
 package org.openbaton.sdk.api.exception;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
 import java.lang.Exception;
 import java.lang.Throwable;
 
@@ -26,18 +30,40 @@ import java.lang.Throwable;
  */
 public class SDKException extends Exception {
 
-  /**
-   * Creates an sdk exeption without exception message
-   */
-  public SDKException() {}
+  private static final Gson gson = new GsonBuilder().create();
+
+  public StackTraceElement[] getStackTraceElements() {
+    return stackTraceElements;
+  }
+
+  public void setStackTraceElements(StackTraceElement[] stackTraceElements) {
+    this.stackTraceElements = stackTraceElements;
+  }
+
+  private StackTraceElement[] stackTraceElements;
+
+  public String getReason() {
+    return reason;
+  }
+
+  public void setReason(String reason) {
+    this.reason = reason;
+  }
+
+  private String reason;
 
   /**
    * Creates an sdk exeption with an exception message as string
    *
    * @param message custom message
    */
-  public SDKException(String message) {
-    super(message);
+  public SDKException(String message, StackTraceElement[] stackTraceElements, String reason) {
+    super(
+        message
+            + ". The reason is: "
+            + gson.fromJson(reason, JsonObject.class).get("message").getAsString());
+    this.stackTraceElements = stackTraceElements;
+    this.reason = reason;
   }
 
   /**
@@ -47,15 +73,5 @@ public class SDKException extends Exception {
    */
   public SDKException(Throwable cause) {
     super(cause);
-  }
-
-  /**
-   * Creates an sdk exeption with a message as string and a throwable cause
-   *
-   * @param message custom message
-   * @param cause the throwable cause
-   */
-  public SDKException(String message, Throwable cause) {
-    super(message, cause);
   }
 }

@@ -48,6 +48,7 @@ project.ext {
     //------------------------------------------------//
 }
 
+apply plugin: 'java'
 
 subprojects {
     apply plugin: 'java'
@@ -89,4 +90,4 @@ subprojects {
     }
 }
 
-build.dependsOn verifyGoogleJavaFormat
+compileJava.dependsOn tasks.googleJavaFormat

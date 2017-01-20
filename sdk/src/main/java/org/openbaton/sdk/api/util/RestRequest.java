@@ -17,14 +17,23 @@
 
 package org.openbaton.sdk.api.util;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mashape.unirest.http.JsonNode;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -45,7 +54,6 @@ import org.openbaton.sdk.api.exception.SDKException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -58,6 +66,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.SSLContext;
 
 /**
  * OpenBaton api request abstraction for all requester. Shares common data and methods.
@@ -150,7 +160,10 @@ public abstract class RestRequest {
         checkToken();
       } catch (IOException e) {
         log.error(e.getMessage(), e);
-        throw new SDKException("Could not get token", e);
+        throw new SDKException(
+            "Could not get token",
+            e.getStackTrace(),
+            "Could not get token because: " + e.getMessage());
       }
 
       // call the api here
@@ -178,7 +191,10 @@ public abstract class RestRequest {
       // catch request exceptions here
       log.error(e.getMessage(), e);
       if (httpPost != null) httpPost.releaseConnection();
-      throw new SDKException("Could not http-post or open the object properly", e);
+      throw new SDKException(
+          "Could not http-post or open the object properly",
+          e.getStackTrace(),
+          "Could not http-post or open the object properly because: " + e.getMessage());
     } catch (SDKException e) {
       if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
         token = null;
@@ -186,7 +202,18 @@ public abstract class RestRequest {
         return requestPost(id);
       } else {
         if (httpPost != null) httpPost.releaseConnection();
-        throw new SDKException("Status is " + response.getStatusLine().getStatusCode());
+        try {
+          throw new SDKException(
+              "Status is " + response.getStatusLine().getStatusCode(),
+              new StackTraceElement[0],
+              EntityUtils.toString(response.getEntity()));
+        } catch (IOException e1) {
+          e1.printStackTrace();
+          throw new SDKException(
+              "Status is " + response.getStatusLine().getStatusCode(),
+              new StackTraceElement[0],
+              "could not provide reason because: " + e.getMessage());
+        }
       }
     }
   }
@@ -219,7 +246,10 @@ public abstract class RestRequest {
         checkToken();
       } catch (IOException e) {
         log.error(e.getMessage(), e);
-        throw new SDKException("Could not get token", e);
+        throw new SDKException(
+            "Could not get token",
+            e.getStackTrace(),
+            "Could not get token because: " + e.getMessage());
       }
 
       // call the api here
@@ -259,7 +289,10 @@ public abstract class RestRequest {
       // catch request exceptions here
       log.error(e.getMessage(), e);
       if (httpPost != null) httpPost.releaseConnection();
-      throw new SDKException("Could not http-post or open the object properly", e);
+      throw new SDKException(
+          "Could not http-post or open the object properly",
+          e.getStackTrace(),
+          "Could not http-post or open the object properly because: " + e.getMessage());
     } catch (SDKException e) {
       if (response != null
           && response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
@@ -267,8 +300,7 @@ public abstract class RestRequest {
         if (httpPost != null) httpPost.releaseConnection();
         return requestPost(id);
       } else if (response != null) {
-        if (httpPost != null) httpPost.releaseConnection();
-        throw new SDKException("Status is " + response.getStatusLine().getStatusCode());
+        throw e;
       } else {
         throw e;
       }
@@ -300,7 +332,10 @@ public abstract class RestRequest {
         checkToken();
       } catch (IOException e) {
         log.error(e.getMessage(), e);
-        throw new SDKException("Could not get token", e);
+        throw new SDKException(
+            "Could not get token",
+            e.getStackTrace(),
+            "could not get token because: " + e.getMessage());
       }
 
       // call the api here
@@ -337,7 +372,10 @@ public abstract class RestRequest {
       // catch request exceptions here
       log.error(e.getMessage(), e);
       if (httpPost != null) httpPost.releaseConnection();
-      throw new SDKException("Could not http-post or open the object properly", e);
+      throw new SDKException(
+          "Could not http-post or open the object properly",
+          e.getStackTrace(),
+          "Could not http-post or open the object properly because: " + e.getMessage());
     } catch (SDKException e) {
       if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
         token = null;
@@ -345,7 +383,18 @@ public abstract class RestRequest {
         return requestPost(id);
       } else {
         if (httpPost != null) httpPost.releaseConnection();
-        throw new SDKException("Status is " + response.getStatusLine().getStatusCode());
+        try {
+          throw new SDKException(
+              "Status is " + response.getStatusLine().getStatusCode(),
+              new StackTraceElement[0],
+              EntityUtils.toString(response.getEntity()));
+        } catch (IOException e1) {
+          e1.printStackTrace();
+          throw new SDKException(
+              "Status is " + response.getStatusLine().getStatusCode(),
+              new StackTraceElement[0],
+              "could not provide reason because: " + e.getMessage());
+        }
       }
     }
   }
@@ -366,7 +415,7 @@ public abstract class RestRequest {
         checkToken();
       } catch (IOException e) {
         log.error(e.getMessage(), e);
-        throw new SDKException("Could not get token", e);
+        throw new SDKException("Could not get token", e.getStackTrace(), e.getMessage());
       }
       log.debug("Executing post on " + baseUrl);
       httpPost = new HttpPost(this.baseUrl);
@@ -382,10 +431,16 @@ public abstract class RestRequest {
       response = httpClient.execute(httpPost);
     } catch (ClientProtocolException e) {
       httpPost.releaseConnection();
-      throw new SDKException("Could not create VNFPackage from file " + f.getName(), e);
+      throw new SDKException(
+          "Could not create VNFPackage from file " + f.getName(),
+          e.getStackTrace(),
+          e.getMessage());
     } catch (IOException e) {
       httpPost.releaseConnection();
-      throw new SDKException("Could not create VNFPackage from file " + f.getName(), e);
+      throw new SDKException(
+          "Could not create VNFPackage from file " + f.getName(),
+          e.getStackTrace(),
+          e.getMessage());
     }
 
     // check response status
@@ -441,7 +496,7 @@ public abstract class RestRequest {
         checkToken();
       } catch (IOException e) {
         log.error(e.getMessage(), e);
-        throw new SDKException("Could not get token", e);
+        throw new SDKException("Could not get token", e.getStackTrace(), e.getMessage());
       }
 
       // call the api here
@@ -462,7 +517,7 @@ public abstract class RestRequest {
       // catch request exceptions here
       log.error(e.getMessage(), e);
       if (httpDelete != null) httpDelete.releaseConnection();
-      throw new SDKException("Could not http-delete", e);
+      throw new SDKException("Could not http-delete", e.getStackTrace(), e.getMessage());
     } catch (SDKException e) {
       if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
         token = null;
@@ -471,7 +526,8 @@ public abstract class RestRequest {
         return;
       }
       if (httpDelete != null) httpDelete.releaseConnection();
-      throw new SDKException("Could not http-delete or the api response was wrong", e);
+      throw new SDKException(
+          "Could not http-delete or the api response was wrong", e.getStackTrace(), e.getMessage());
     }
   }
 
@@ -503,7 +559,7 @@ public abstract class RestRequest {
         checkToken();
       } catch (IOException e) {
         log.error(e.getMessage(), e);
-        throw new SDKException("Could not get token", e);
+        throw new SDKException("Could not get token", e.getStackTrace(), e.getMessage());
       }
 
       // call the api here
@@ -538,7 +594,7 @@ public abstract class RestRequest {
       // catch request exceptions here
       log.error(e.getMessage(), e);
       if (httpGet != null) httpGet.releaseConnection();
-      throw new SDKException("Could not http-get", e);
+      throw new SDKException("Could not http-get", e.getStackTrace(), e.getMessage());
     } catch (SDKException e) {
       if (response != null) {
         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
@@ -548,7 +604,7 @@ public abstract class RestRequest {
         } else {
           log.error(e.getMessage(), e);
           if (httpGet != null) httpGet.releaseConnection();
-          throw new SDKException("Could not authorize", e);
+          throw new SDKException("Could not authorize", e.getStackTrace(), e.getMessage());
         }
       } else {
         log.error(e.getMessage(), e);
@@ -576,7 +632,7 @@ public abstract class RestRequest {
         checkToken();
       } catch (IOException e) {
         log.error(e.getMessage(), e);
-        throw new SDKException("Could not get token", e);
+        throw new SDKException("Could not get token", e.getStackTrace(), e.getMessage());
       }
 
       // call the api here
@@ -613,7 +669,7 @@ public abstract class RestRequest {
       // catch request exceptions here
       log.error(e.getMessage(), e);
       if (httpGet != null) httpGet.releaseConnection();
-      throw new SDKException("Could not http-get", e);
+      throw new SDKException("Could not http-get", e.getStackTrace(), e.getMessage());
     } catch (SDKException e) {
       if (response != null) {
         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
@@ -623,7 +679,7 @@ public abstract class RestRequest {
         } else {
           log.error(e.getMessage(), e);
           if (httpGet != null) httpGet.releaseConnection();
-          throw new SDKException("Could not authorize", e);
+          throw new SDKException("Could not authorize", e.getStackTrace(), e.getMessage());
         }
       } else {
         log.error(e.getMessage(), e);
@@ -666,7 +722,7 @@ public abstract class RestRequest {
         checkToken();
       } catch (IOException e) {
         log.error(e.getMessage(), e);
-        throw new SDKException("Could not get token", e);
+        throw new SDKException("Could not get token", e.getStackTrace(), e.getMessage());
       }
 
       // call the api here
@@ -706,7 +762,9 @@ public abstract class RestRequest {
       log.error(e.getMessage(), e);
       if (httpPut != null) httpPut.releaseConnection();
       throw new SDKException(
-          "Could not http-put or the api response was wrong or open the object properly", e);
+          "Could not http-put or the api response was wrong or open the object properly",
+          e.getStackTrace(),
+          e.getMessage());
     } catch (SDKException e) {
       if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
         token = null;
@@ -715,7 +773,9 @@ public abstract class RestRequest {
       } else {
         if (httpPut != null) httpPut.releaseConnection();
         throw new SDKException(
-            "Could not http-put or the api response was wrong or open the object properly", e);
+            "Could not http-put or the api response was wrong or open the object properly",
+            e.getStackTrace(),
+            e.getMessage());
       }
     } finally {
       if (httpPut != null) httpPut.releaseConnection();
@@ -730,13 +790,29 @@ public abstract class RestRequest {
    */
   private void checkStatus(CloseableHttpResponse httpResponse, final int httpStatus)
       throws SDKException {
+
     if (httpResponse.getStatusLine().getStatusCode() != httpStatus) {
-      System.out.println(
+      log.error(
           "Status expected: "
               + httpStatus
               + " obtained: "
               + httpResponse.getStatusLine().getStatusCode());
-      throw new SDKException("Received wrong API HTTPStatus");
+      log.error("httpresponse: " + httpResponse.toString());
+      String body;
+      try {
+        body = EntityUtils.toString(httpResponse.getEntity());
+      } catch (IOException e) {
+        e.printStackTrace();
+        throw new SDKException(
+            "Status is " + httpResponse.getStatusLine().getStatusCode(),
+            new StackTraceElement[0],
+            "could not provide reason because: " + e.getMessage());
+      }
+      log.error("Body: " + body);
+      throw new SDKException(
+          "Status is " + httpResponse.getStatusLine().getStatusCode(),
+          new StackTraceElement[0],
+          body);
     }
   }
 
@@ -788,7 +864,9 @@ public abstract class RestRequest {
               + statusCode
               + "]: Error signing-in ["
               + (detailMessage != null ? detailMessage.getAsString() : "no error description")
-              + "]");
+              + "]",
+          new StackTraceElement[0],
+          (detailMessage != null ? detailMessage.getAsString() : "no error description"));
     }
     JsonObject jobj = new Gson().fromJson(responseString, JsonObject.class);
     log.trace("JsonTokeAccess is: " + jobj.toString());
@@ -801,7 +879,9 @@ public abstract class RestRequest {
       String error = jobj.get("error").getAsString();
       if (error.equals("invalid_grant")) {
         throw new SDKException(
-            "Error during authentication: " + jobj.get("error_description").getAsString(), e);
+            "Error during authentication: " + jobj.get("error_description").getAsString(),
+            e.getStackTrace(),
+            e.getMessage());
       }
     }
   }
