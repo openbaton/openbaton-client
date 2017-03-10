@@ -42,6 +42,7 @@ project.ext {
 
 apply from: 'gradle/gradle/packaging.cli.debian.gradle'
 apply from: 'gradle/gradle/distribution.gradle'
+apply from: 'gradle/gradle/brew.formula.creator.gradle'
 //################
 
 
