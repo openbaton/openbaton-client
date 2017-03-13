@@ -1,31 +1,3 @@
-apply plugin: "application"
-
-mainClassName = 'org.openbaton.cli.NFVOCommandLineInterface'
-
-
-startScripts {
-    doLast {
-        def unixFile = file getUnixScript()
-
-        def unixTextTmp = ""
-        def unixText = unixFile.text
-        def unixDaemonScript = new File("${rootProject.projectDir}/cli/gradle/gradle/scripts/openbaton-client.pscript").text
-
-        String execLine = ""
-        unixText.readLines().each {
-            line ->
-                if (line.startsWith("exec")) {
-                    unixTextTmp += unixDaemonScript;
-                    execLine = line;
-                } else {
-                    unixTextTmp += line + '\n'
-                }
-        }
-        unixFile.text = unixTextTmp
-        unixFile.text = unixFile.text.replace("### EXECUTE COMMAND","  "+execLine)
-        unixFile.renameTo("${startScripts.outputDir}/openbaton-client")
-    }
-}
 
 /*
  * Copyright (c) 2016 Open Baton (http://www.openbaton.org)
@@ -43,26 +15,28 @@ startScripts {
  * limitations under the License.
  *
  */
+apply plugin: "application"
 
-// to be executed just before the new release so that it gets the right version
-task makeBrewFormula() {
+mainClassName = 'org.openbaton.cli.NFVOCommandLineInterface'
 
-    def brewFormula = new File("${rootProject.projectDir}/cli/gradle/gradle/scripts/osx/openbaton-client.rb")
-    String brewFormulaText = brewFormula.text
-    String brewFormulaTextNew = ""
-    String newVersion = version.toString().replace("-SNAPSHOT","")
 
-    brewFormulaText.readLines().each {
-        line ->
-            if (line.trim().startsWith("version")){
-                brewFormulaTextNew += "  version \""+newVersion + "\"" + '\n'
-            }
-            else if(line.trim().startsWith("url")){
-                brewFormulaTextNew += "  url \"https://codeload.github.com/openbaton/openbaton-client/legacy.tar.gz/"+newVersion+"\"" + '\n'
-            }
-            else {
-                brewFormulaTextNew += line + '\n'
-            }
+startScripts {
+    doLast {
+        def unixFile = file getUnixScript()
+
+        def unixTextTmp = ""
+        def unixText = unixFile.text
+        def unixDaemonScript = new File("${rootProject.projectDir}/cli/gradle/gradle/scripts/openbaton-client.pscript").text
+
+        unixText.readLines().each {
+            line ->
+                if (line.startsWith("exec")) {
+                    unixTextTmp += unixDaemonScript;
+                } else {
+                    unixTextTmp += line + '\n'
+                }
+        }
+        unixFile.text = unixTextTmp
+        unixFile.renameTo("${startScripts.outputDir}/openbaton-client")
     }
-    brewFormula.text = brewFormulaTextNew
 }

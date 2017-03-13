@@ -58,10 +58,7 @@ public class SDKException extends Exception {
    * @param message custom message
    */
   public SDKException(String message, StackTraceElement[] stackTraceElements, String reason) {
-    super(
-        message
-            + ". The reason is: "
-            + gson.fromJson(reason, JsonObject.class).get("message").getAsString());
+    super(message + ". The reason is: " + reason);
     this.stackTraceElements = stackTraceElements;
     this.reason = reason;
   }
