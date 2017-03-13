@@ -42,7 +42,7 @@ function checkEnvironmentVariables {
 function checkEnvironmentVariable {
     if  ! env | grep -q ^$1= ; then
         echo "$1 is not defined as an Environment Variable"
-        echo "Please run 'source nfvo.properties' or define it manually..."
+        echo "Please run 'source /usr/local/etc/openbaton/cli/nfvo.properties' or define it manually..."
         exit 1
     fi
 }
