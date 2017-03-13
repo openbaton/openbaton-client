@@ -1,5 +1,7 @@
 
-APP_NAME="Open Baton Client"
+APP_NAME="Open Baton CLI"
+APP_ARGS_TRIMMED=$(echo $APP_ARGS | sed 's/"//g')
+START_ARGUMENTS=${@#$APP_ARGS_TRIMMED}
 
 ##########################
 #### Open Baton Client ###
@@ -7,24 +9,23 @@ APP_NAME="Open Baton Client"
 
 
 function usage {
-    echo -e "Open-Baton\n"
-    echo -e "Usage:\n\t ./openbaton.sh [option] command [command] [command]\n\t"
-    echo -e "where option is"
-    echo -e "\t\t * -c show configuration"
-    echo -e "\t\t * -d activate debug mode"
-    echo -e "\t\t * -h prints this help"
-    echo -e "\t\t * -l lists available commands"
+    echo "$APP_NAME"
+    echo "Usage:\t openbaton-client [option] command [command] [command]"
+    echo "Where option is:"
+    echo " * -c show configuration"
+    echo " * -h prints this help"
+    echo " * -l lists available commands"
 }
 
 function showConfiguration {
     echo "Using the following Environment Variables:"
-    echo -e "\tNFVO_IP=$NFVO_IP"
-    echo -e "\tNFVO_PORT=$NFVO_PORT"
-    echo -e "\tNFVO_API_VERSION=$NFVO_API_VERSION"
-    echo -e "\tNFVO_USERNAME=$NFVO_USERNAME"
-    echo -e "\tNFVO_PASSWORD=$NFVO_PASSWORD"
-    echo -e "\tNFVO_PROJECT_ID=$NFVO_PROJECT_ID"
-    echo -e "\tNFVO_SSL_ENABLED=$NFVO_SSL_ENABLED"
+    echo "\tNFVO_IP=$NFVO_IP"
+    echo "\tNFVO_PORT=$NFVO_PORT"
+    echo "\tNFVO_API_VERSION=$NFVO_API_VERSION"
+    echo "\tNFVO_USERNAME=$NFVO_USERNAME"
+    echo "\tNFVO_PASSWORD=$NFVO_PASSWORD"
+    echo "\tNFVO_PROJECT_ID=$NFVO_PROJECT_ID"
+    echo "\tNFVO_SSL_ENABLED=$NFVO_SSL_ENABLED"
 
 }
 
@@ -39,7 +40,7 @@ function checkEnvironmentVariables {
 }
 
 function checkEnvironmentVariable {
-    if ! env | grep -q ^$1= ; then
+    if  ! env | grep -q ^$1= ; then
         echo "$1 is not defined as an Environment Variable"
         echo "Please run 'source nfvo.properties' or define it manually..."
         exit 1
@@ -47,39 +48,37 @@ function checkEnvironmentVariable {
 }
 
 function execute {
-### EXECUTE COMMAND
+
+$JAVACMD  $START_ARGUMENTS  "$@"
+
 }
 
 ##
 #   MAIN
 ##
 
-while getopts "hlcd" OPTION
+if [ $(echo "$APP_ARGS_TRIMMED" | wc -w) -eq 0 ]
+then
+        usage
+        exit 1
+fi
+
+for cmd in $APP_ARGS_TRIMMED
     do
-         case $OPTION in
-             c)
+         case $cmd in
+             "-c")
                 showConfiguration
                 exit 1
                  ;;
-             d)
-                 _level=DEBUG
-                 ;;
-             l)
+             "-l")
                 execute help
                 exit 1
                 ;;
-             h) usage
+             "-h") usage
                 exit 1
                 ;;
          esac
     done
-    shift $(( OPTIND - 1 ))
 
-if [ $# -eq 0 ]
-then
-    usage
-    exit 1
-else
-    checkEnvironmentVariables
-    execute ${1+"$@"}
-fi
+checkEnvironmentVariables
+execute $APP_ARGS_TRIMMED
