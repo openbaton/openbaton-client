@@ -68,9 +68,11 @@ for cmd in $APP_ARGS_TRIMMED
          case $cmd in
              "-c")
                 showConfiguration
+                checkEnvironmentVariables
                 exit 1
                  ;;
              "-l")
+                checkEnvironmentVariables
                 execute help
                 exit 1
                 ;;
