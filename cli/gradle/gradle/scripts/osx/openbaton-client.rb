@@ -1,8 +1,8 @@
 class OpenbatonClient < Formula
   desc "Formula of Open Baton Client"
   homepage "http://www.openbaton.org"
-  url "https://codeload.github.com/openbaton/openbaton-client/legacy.tar.gz/develop"
-  version "3.2.1-SNAPSHOT"
+  url "https://codeload.github.com/openbaton/openbaton-client/legacy.tar.gz/3.2.1"
+  version "3.2.1"
   # sha256 ""
 
   depends_on :java => "1.7+"
