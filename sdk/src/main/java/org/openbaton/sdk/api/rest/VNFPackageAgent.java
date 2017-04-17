@@ -43,15 +43,7 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
       String nfvoIp,
       String nfvoPort,
       String version) {
-    super(
-        username,
-        password,
-        projectId,
-        sslEnabled,
-        nfvoIp,
-        nfvoPort,
-        version,
-        VNFPackage.class);
+    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, VNFPackage.class);
   }
 
   @Override

@@ -37,11 +37,6 @@ import java.util.List;
  */
 public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceRecord> {
 
-  /**
-   * Create a NetworkServiceRecord requester with a given url path
-   *
-   * @param path the url path used for the api requests
-   */
   public NetworkServiceRecordAgent(
       String username,
       String password,

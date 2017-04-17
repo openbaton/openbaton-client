@@ -24,11 +24,7 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
  * OpenBaton VirtualLink -related api requester.
  */
 public class VirtualLinkAgent extends AbstractRestAgent<VirtualLinkDescriptor> {
-  /**
-   * Create a VirtualLink requester with a given url path
-   *
-   * @param path the url path used for the api requests
-   */
+
   public VirtualLinkAgent(
       String username,
       String password,

@@ -72,7 +72,8 @@ public class SdkTest {
       e.printStackTrace();
       System.exit(1);
     }
-    requestor.setProjectId(projectId);
+
+    requestor = new NFVORequestor("admin", "openbaton", projectId, false, "localhost", "8080", "1");
 
     /**
      * VimInsance

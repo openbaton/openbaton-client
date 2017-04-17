@@ -20,7 +20,6 @@ package org.openbaton.sdk;
 import org.openbaton.sdk.api.rest.*;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
-
 public final class NFVORequestor {
 
   private String username;
@@ -44,8 +43,14 @@ public final class NFVORequestor {
   private UserAgent userAgent;
   private KeyAgent keyAgent;
 
-
-  public NFVORequestor(String username, String password, String projectId, boolean sslEnabled, String nfvoIp, String nfvoPort, String version) {
+  public NFVORequestor(
+      String username,
+      String password,
+      String projectId,
+      boolean sslEnabled,
+      String nfvoIp,
+      String nfvoPort,
+      String version) {
     this.username = username;
     this.password = password;
     this.projectId = projectId;
@@ -62,7 +67,15 @@ public final class NFVORequestor {
    */
   public ConfigurationAgent getConfigurationAgent() {
     if (this.configurationAgent == null)
-      this.configurationAgent = new ConfigurationAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+      this.configurationAgent =
+          new ConfigurationAgent(
+              this.username,
+              this.password,
+              this.projectId,
+              this.sslEnabled,
+              this.nfvoIp,
+              this.nfvoPort,
+              this.version);
     return this.configurationAgent;
   }
 
@@ -73,7 +86,15 @@ public final class NFVORequestor {
    */
   public NetworkServiceDescriptorAgent getNetworkServiceDescriptorAgent() {
     if (this.networkServiceDescriptorAgent == null)
-      this.networkServiceDescriptorAgent = new NetworkServiceDescriptorAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+      this.networkServiceDescriptorAgent =
+          new NetworkServiceDescriptorAgent(
+              this.username,
+              this.password,
+              this.projectId,
+              this.sslEnabled,
+              this.nfvoIp,
+              this.nfvoPort,
+              this.version);
     return this.networkServiceDescriptorAgent;
   }
 
@@ -84,7 +105,15 @@ public final class NFVORequestor {
    */
   public VirtualNetworkFunctionDescriptorAgent getVirtualNetworkFunctionDescriptorAgent() {
     if (this.virtualNetworkFunctionDescriptorAgent == null)
-      this.virtualNetworkFunctionDescriptorAgent = new VirtualNetworkFunctionDescriptorAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+      this.virtualNetworkFunctionDescriptorAgent =
+          new VirtualNetworkFunctionDescriptorAgent(
+              this.username,
+              this.password,
+              this.projectId,
+              this.sslEnabled,
+              this.nfvoIp,
+              this.nfvoPort,
+              this.version);
     return this.virtualNetworkFunctionDescriptorAgent;
   }
 
@@ -95,7 +124,15 @@ public final class NFVORequestor {
    */
   public NetworkServiceRecordAgent getNetworkServiceRecordAgent() {
     if (this.networkServiceRecordAgent == null)
-      this.networkServiceRecordAgent = new NetworkServiceRecordAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+      this.networkServiceRecordAgent =
+          new NetworkServiceRecordAgent(
+              this.username,
+              this.password,
+              this.projectId,
+              this.sslEnabled,
+              this.nfvoIp,
+              this.nfvoPort,
+              this.version);
     return this.networkServiceRecordAgent;
   }
 
@@ -106,7 +143,15 @@ public final class NFVORequestor {
    */
   public VimInstanceAgent getVimInstanceAgent() {
     if (this.vimInstanceAgent == null)
-      this.vimInstanceAgent = new VimInstanceAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+      this.vimInstanceAgent =
+          new VimInstanceAgent(
+              this.username,
+              this.password,
+              this.projectId,
+              this.sslEnabled,
+              this.nfvoIp,
+              this.nfvoPort,
+              this.version);
     return this.vimInstanceAgent;
   }
 
@@ -117,7 +162,15 @@ public final class NFVORequestor {
    */
   public VirtualLinkAgent getVirtualLinkAgent() {
     if (this.virtualLinkAgent == null)
-      this.virtualLinkAgent = new VirtualLinkAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+      this.virtualLinkAgent =
+          new VirtualLinkAgent(
+              this.username,
+              this.password,
+              this.projectId,
+              this.sslEnabled,
+              this.nfvoIp,
+              this.nfvoPort,
+              this.version);
     return this.virtualLinkAgent;
   }
 
@@ -128,7 +181,15 @@ public final class NFVORequestor {
    */
   public VirtualNetworkFunctionDescriptorAgent getVirtualNetworkFunctionDescriptorRestAgent() {
     if (this.virtualNetworkFunctionDescriptorAgent == null)
-      this.virtualNetworkFunctionDescriptorAgent = new VirtualNetworkFunctionDescriptorAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+      this.virtualNetworkFunctionDescriptorAgent =
+          new VirtualNetworkFunctionDescriptorAgent(
+              this.username,
+              this.password,
+              this.projectId,
+              this.sslEnabled,
+              this.nfvoIp,
+              this.nfvoPort,
+              this.version);
     return this.virtualNetworkFunctionDescriptorAgent;
   }
 
@@ -139,7 +200,15 @@ public final class NFVORequestor {
    */
   public VNFFGAgent getVNFFGAgent() {
     if (this.vnffgAgent == null)
-      this.vnffgAgent = new VNFFGAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+      this.vnffgAgent =
+          new VNFFGAgent(
+              this.username,
+              this.password,
+              this.projectId,
+              this.sslEnabled,
+              this.nfvoIp,
+              this.nfvoPort,
+              this.version);
     return this.vnffgAgent;
   }
 
@@ -150,7 +219,15 @@ public final class NFVORequestor {
    */
   public EventAgent getEventAgent() {
     if (this.eventAgent == null)
-      this.eventAgent = new EventAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+      this.eventAgent =
+          new EventAgent(
+              this.username,
+              this.password,
+              this.projectId,
+              this.sslEnabled,
+              this.nfvoIp,
+              this.nfvoPort,
+              this.version);
     return this.eventAgent;
   }
 
@@ -161,7 +238,15 @@ public final class NFVORequestor {
    */
   public VNFPackageAgent getVNFPackageAgent() {
     if (this.vnfPackageAgent == null)
-      this.vnfPackageAgent = new VNFPackageAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+      this.vnfPackageAgent =
+          new VNFPackageAgent(
+              this.username,
+              this.password,
+              this.projectId,
+              this.sslEnabled,
+              this.nfvoIp,
+              this.nfvoPort,
+              this.version);
     return this.vnfPackageAgent;
   }
 
@@ -172,7 +257,15 @@ public final class NFVORequestor {
    */
   public ProjectAgent getProjectAgent() {
     if (this.projectAgent == null)
-      this.projectAgent = new ProjectAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+      this.projectAgent =
+          new ProjectAgent(
+              this.username,
+              this.password,
+              this.projectId,
+              this.sslEnabled,
+              this.nfvoIp,
+              this.nfvoPort,
+              this.version);
     return this.projectAgent;
   }
 
@@ -183,7 +276,15 @@ public final class NFVORequestor {
    */
   public UserAgent getUserAgent() {
     if (this.userAgent == null)
-      this.userAgent = new UserAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+      this.userAgent =
+          new UserAgent(
+              this.username,
+              this.password,
+              this.projectId,
+              this.sslEnabled,
+              this.nfvoIp,
+              this.nfvoPort,
+              this.version);
     return this.userAgent;
   }
 
@@ -194,8 +295,15 @@ public final class NFVORequestor {
    */
   public KeyAgent getKeyAgent() {
     if (this.keyAgent == null)
-      this.keyAgent = new KeyAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+      this.keyAgent =
+          new KeyAgent(
+              this.username,
+              this.password,
+              this.projectId,
+              this.sslEnabled,
+              this.nfvoIp,
+              this.nfvoPort,
+              this.version);
     return this.keyAgent;
   }
-
 }

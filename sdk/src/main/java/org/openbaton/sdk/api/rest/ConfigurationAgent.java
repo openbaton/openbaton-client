@@ -25,7 +25,6 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
  */
 public class ConfigurationAgent extends AbstractRestAgent<Configuration> {
 
-
   public ConfigurationAgent(
       String username,
       String password,
@@ -35,13 +34,6 @@ public class ConfigurationAgent extends AbstractRestAgent<Configuration> {
       String nfvoPort,
       String version) {
     super(
-        username,
-        password,
-        projectId,
-        sslEnabled,
-        nfvoIp,
-        nfvoPort,
-        version,
-        Configuration.class);
+        username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, Configuration.class);
   }
 }

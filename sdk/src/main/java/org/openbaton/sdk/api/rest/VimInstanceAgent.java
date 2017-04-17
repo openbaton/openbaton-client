@@ -39,14 +39,6 @@ public class VimInstanceAgent extends AbstractRestAgent<VimInstance> {
       String nfvoIp,
       String nfvoPort,
       String version) {
-    super(
-        username,
-        password,
-        projectId,
-        sslEnabled,
-        nfvoIp,
-        nfvoPort,
-        version,
-        VimInstance.class);
+    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, VimInstance.class);
   }
 }

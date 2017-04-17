@@ -33,7 +33,6 @@ public class ProjectAgent extends AbstractRestAgent<Project> {
       String nfvoIp,
       String nfvoPort,
       String version) {
-    super(
-        username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, Project.class);
+    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, Project.class);
   }
 }
