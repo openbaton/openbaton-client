@@ -30,14 +30,19 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * OpenBaton network-service-descriptor-related api requester.
+ * This class is a Rest Request Agent for sending requests regarding NetworkServiceDescriptor objects to the NFVO API.
  */
 public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServiceDescriptor> {
 
   /**
-   * Create a NetworkServiceDescriptor requester with a given url path
    *
-   * @param nfvoIp the url path used for the api requests
+   * @param username the username used for sending requests
+   * @param password the password used for sending requests
+   * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
+   * @param sslEnabled true if the NFVO uses SSL
+   * @param nfvoIp the IP address of the NFVO to which the requests are sent
+   * @param nfvoPort the port on which the NFVO runs
+   * @param version the API version
    */
   public NetworkServiceDescriptorAgent(
       String username,
@@ -58,12 +63,14 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
         NetworkServiceDescriptor.class);
   }
 
+
   /**
+   * Get all VirtualNetworkFunctionDescriptors contained in a NetworkServiceDescriptor specified by its ID.
    *
-   * @param idNSD : The id of NSD
-   * @return The List of VirtualNetworkFunctionDescriptor into NSD
+   * @param idNSD the NetworkServiceDescriptor's id
+   * @return a List of all VirtualNetworkServiceDescriptors contained in the NetworkServiceDescriptor
    * @throws SDKException
-   */
+     */
   @Help(
     help =
         "Get all the VirtualNetworkFunctionDescriptors of a NetworkServiceDescriptor with specific id"
@@ -78,46 +85,49 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
-   * Return a VirtualNetworkFunctionDescriptor into a NSD with id
+   * Return a VirtualNetworkFunctionDescriptor that is contained in a particular NetworkServiceDescriptor.
    *
-   * @param idNSD : The id of NSD
-   * @param id_vfn : The id of the VNF Descriptor
-   * @return : The List of VirtualNetworkFunctionDescriptor into NSD
+   * @param idNSD the ID of the NetworkServiceDescriptor
+   * @param idVfn the id of the VirtualNetworkFunctionDescriptor
+   * @return the VirtualNetworkFunctionDescriptor
+   * @throws SDKException
    */
   @Help(
     help =
-        "Get the VirtualNetworkFunctionDescriptor with specific id of a NetworkServiceDescriptor with specific id"
+        "Get a specific VirtualNetworkFunctionDescriptor of a particular NetworkServiceDescriptor specified by their IDs"
   )
   @Deprecated
   public VirtualNetworkFunctionDescriptor getVirtualNetworkFunctionDescriptor(
-      final String idNSD, final String id_vfn) throws SDKException {
-    String url = idNSD + "/vnfdescriptors" + "/" + id_vfn;
+      final String idNSD, final String idVfn) throws SDKException {
+    String url = idNSD + "/vnfdescriptors" + "/" + idVfn;
     return (VirtualNetworkFunctionDescriptor)
         requestGet(url, VirtualNetworkFunctionDescriptor.class);
   }
 
   /**
-   * Delete the VirtualNetworkFunctionDescriptor
+   * Delete a specific VirtualNetworkFunctionDescriptor that is contained in a particular NetworkServiceDescriptor.
    *
-   * @param idNSD : The id of NSD
-   * @param id_vfn : The id of the VNF Descriptor
+   * @param idNSD the ID of the NetworkServiceDescriptor
+   * @param idVnf the id of the VirtualNetworkFunctionDescriptor
+   * @throws SDKException
    */
   @Help(
     help =
         "Delete the VirtualNetworkFunctionDescriptor of a NetworkServiceDescriptor with specific id"
   )
   @Deprecated
-  public void deleteVirtualNetworkFunctionDescriptors(final String idNSD, final String id_vfn)
+  public void deleteVirtualNetworkFunctionDescriptors(final String idNSD, final String idVnf)
       throws SDKException {
-    String url = idNSD + "/vnfdescriptors" + "/" + id_vfn;
+    String url = idNSD + "/vnfdescriptors" + "/" + idVnf;
     requestDelete(url);
   }
 
   /**
-   * Create a VirtualNetworkFunctionDescriptor
+   * Create a VirtualNetworkFunctionDescriptor in a specific NetworkServiceDescriptor.
    *
-   * @param virtualNetworkFunctionDescriptor : : the Network Service Descriptor to be updated
    * @param idNSD : The id of the networkServiceDescriptor the vnfd shall be created at
+   * @param virtualNetworkFunctionDescriptor : : the Network Service Descriptor to be updated
+   * @throws SDKException
    */
   @Help(
     help =
@@ -132,12 +142,13 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
-   * Update the VirtualNetworkFunctionDescriptor
+   * Update a specific VirtualNetworkFunctionDescriptor that is contained in a particular NetworkServiceDescriptor.
    *
-   * @param virtualNetworkFunctionDescriptor : : the Network Service Descriptor to be updated
-   * @param idNSD : The id of the (old) VNF Descriptor
-   * @param id_vfn : The id of the VNF Descriptor
-   * @return : The updated virtualNetworkFunctionDescriptor
+   * @param idNSD the ID of the NetworkServiceRecord containing the VirtualNetworkFunctionDescriptor
+   * @param idVfn the ID of the VNF Descriptor that shall be updated
+   * @param virtualNetworkFunctionDescriptor the updated version of the VirtualNetworkFunctionDescriptor
+   * @return the updated VirtualNetworkFunctionDescriptor
+   * @throws SDKException
    */
   @Help(
     help =
@@ -146,18 +157,19 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   @Deprecated
   public VirtualNetworkFunctionDescriptor updateVNFD(
       final String idNSD,
-      final String id_vfn,
+      final String idVfn,
       final VirtualNetworkFunctionDescriptor virtualNetworkFunctionDescriptor)
       throws SDKException {
-    String url = idNSD + "/vnfdescriptors" + "/" + id_vfn;
+    String url = idNSD + "/vnfdescriptors" + "/" + idVfn;
     return (VirtualNetworkFunctionDescriptor) requestPut(url, virtualNetworkFunctionDescriptor);
   }
 
   /**
-   * Return the list of VNFDependencies into a NSD
+   * Return a List with all the VNFDependencies that are contained in a specific NetworkServiceDescriptor.
    *
-   * @param idNSD : The id of the networkServiceDescriptor
-   * @return : The List of VNFDependency into NSD
+   * @param idNSD the ID of the NetworkServiceDescriptor
+   * @return the List of VNFDependencies
+   * @throws SDKException
    */
   @Help(
     help =
@@ -169,42 +181,46 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
-   * Return a VNFDependency into a NSD
+   * Return a specific VNFDependency that is contained in a particular NetworkServiceDescriptor.
    *
-   * @param idNSD : The id of the VNF Descriptor
-   * @param id_vnfd : The VNFDependencies id
-   * @return VNFDependency: The List of VNFDependency into NSD
+   * @param idNSD the ID of the NetworkServiceDescriptor
+   * @param idVnfd the VNFDependencies' ID
+   * @return the VNFDependency
+   * @throws SDKException
    */
   @Help(
     help =
         "get the VirtualNetworkFunctionDescriptor dependency with specific id of a NetworkServiceDescriptor with specific id"
   )
-  public VNFDependency getVNFDependency(final String idNSD, final String id_vnfd)
+  public VNFDependency getVNFDependency(final String idNSD, final String idVnfd)
       throws SDKException {
-    String url = idNSD + "/vnfdependencies" + "/" + id_vnfd;
+    String url = idNSD + "/vnfdependencies" + "/" + idVnfd;
     return (VNFDependency) requestGet(url, VNFDependency.class);
   }
 
   /**
-   * Delets a VNFDependency
+   * Delete a VNFDependency.
    *
-   * @param idNSD : The id of the networkServiceDescriptor
-   * @param id_vnfd : The id of the VNFDependency
+   * @param idNSD the ID of the NetworkServiceDescriptor which contains the VNFDependency
+   * @param idVnfd the ID of the VNFDependency that shall be deleted
+   * @throws SDKException
    */
   @Help(
     help =
         "Delete the VirtualNetworkFunctionDescriptor dependency of a NetworkServiceDescriptor with specific id"
   )
-  public void deleteVNFDependency(final String idNSD, final String id_vnfd) throws SDKException {
-    String url = idNSD + "/vnfdependencies" + "/" + id_vnfd;
+  public void deleteVNFDependency(final String idNSD, final String idVnfd) throws SDKException {
+    String url = idNSD + "/vnfdependencies" + "/" + idVnfd;
     requestDelete(url);
   }
 
   /**
-   * Create a VNFDependency
+   * Add a new VNFDependency to a specific NetworkServiceDescriptor.
    *
-   * @param vnfDependency : The VNFDependency to be updated
-   * @param idNSD : The id of the networkServiceDescriptor
+   * @param idNSD the ID of the NetworkServiceDescriptor
+   * @param vnfDependency the new VNFDependency
+   * @return the new VNFDependency
+   * @throws SDKException
    */
   @Help(
     help =
@@ -217,29 +233,31 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
-   * Update the VNFDependency
+   * Update a specific VNFDependency which is contained in a particular NetworkServiceDescriptor.
    *
-   * @param vnfDependency : The VNFDependency to be updated
-   * @param idNSD : The id of the networkServiceDescriptor
-   * @param id_vnfd : The id of the VNFDependency
-   * @return The updated VNFDependency
+   * @param idNSD the ID of the NetworkServiceDescriptor containing the VNFDependency
+   * @param idVnfDep the ID of the VNFDependency which shall be updated
+   * @param vnfDependency the updated version of the VNFDependency
+   * @return the updated VNFDependency
+   * @throws SDKException
    */
   @Help(
     help =
         "Update the VirtualNetworkFunctionDescriptor dependency of a NetworkServiceDescriptor with specific id"
   )
   public VNFDependency updateVNFD(
-      final String idNSD, final String id_vnfd, final VNFDependency vnfDependency)
+      final String idNSD, final String idVnfDep, final VNFDependency vnfDependency)
       throws SDKException {
-    String url = idNSD + "/vnfdependencies" + "/" + id_vnfd;
+    String url = idNSD + "/vnfdependencies" + "/" + idVnfDep;
     return (VNFDependency) requestPut(url, vnfDependency);
   }
 
   /**
-   * Return the list of PhysicalNetworkFunctionDescriptor into a NSD with id
+   * Returns the List of PhysicalNetworkFunctionDescriptors that are contained in a specific NetworkServiceDescriptor.
    *
-   * @param idNSD : The id of NSD
-   * @return : The List of PhysicalNetworkFunctionDescriptor into NSD
+   * @param idNSD the ID of the NetworkServiceDescriptor
+   * @return the List of PhysicalNetworkFunctionDescriptors
+   * @throws SDKException
    */
   @Help(
     help =
@@ -254,129 +272,135 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
-   * Returns the PhysicalNetworkFunctionDescriptor into a NSD with id
+   * Returns a specific PhysicalNetworkFunctionDescriptor that is contained in a particular NetworkServiceDescriptor.
    *
-   * @param idNSD : The NSD id
-   * @param idPnf : The PhysicalNetworkFunctionDescriptor id
-   * @return PhysicalNetworkFunctionDescriptor: The PhysicalNetworkFunctionDescriptor selected
+   * @param idNsd the NetworkServiceDescriptr's ID
+   * @param idPnf the PhysicalNetworkFunctionDescriptor's ID
+   * @return the PhysicalNetworkFunctionDescriptor
+   * @throws SDKException
    */
   @Help(
     help =
         "Get the PhysicalNetworkFunctionDescriptor with specific id of a NetworkServiceDescriptor with specific id"
   )
   public PhysicalNetworkFunctionDescriptor getPhysicalNetworkFunctionDescriptor(
-      final String idNSD, final String idPnf) throws SDKException {
-    String url = idNSD + "/pnfdescriptors" + "/" + idPnf;
+      final String idNsd, final String idPnf) throws SDKException {
+    String url = idNsd + "/pnfdescriptors" + "/" + idPnf;
     return (PhysicalNetworkFunctionDescriptor)
         requestGetWithStatusAccepted(url, PhysicalNetworkFunctionDescriptor.class);
   }
 
   /**
-   * Delete the PhysicalNetworkFunctionDescriptor with the idPnf
+   * Delete a specific PhysicalNetworkFunctionDescriptor which is contained in a particular NetworkServiceDescriptor.
    *
-   * @param idNSD : The NSD id
-   * @param idPnf : The PhysicalNetworkFunctionDescriptor id
+   * @param idNsd the NetworkServiceDescriptor's ID
+   * @param idPnf :the PhysicalNetworkFunctionDescriptor's ID
+   * @throws SDKException
    */
   @Help(
     help =
         "Delete the PhysicalNetworkFunctionDescriptor of a NetworkServiceDescriptor with specific id"
   )
-  public void deletePhysicalNetworkFunctionDescriptor(final String idNSD, final String idPnf)
+  public void deletePhysicalNetworkFunctionDescriptor(final String idNsd, final String idPnf)
       throws SDKException {
-    String url = idNSD + "/pnfdescriptors" + "/" + idPnf;
+    String url = idNsd + "/pnfdescriptors" + "/" + idPnf;
     requestDelete(url);
   }
 
   /**
-   * Store the PhysicalNetworkFunctionDescriptor
+   * Create a new PhysicalNetworkFunctionDescriptor in a NetworkServiceDescriptor
    *
-   * @param physicalNetworkFunctionDescriptor : The PhysicalNetworkFunctionDescriptor to be stored
-   * @param idNSD : The NSD id
-   * @return PhysicalNetworkFunctionDescriptor: The PhysicalNetworkFunctionDescriptor stored
+   * @param idNsd the NetworkServiceDescriptor's ID
+   * @param physicalNetworkFunctionDescriptor the new PhysicalNetworkFunctionDescriptor
+   * @return the created PhysicalNetworkFunctionDescriptor
+   * @throws SDKException
    */
   @Help(
     help =
         "Create the PhysicalNetworkFunctionDescriptor of a NetworkServiceDescriptor with specific id"
   )
   public PhysicalNetworkFunctionDescriptor createPhysicalNetworkFunctionDescriptor(
-      final String idNSD, final PhysicalNetworkFunctionDescriptor physicalNetworkFunctionDescriptor)
+      final String idNsd, final PhysicalNetworkFunctionDescriptor physicalNetworkFunctionDescriptor)
       throws SDKException {
-    String url = idNSD + "/pnfdescriptors";
+    String url = idNsd + "/pnfdescriptors";
     return (PhysicalNetworkFunctionDescriptor) requestPost(url, physicalNetworkFunctionDescriptor);
   }
 
   /**
-   * Update the PhysicalNetworkFunctionDescriptor
+   * Update a PhysicalNetworkFunctionDescriptor.
    *
-   * @param physicalNetworkFunctionDescriptor : The PhysicalNetworkFunctionDescriptor to be edited
-   * @param idNSD : The NSD id
-   * @param idPnf : The PhysicalNetworkFunctionDescriptor id
-   * @return PhysicalNetworkFunctionDescriptor: The PhysicalNetworkFunctionDescriptor edited
-   *
+   * @param idNsd the NetworkFunctionDescriptor's ID
+   * @param idPnf the PhysicalNetworkFunctionDescriptor's ID
+   * @param physicalNetworkFunctionDescriptor the updated version of the PhysicalNetworkFunctionDescriptor
+   * @return the updated PhysicalNetworkFunctionDescriptor
+   * @throws SDKException
    */
   @Help(
     help =
         "Update the PhysicalNetworkFunctionDescriptor of a NetworkServiceDescriptor with specific id"
   )
   public PhysicalNetworkFunctionDescriptor updatePNFD(
-      final String idNSD,
+      final String idNsd,
       final String idPnf,
       final PhysicalNetworkFunctionDescriptor physicalNetworkFunctionDescriptor)
       throws SDKException {
-    String url = idNSD + "/pnfdescriptors" + "/" + idPnf;
+    String url = idNsd + "/pnfdescriptors" + "/" + idPnf;
     return (PhysicalNetworkFunctionDescriptor) requestPut(url, physicalNetworkFunctionDescriptor);
   }
 
   /**
-   * Return the Security into a NSD
+   * Returns a List of all Security objects that are contained in a specific NetworkServiceDescriptor.
    *
-   * @param idNSD : The id of NSD
-   * @return Security: The Security of PhysicalNetworkFunctionDescriptor into NSD
+   * @param idNsd the ID of the NetworkServiceDescriptor
+   * @return the List of Security objects
+   * @throws SDKException
    */
   @Help(help = "Get all the Security of a NetworkServiceDescriptor with specific id")
-  public Security getSecurities(final String idNSD) throws SDKException {
-    String url = idNSD + "/security";
+  public Security getSecurities(final String idNsd) throws SDKException {
+    String url = idNsd + "/security";
     return ((Security) requestGet(url, Security.class));
   }
 
   /**
-   * Delete the Security with the id_s
+   * Delete a Security object.
    *
-   * @param idNSD : The NSD id
-   * @param id_s : The Security id
-   *
+   * @param idNsd the NetworkServiceDescriptor's ID
+   * @param idSecurity the Security object's ID
+   * @throws SDKException
    */
   @Help(help = "Delete the Security of a NetworkServiceDescriptor with specific id")
-  public void deleteSecurity(final String idNSD, final String id_s) throws SDKException {
-    String url = idNSD + "/security" + "/" + id_s;
+  public void deleteSecurity(final String idNsd, final String idSecurity) throws SDKException {
+    String url = idNsd + "/security" + "/" + idSecurity;
     requestDelete(url);
   }
 
   /**
-   * Store the Security into NSD
+   * Add a new Security object to a NetworkServiceDescriptor.
    *
-   * @param security : The Security to be stored
-   * @param idNSD : The id of NSD
-   * @return Security: The Security stored
+   * @param idNSD the ID of the NetworkServiceDescriptor
+   * @param security the Security object to add
+   * @return the new Security object
+   * @throws SDKException
    */
-  @Help(help = "create the Security of a NetworkServiceDescriptor with specific id")
+  @Help(help = "Create the Security of a NetworkServiceDescriptor with specific id")
   public Security createSecurity(final String idNSD, final Security security) throws SDKException {
     String url = idNSD + "/security" + "/";
     return (Security) requestPost(url, security);
   }
 
   /**
-   * Update the Security into NSD
+   * Update a Security object of a specific NetworkServiceDescriptor.
    *
-   * @param security : The Security to be stored
-   * @param idNSD : The id of NSD
-   * @param id_s : The security id
-   * @return Security: The Security stored
+   * @param idNSD the id of the NetworkServiceDescriptor
+   * @param idSecurity the ID of the Security object which shall be updated
+   * @param updatedSecurity the updated version of the Security object
+   * @return the updated Security object
+   * @throws SDKException
    */
   @Help(help = "Update the Security of a NetworkServiceDescriptor with specific id")
-  public Security updateSecurity(final String idNSD, final String id_s, final Security security)
+  public Security updateSecurity(final String idNSD, final String idSecurity, final Security updatedSecurity)
       throws SDKException {
-    String url = idNSD + "/security" + "/" + id_s;
-    return (Security) requestPut(url, security);
+    String url = idNSD + "/security" + "/" + idSecurity;
+    return (Security) requestPut(url, updatedSecurity);
   }
 }

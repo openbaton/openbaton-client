@@ -21,15 +21,20 @@ import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
- * OpenBaton VirtualNetworkFunctionDescriptor-related api requester.
+ * This class is a Rest Request Agent for sending requests regarding VirtualNetworkFunctionDescriptor objects to the NFVO API.
  */
 public class VirtualNetworkFunctionDescriptorAgent
     extends AbstractRestAgent<VirtualNetworkFunctionDescriptor> {
 
   /**
-   * Create a VirtualNetworkFunctionDescriptor requester with a given url path
    *
-   * @param nfvoIp the url path used for the api requests
+   * @param username the username used for sending requests
+   * @param password the password used for sending requests
+   * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
+   * @param sslEnabled true if the NFVO uses SSL
+   * @param nfvoIp the IP address of the NFVO to which the requests are sent
+   * @param nfvoPort the port on which the NFVO runs
+   * @param version the API version
    */
   public VirtualNetworkFunctionDescriptorAgent(
       String username,

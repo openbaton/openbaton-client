@@ -101,7 +101,7 @@ public class SdkTest {
       res2 = requestor.getNetworkServiceDescriptorAgent().create(networkServiceDescriptor);
     } catch (SDKException e) {
       e.printStackTrace();
-      System.err.println("rEason: " + e.getReason());
+      System.err.println("Reason: " + e.getReason());
       System.exit(2);
     }
     System.out.println("DESCRIPTOR: " + res2);
@@ -110,7 +110,7 @@ public class SdkTest {
       requestor.getNetworkServiceDescriptorAgent().delete(res2.getId());
     } catch (SDKException e) {
       e.printStackTrace();
-      System.err.println("rEason: " + e.getReason());
+      System.err.println("Reason: " + e.getReason());
       System.exit(2);
     }
 
@@ -118,7 +118,7 @@ public class SdkTest {
       requestor.getVimInstanceAgent().delete(vimInstance.getId());
     } catch (SDKException e) {
       e.printStackTrace();
-      System.err.println("rEason: " + e.getReason());
+      System.err.println("Reason: " + e.getReason());
       System.exit(2);
     }
     /**
