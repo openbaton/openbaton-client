@@ -17,9 +17,7 @@
 
 package org.openbaton.cli.exceptions;
 
-/**
- * Created by tbr on 26.05.16.
- */
+/** Created by tbr on 26.05.16. */
 public class CommandLineException extends Exception {
 
   public CommandLineException() {}

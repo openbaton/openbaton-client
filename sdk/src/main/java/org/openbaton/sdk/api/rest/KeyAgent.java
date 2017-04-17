@@ -28,7 +28,6 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
 public class KeyAgent extends AbstractRestAgent<Key> {
 
   /**
-   *
    * @param username the username used for sending requests
    * @param password the password used for sending requests
    * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO

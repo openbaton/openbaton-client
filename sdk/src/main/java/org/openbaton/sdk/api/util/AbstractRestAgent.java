@@ -17,20 +17,19 @@
 
 package org.openbaton.sdk.api.util;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * This class can be extended by explicit request agents which then obtain methods for sending
  * create, get, delete and update requests to the NFVO API.
  *
- * Created by lto on 03/07/15.
+ * <p>Created by lto on 03/07/15.
  */
 public class AbstractRestAgent<T extends Serializable> extends RestRequest {
 
@@ -40,7 +39,6 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
   private static final PropertyReader propertyReader = new PropertyReader(SDK_PROPERTIES_FILE);
 
   /**
-   *
    * @param username the username used for sending requests
    * @param password the password used for sending requests
    * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
@@ -75,61 +73,60 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
     return clazz;
   }
 
-
-    /**
-     * Sends a request for creating an instance of type T to the NFVO API.
-     *
-     * @param object the object that is sent in the create request
-     * @return the created object
-     * @throws SDKException
-     */
+  /**
+   * Sends a request for creating an instance of type T to the NFVO API.
+   *
+   * @param object the object that is sent in the create request
+   * @return the created object
+   * @throws SDKException
+   */
   @Help(help = "Create the object of type {#}")
   public T create(final T object) throws SDKException {
     return (T) requestPost(object);
   }
 
-    /**
-     * Sends a request to the NFVO API for deleting an instance of type T specified by its ID.
-     *
-     * @param id the ID of the object that shall be deleted
-     * @throws SDKException
-     */
+  /**
+   * Sends a request to the NFVO API for deleting an instance of type T specified by its ID.
+   *
+   * @param id the ID of the object that shall be deleted
+   * @throws SDKException
+   */
   @Help(help = "Delete the object of type {#} passing the id")
   public void delete(final String id) throws SDKException {
     requestDelete(id);
   }
 
-    /**
-     * Sends a request for finding all instances of type T to the NFVO API.
-     *
-     * @return the list of found objects
-     * @throws SDKException
-     */
+  /**
+   * Sends a request for finding all instances of type T to the NFVO API.
+   *
+   * @return the list of found objects
+   * @throws SDKException
+   */
   @Help(help = "Find all the objects of type {#}")
   public List<T> findAll() throws SDKException, ClassNotFoundException {
     return Arrays.asList((T[]) requestGet(null, clazz));
   }
 
-    /**
-     * Sends a request to the NFVO API for finding an instance of type T specified by it's ID.
-     *
-     * @param id the ID of the object that shall be retrieved
-     * @return the found object
-     * @throws SDKException
-     */
+  /**
+   * Sends a request to the NFVO API for finding an instance of type T specified by it's ID.
+   *
+   * @param id the ID of the object that shall be retrieved
+   * @return the found object
+   * @throws SDKException
+   */
   @Help(help = "Find the object of type {#} through the id")
   public T findById(final String id) throws SDKException, ClassNotFoundException {
     return (T) requestGet(id, clazz);
   }
 
-    /**
-     * Sends a request to the NFVO API for updating an instance of type T specified by its ID.
-     *
-     * @param object the new object that is sent in the update request
-     * @param id the ID of the object to update
-     * @return the updated object
-     * @throws SDKException
-     */
+  /**
+   * Sends a request to the NFVO API for updating an instance of type T specified by its ID.
+   *
+   * @param object the new object that is sent in the update request
+   * @param id the ID of the object to update
+   * @return the updated object
+   * @throws SDKException
+   */
   @Help(help = "Update the object of type {#} passing the new object and the id of the old object")
   public T update(final T object, final String id) throws SDKException {
     return (T) requestPut(id, object);

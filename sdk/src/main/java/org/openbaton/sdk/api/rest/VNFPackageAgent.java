@@ -17,6 +17,7 @@
 
 package org.openbaton.sdk.api.rest;
 
+import java.io.File;
 import org.openbaton.catalogue.nfvo.VNFPackage;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
@@ -24,17 +25,15 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-
 /**
- * This class is a Rest Request Agent for sending requests regarding VNFPackage objects to the NFVO API.
+ * This class is a Rest Request Agent for sending requests regarding VNFPackage objects to the NFVO
+ * API.
  */
 public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
 
   private Logger log = LoggerFactory.getLogger(this.getClass());
 
   /**
-   *
    * @param username the username used for sending requests
    * @param password the password used for sending requests
    * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO

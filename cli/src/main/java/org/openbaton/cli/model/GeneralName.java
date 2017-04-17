@@ -17,17 +17,14 @@
 
 package org.openbaton.cli.model;
 
-import org.apache.commons.lang3.ArrayUtils;
+import static org.openbaton.cli.util.PrintFormat.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import org.apache.commons.lang3.ArrayUtils;
 
-import static org.openbaton.cli.util.PrintFormat.*;
-
-/**
- * Created by tce on 25.09.15.
- */
+/** Created by tce on 25.09.15. */
 public class GeneralName {
 
   public static String print(List<Object> object)

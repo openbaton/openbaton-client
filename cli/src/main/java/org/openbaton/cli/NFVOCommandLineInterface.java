@@ -20,6 +20,17 @@ package org.openbaton.cli;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
@@ -42,39 +53,23 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
-
-/**
- * Created by lto on 14/07/15.
- */
+/** Created by lto on 14/07/15. */
 public class NFVOCommandLineInterface {
 
   private static Logger log = LoggerFactory.getLogger(NFVOCommandLineInterface.class);
 
   private static final String VERSION = "1";
 
-  private final static LinkedHashMap<String, LinkedList<Command>> commandMap =
+  private static final LinkedHashMap<String, LinkedList<Command>> commandMap =
       new LinkedHashMap<>();
-  private final static LinkedHashMap<String, String> helpCommandMap =
+  private static final LinkedHashMap<String, String> helpCommandMap =
       new LinkedHashMap<String, String>() {
         {
           put("help", "print the usage");
         }
       };
 
-  /**
-   * Print out how to use the OpenBaton command line interface.
-   */
+  /** Print out how to use the OpenBaton command line interface. */
   public static void usage() {
 
     log.info(

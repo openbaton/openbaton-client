@@ -21,9 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-/**
- * OpenBaton SDK Property Reader. Provides URL information from the properties file
- */
+/** OpenBaton SDK Property Reader. Provides URL information from the properties file */
 public class PropertyReader {
 
   private Properties sdkProperties;
@@ -38,7 +36,6 @@ public class PropertyReader {
   }
 
   /**
-   *
    * @param propertiesPath
    * @return Properties
    */

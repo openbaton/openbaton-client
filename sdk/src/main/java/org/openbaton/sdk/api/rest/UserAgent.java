@@ -17,14 +17,11 @@
 
 package org.openbaton.sdk.api.rest;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import java.util.HashMap;
 import org.openbaton.catalogue.security.User;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
-
-import java.util.HashMap;
 
 /**
  * This class is a Rest Request Agent for sending requests regarding User objects to the NFVO API.
@@ -32,7 +29,6 @@ import java.util.HashMap;
 public class UserAgent extends AbstractRestAgent<User> {
 
   /**
-   *
    * @param username the username used for sending requests
    * @param password the password used for sending requests
    * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO

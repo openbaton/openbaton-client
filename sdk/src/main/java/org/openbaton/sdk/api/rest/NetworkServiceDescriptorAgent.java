@@ -30,12 +30,12 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This class is a Rest Request Agent for sending requests regarding NetworkServiceDescriptor objects to the NFVO API.
+ * This class is a Rest Request Agent for sending requests regarding NetworkServiceDescriptor
+ * objects to the NFVO API.
  */
 public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServiceDescriptor> {
 
   /**
-   *
    * @param username the username used for sending requests
    * @param password the password used for sending requests
    * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
@@ -63,14 +63,15 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
         NetworkServiceDescriptor.class);
   }
 
-
   /**
-   * Get all VirtualNetworkFunctionDescriptors contained in a NetworkServiceDescriptor specified by its ID.
+   * Get all VirtualNetworkFunctionDescriptors contained in a NetworkServiceDescriptor specified by
+   * its ID.
    *
    * @param idNSD the NetworkServiceDescriptor's id
-   * @return a List of all VirtualNetworkServiceDescriptors contained in the NetworkServiceDescriptor
+   * @return a List of all VirtualNetworkServiceDescriptors contained in the
+   *     NetworkServiceDescriptor
    * @throws SDKException
-     */
+   */
   @Help(
     help =
         "Get all the VirtualNetworkFunctionDescriptors of a NetworkServiceDescriptor with specific id"
@@ -85,7 +86,8 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
-   * Return a VirtualNetworkFunctionDescriptor that is contained in a particular NetworkServiceDescriptor.
+   * Return a VirtualNetworkFunctionDescriptor that is contained in a particular
+   * NetworkServiceDescriptor.
    *
    * @param idNSD the ID of the NetworkServiceDescriptor
    * @param idVfn the id of the VirtualNetworkFunctionDescriptor
@@ -105,7 +107,8 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
-   * Delete a specific VirtualNetworkFunctionDescriptor that is contained in a particular NetworkServiceDescriptor.
+   * Delete a specific VirtualNetworkFunctionDescriptor that is contained in a particular
+   * NetworkServiceDescriptor.
    *
    * @param idNSD the ID of the NetworkServiceDescriptor
    * @param idVnf the id of the VirtualNetworkFunctionDescriptor
@@ -142,11 +145,13 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
-   * Update a specific VirtualNetworkFunctionDescriptor that is contained in a particular NetworkServiceDescriptor.
+   * Update a specific VirtualNetworkFunctionDescriptor that is contained in a particular
+   * NetworkServiceDescriptor.
    *
    * @param idNSD the ID of the NetworkServiceRecord containing the VirtualNetworkFunctionDescriptor
    * @param idVfn the ID of the VNF Descriptor that shall be updated
-   * @param virtualNetworkFunctionDescriptor the updated version of the VirtualNetworkFunctionDescriptor
+   * @param virtualNetworkFunctionDescriptor the updated version of the
+   *     VirtualNetworkFunctionDescriptor
    * @return the updated VirtualNetworkFunctionDescriptor
    * @throws SDKException
    */
@@ -165,7 +170,8 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
-   * Return a List with all the VNFDependencies that are contained in a specific NetworkServiceDescriptor.
+   * Return a List with all the VNFDependencies that are contained in a specific
+   * NetworkServiceDescriptor.
    *
    * @param idNSD the ID of the NetworkServiceDescriptor
    * @return the List of VNFDependencies
@@ -253,7 +259,8 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
-   * Returns the List of PhysicalNetworkFunctionDescriptors that are contained in a specific NetworkServiceDescriptor.
+   * Returns the List of PhysicalNetworkFunctionDescriptors that are contained in a specific
+   * NetworkServiceDescriptor.
    *
    * @param idNSD the ID of the NetworkServiceDescriptor
    * @return the List of PhysicalNetworkFunctionDescriptors
@@ -272,7 +279,8 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
-   * Returns a specific PhysicalNetworkFunctionDescriptor that is contained in a particular NetworkServiceDescriptor.
+   * Returns a specific PhysicalNetworkFunctionDescriptor that is contained in a particular
+   * NetworkServiceDescriptor.
    *
    * @param idNsd the NetworkServiceDescriptr's ID
    * @param idPnf the PhysicalNetworkFunctionDescriptor's ID
@@ -291,7 +299,8 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
-   * Delete a specific PhysicalNetworkFunctionDescriptor which is contained in a particular NetworkServiceDescriptor.
+   * Delete a specific PhysicalNetworkFunctionDescriptor which is contained in a particular
+   * NetworkServiceDescriptor.
    *
    * @param idNsd the NetworkServiceDescriptor's ID
    * @param idPnf :the PhysicalNetworkFunctionDescriptor's ID
@@ -331,7 +340,8 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    *
    * @param idNsd the NetworkFunctionDescriptor's ID
    * @param idPnf the PhysicalNetworkFunctionDescriptor's ID
-   * @param physicalNetworkFunctionDescriptor the updated version of the PhysicalNetworkFunctionDescriptor
+   * @param physicalNetworkFunctionDescriptor the updated version of the
+   *     PhysicalNetworkFunctionDescriptor
    * @return the updated PhysicalNetworkFunctionDescriptor
    * @throws SDKException
    */
@@ -349,7 +359,8 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
   }
 
   /**
-   * Returns a List of all Security objects that are contained in a specific NetworkServiceDescriptor.
+   * Returns a List of all Security objects that are contained in a specific
+   * NetworkServiceDescriptor.
    *
    * @param idNsd the ID of the NetworkServiceDescriptor
    * @return the List of Security objects
@@ -398,7 +409,8 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @throws SDKException
    */
   @Help(help = "Update the Security of a NetworkServiceDescriptor with specific id")
-  public Security updateSecurity(final String idNSD, final String idSecurity, final Security updatedSecurity)
+  public Security updateSecurity(
+      final String idNSD, final String idSecurity, final Security updatedSecurity)
       throws SDKException {
     String url = idNSD + "/security" + "/" + idSecurity;
     return (Security) requestPut(url, updatedSecurity);
