@@ -20,9 +20,7 @@ package org.openbaton.sdk.api.rest;
 import org.openbaton.catalogue.nfvo.EventEndpoint;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
-/**
- * OpenBaton event-related api requester.
- */
+
 public class EventAgent extends AbstractRestAgent<EventEndpoint> {
 
   public EventAgent(
@@ -32,7 +30,6 @@ public class EventAgent extends AbstractRestAgent<EventEndpoint> {
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String path,
       String version) {
     super(
         username,
@@ -41,7 +38,6 @@ public class EventAgent extends AbstractRestAgent<EventEndpoint> {
         sslEnabled,
         nfvoIp,
         nfvoPort,
-        path,
         version,
         EventEndpoint.class);
   }

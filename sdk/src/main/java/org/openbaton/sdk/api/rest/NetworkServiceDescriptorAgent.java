@@ -32,21 +32,20 @@ import java.util.List;
 /**
  * OpenBaton network-service-descriptor-related api requester.
  */
-public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<NetworkServiceDescriptor> {
+public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServiceDescriptor> {
 
   /**
    * Create a NetworkServiceDescriptor requester with a given url path
    *
    * @param nfvoIp the url path used for the api requests
    */
-  public NetworkServiceDescriptorRestAgent(
+  public NetworkServiceDescriptorAgent(
       String username,
       String password,
       String projectId,
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String path,
       String version) {
     super(
         username,
@@ -55,7 +54,6 @@ public class NetworkServiceDescriptorRestAgent extends AbstractRestAgent<Network
         sslEnabled,
         nfvoIp,
         nfvoPort,
-        path,
         version,
         NetworkServiceDescriptor.class);
   }

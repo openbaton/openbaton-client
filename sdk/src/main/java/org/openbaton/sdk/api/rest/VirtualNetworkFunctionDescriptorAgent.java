@@ -17,28 +17,27 @@
 
 package org.openbaton.sdk.api.rest;
 
-import org.openbaton.catalogue.nfvo.VimInstance;
+import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
- * OpenBaton viminstance(datacenter)-related api requester.
+ * OpenBaton VirtualNetworkFunctionDescriptor-related api requester.
  */
-public class VimInstanceRestAgent extends AbstractRestAgent<VimInstance> {
+public class VirtualNetworkFunctionDescriptorAgent
+    extends AbstractRestAgent<VirtualNetworkFunctionDescriptor> {
 
   /**
-   * Create a VimInstance requester with a given url path
+   * Create a VirtualNetworkFunctionDescriptor requester with a given url path
    *
-   * @param username
-   * @param password
+   * @param nfvoIp the url path used for the api requests
    */
-  public VimInstanceRestAgent(
+  public VirtualNetworkFunctionDescriptorAgent(
       String username,
       String password,
       String projectId,
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String path,
       String version) {
     super(
         username,
@@ -47,8 +46,7 @@ public class VimInstanceRestAgent extends AbstractRestAgent<VimInstance> {
         sslEnabled,
         nfvoIp,
         nfvoPort,
-        path,
         version,
-        VimInstance.class);
+        VirtualNetworkFunctionDescriptor.class);
   }
 }

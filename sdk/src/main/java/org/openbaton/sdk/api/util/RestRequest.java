@@ -91,7 +91,6 @@ public abstract class RestRequest {
   }
 
   private String projectId;
-  private boolean sslEnabled;
   private String authStr = "openbatonOSClient" + ":" + "secret";
   private String encoding = Base64.encodeBase64String(authStr.getBytes());
   private final String provider;

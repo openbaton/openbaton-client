@@ -33,6 +33,8 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
 
   private final Class<T> clazz;
   private Logger log = LoggerFactory.getLogger(this.getClass());
+  private static final String SDK_PROPERTIES_FILE = "sdk.api.properties";
+  private static final PropertyReader propertyReader = new PropertyReader(SDK_PROPERTIES_FILE);
 
   public AbstractRestAgent(
       String username,
@@ -41,10 +43,9 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String path,
       String version,
       Class<T> tClass) {
-    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version);
+    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, propertyReader.getRestUrl(tClass.getSimpleName()), version);
     clazz = tClass;
   }
 

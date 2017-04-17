@@ -42,7 +42,6 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String path,
       String version) {
     super(
         username,
@@ -51,7 +50,6 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
         sslEnabled,
         nfvoIp,
         nfvoPort,
-        path,
         version,
         VNFPackage.class);
   }

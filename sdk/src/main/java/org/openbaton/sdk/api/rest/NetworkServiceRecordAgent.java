@@ -35,21 +35,20 @@ import java.util.List;
 /**
  * OpenBaton image-related commands api requester.
  */
-public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServiceRecord> {
+public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceRecord> {
 
   /**
    * Create a NetworkServiceRecord requester with a given url path
    *
    * @param path the url path used for the api requests
    */
-  public NetworkServiceRecordRestAgent(
+  public NetworkServiceRecordAgent(
       String username,
       String password,
       String projectId,
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String path,
       String version) {
     super(
         username,
@@ -58,7 +57,6 @@ public class NetworkServiceRecordRestAgent extends AbstractRestAgent<NetworkServ
         sslEnabled,
         nfvoIp,
         nfvoPort,
-        path,
         version,
         NetworkServiceRecord.class);
   }

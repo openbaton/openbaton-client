@@ -66,12 +66,13 @@ public class PropertyReader {
   }
 
   /**
-   * Gets the api url
+   * Get the URL for the given class name.
    *
-   * @return the api url property
+   * @param className
+   * @return the URL path property
    */
-  public String getApiUrl() {
-    return sdkProperties.getProperty("apiUrl");
+  public String getRestUrl(String className) {
+    return sdkProperties.getProperty("rest" + className + "Path");
   }
 
   /**

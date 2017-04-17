@@ -34,9 +34,8 @@ public class KeyAgent extends AbstractRestAgent<Key> {
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String path,
       String version) {
-    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version, Key.class);
+    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, Key.class);
   }
 
   /**

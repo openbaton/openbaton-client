@@ -38,9 +38,8 @@ public class UserAgent extends AbstractRestAgent<User> {
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String path,
       String version) {
-    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version, User.class);
+    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, User.class);
   }
 
   @Override

@@ -17,25 +17,23 @@
 
 package org.openbaton.sdk.api.rest;
 
-import org.openbaton.catalogue.nfvo.Configuration;
+import org.openbaton.catalogue.mano.descriptor.VNFForwardingGraphDescriptor;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
- * OpenBaton configuration-related api requester.
+ * OpenBaton VNFFG-related api requester.
  */
-public class ConfigurationRestRequest extends AbstractRestAgent<Configuration> {
+public class VNFFGAgent extends AbstractRestAgent<VNFForwardingGraphDescriptor> {
 
   /**
-   * Create a configuration requester with a given url path
+   * Create a VNFFG requester with a given url path
    *
-   * @param url the url path used for the api requests
    */
-  public ConfigurationRestRequest(
+  public VNFFGAgent(
       String username,
       String password,
       String projectId,
       boolean sslEnabled,
-      String url,
       String nfvoIp,
       String nfvoPort,
       String version) {
@@ -46,8 +44,7 @@ public class ConfigurationRestRequest extends AbstractRestAgent<Configuration> {
         sslEnabled,
         nfvoIp,
         nfvoPort,
-        url,
         version,
-        Configuration.class);
+        VNFForwardingGraphDescriptor.class);
   }
 }

@@ -20,73 +20,39 @@ package org.openbaton.sdk;
 import org.openbaton.sdk.api.rest.*;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
-/**
- * OpenBaton api requestor. The Class is implemented in a static way to avoid any dependencies to
- * spring and to create a corresponding small lib size.
- */
+
 public final class NFVORequestor {
 
-  private RequestFactory factory;
+  private String username;
+  private String password;
+  private String projectId;
+  private boolean sslEnabled;
+  private String nfvoIp;
+  private String nfvoPort;
+  private String version;
 
-  /**
-   * The public constructor for an NFVORequestor to a NFVO which runs on localhost port 8443 and
-   * uses SSL
-   *
-   * @param username
-   * @param password
-   * @param projectId
-   * @param version
-   */
-  public NFVORequestor(String username, String password, String projectId, String version) {
-    factory =
-        RequestFactory.getInstance(
-            username, password, projectId, true, "localhost", "8443", version);
-  }
+  private ConfigurationAgent configurationAgent;
+  private NetworkServiceDescriptorAgent networkServiceDescriptorAgent;
+  private NetworkServiceRecordAgent networkServiceRecordAgent;
+  private VimInstanceAgent vimInstanceAgent;
+  private VirtualLinkAgent virtualLinkAgent;
+  private VirtualNetworkFunctionDescriptorAgent virtualNetworkFunctionDescriptorAgent;
+  private VNFFGAgent vnffgAgent;
+  private EventAgent eventAgent;
+  private VNFPackageAgent vnfPackageAgent;
+  private ProjectAgent projectAgent;
+  private UserAgent userAgent;
+  private KeyAgent keyAgent;
 
-  /**
-   * The public constructor for an NFVORequestor to a NFVO which runs on localhost and depending
-   * whether ssl is enabled or not the port will be chosen as 8443 or 8080
-   *
-   * @param username
-   * @param password
-   * @param projectId
-   * @param sslEnabled
-   * @param version
-   */
-  public NFVORequestor(
-      String username, String password, String projectId, boolean sslEnabled, String version) {
-    if (sslEnabled)
-      factory =
-          RequestFactory.getInstance(
-              username, password, projectId, sslEnabled, "localhost", "8443", version);
-    else
-      factory =
-          RequestFactory.getInstance(
-              username, password, projectId, sslEnabled, "localhost", "8080", version);
-  }
 
-  /**
-   * The public constructor for an NFVORequestor
-   *
-   * @param username
-   * @param password
-   * @param projectId
-   * @param sslEnabled
-   * @param nfvoIp
-   * @param nfvoPort
-   * @param version
-   */
-  public NFVORequestor(
-      String username,
-      String password,
-      String projectId,
-      boolean sslEnabled,
-      String nfvoIp,
-      String nfvoPort,
-      String version) {
-    factory =
-        RequestFactory.getInstance(
-            username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version);
+  public NFVORequestor(String username, String password, String projectId, boolean sslEnabled, String nfvoIp, String nfvoPort, String version) {
+    this.username = username;
+    this.password = password;
+    this.projectId = projectId;
+    this.sslEnabled = true;
+    this.nfvoIp = nfvoIp;
+    this.nfvoPort = nfvoPort;
+    this.version = version;
   }
 
   /**
@@ -94,8 +60,10 @@ public final class NFVORequestor {
    *
    * @return configurationRequest: The (final) static configuration requester
    */
-  public ConfigurationRestRequest getConfigurationAgent() {
-    return factory.getConfigurationAgent();
+  public ConfigurationAgent getConfigurationAgent() {
+    if (this.configurationAgent == null)
+      this.configurationAgent = new ConfigurationAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+    return this.configurationAgent;
   }
 
   /**
@@ -103,8 +71,10 @@ public final class NFVORequestor {
    *
    * @return networkServiceDescriptorRequest: The (final) static networkServiceDescriptor requester
    */
-  public NetworkServiceDescriptorRestAgent getNetworkServiceDescriptorAgent() {
-    return factory.getNetworkServiceDescriptorAgent();
+  public NetworkServiceDescriptorAgent getNetworkServiceDescriptorAgent() {
+    if (this.networkServiceDescriptorAgent == null)
+      this.networkServiceDescriptorAgent = new NetworkServiceDescriptorAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+    return this.networkServiceDescriptorAgent;
   }
 
   /**
@@ -112,8 +82,10 @@ public final class NFVORequestor {
    *
    * @return networkServiceDescriptorRequest: The (final) static networkServiceDescriptor requester
    */
-  public VirtualNetworkFunctionDescriptorRestAgent getVirtualNetworkFunctionDescriptorAgent() {
-    return factory.getVirtualNetworkFunctionDescriptorAgent();
+  public VirtualNetworkFunctionDescriptorAgent getVirtualNetworkFunctionDescriptorAgent() {
+    if (this.virtualNetworkFunctionDescriptorAgent == null)
+      this.virtualNetworkFunctionDescriptorAgent = new VirtualNetworkFunctionDescriptorAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+    return this.virtualNetworkFunctionDescriptorAgent;
   }
 
   /**
@@ -121,8 +93,10 @@ public final class NFVORequestor {
    *
    * @return networkServiceRecordRequest: The (final) static networkServiceRecord requester
    */
-  public NetworkServiceRecordRestAgent getNetworkServiceRecordAgent() {
-    return factory.getNetworkServiceRecordAgent();
+  public NetworkServiceRecordAgent getNetworkServiceRecordAgent() {
+    if (this.networkServiceRecordAgent == null)
+      this.networkServiceRecordAgent = new NetworkServiceRecordAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+    return this.networkServiceRecordAgent;
   }
 
   /**
@@ -130,8 +104,10 @@ public final class NFVORequestor {
    *
    * @return vimInstanceRequest: The (final) static vimInstance requester
    */
-  public VimInstanceRestAgent getVimInstanceAgent() {
-    return factory.getVimInstanceAgent();
+  public VimInstanceAgent getVimInstanceAgent() {
+    if (this.vimInstanceAgent == null)
+      this.vimInstanceAgent = new VimInstanceAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+    return this.vimInstanceAgent;
   }
 
   /**
@@ -139,8 +115,10 @@ public final class NFVORequestor {
    *
    * @return virtualLinkRequest: The (final) static virtualLink requester
    */
-  public VirtualLinkRestAgent getVirtualLinkAgent() {
-    return factory.getVirtualLinkAgent();
+  public VirtualLinkAgent getVirtualLinkAgent() {
+    if (this.virtualLinkAgent == null)
+      this.virtualLinkAgent = new VirtualLinkAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+    return this.virtualLinkAgent;
   }
 
   /**
@@ -148,8 +126,10 @@ public final class NFVORequestor {
    *
    * @return vnfdRequest; The (final) static VirtualNetworkFunctionDescriptor requester
    */
-  public VirtualNetworkFunctionDescriptorRestAgent getVirtualNetworkFunctionDescriptorRestAgent() {
-    return factory.getVirtualNetworkFunctionDescriptorAgent();
+  public VirtualNetworkFunctionDescriptorAgent getVirtualNetworkFunctionDescriptorRestAgent() {
+    if (this.virtualNetworkFunctionDescriptorAgent == null)
+      this.virtualNetworkFunctionDescriptorAgent = new VirtualNetworkFunctionDescriptorAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+    return this.virtualNetworkFunctionDescriptorAgent;
   }
 
   /**
@@ -157,8 +137,10 @@ public final class NFVORequestor {
    *
    * @return vNFFGRequest: The (final) static vNFFG requester
    */
-  public VNFFGRestAgent getVNFFGAgent() {
-    return factory.getVNFForwardingGraphAgent();
+  public VNFFGAgent getVNFFGAgent() {
+    if (this.vnffgAgent == null)
+      this.vnffgAgent = new VNFFGAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+    return this.vnffgAgent;
   }
 
   /**
@@ -167,7 +149,9 @@ public final class NFVORequestor {
    * @return eventRequest; The (final) static Event requester
    */
   public EventAgent getEventAgent() {
-    return factory.getEventAgent();
+    if (this.eventAgent == null)
+      this.eventAgent = new EventAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+    return this.eventAgent;
   }
 
   /**
@@ -176,7 +160,9 @@ public final class NFVORequestor {
    * @return vnfPackageRequest; The (final) static VNFPackage requester
    */
   public VNFPackageAgent getVNFPackageAgent() {
-    return factory.getVNFPackageAgent();
+    if (this.vnfPackageAgent == null)
+      this.vnfPackageAgent = new VNFPackageAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+    return this.vnfPackageAgent;
   }
 
   /**
@@ -185,7 +171,9 @@ public final class NFVORequestor {
    * @return projectRequest; The (final) static Project requester
    */
   public ProjectAgent getProjectAgent() {
-    return factory.getProjectAgent();
+    if (this.projectAgent == null)
+      this.projectAgent = new ProjectAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+    return this.projectAgent;
   }
 
   /**
@@ -194,7 +182,9 @@ public final class NFVORequestor {
    * @return userRequest; The (final) static User requester
    */
   public UserAgent getUserAgent() {
-    return factory.getUserAgent();
+    if (this.userAgent == null)
+      this.userAgent = new UserAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+    return this.userAgent;
   }
 
   /**
@@ -203,18 +193,9 @@ public final class NFVORequestor {
    * @return keyRequest; The (final) static Key requester
    */
   public KeyAgent getKeyAgent() {
-    return factory.getKeyAgent();
+    if (this.keyAgent == null)
+      this.keyAgent = new KeyAgent(this.username, this.password, this.projectId, this.sslEnabled, this.nfvoIp, this.nfvoPort, this.version);
+    return this.keyAgent;
   }
 
-  public AbstractRestAgent abstractRestAgent(Class clazz, String path) {
-    return factory.getAbstractAgent(clazz, path);
-  }
-
-  public void setProjectId(String projectId) {
-    factory.setProjectId(projectId);
-  }
-
-  public String getProjectId() {
-    return factory.getProjectId();
-  }
 }

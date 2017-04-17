@@ -32,9 +32,8 @@ public class ProjectAgent extends AbstractRestAgent<Project> {
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String path,
       String version) {
     super(
-        username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version, Project.class);
+        username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, Project.class);
   }
 }
