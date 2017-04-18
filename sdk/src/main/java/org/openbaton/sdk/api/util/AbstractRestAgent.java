@@ -101,6 +101,7 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
    *
    * @return the list of found objects
    * @throws SDKException
+   * @throws ClassNotFoundException
    */
   @Help(help = "Find all the objects of type {#}")
   public List<T> findAll() throws SDKException, ClassNotFoundException {
@@ -113,6 +114,7 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
    * @param id the ID of the object that shall be retrieved
    * @return the found object
    * @throws SDKException
+   * @throws ClassNotFoundException
    */
   @Help(help = "Find the object of type {#} through the id")
   public T findById(final String id) throws SDKException, ClassNotFoundException {

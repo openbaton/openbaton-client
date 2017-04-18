@@ -17,6 +17,8 @@
 
 package org.openbaton.sdk.api.rest;
 
+import java.util.Arrays;
+import java.util.List;
 import org.openbaton.catalogue.mano.common.Security;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
 import org.openbaton.catalogue.mano.descriptor.PhysicalNetworkFunctionDescriptor;
@@ -25,9 +27,6 @@ import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * This class is a Rest Request Agent for sending requests regarding NetworkServiceDescriptor

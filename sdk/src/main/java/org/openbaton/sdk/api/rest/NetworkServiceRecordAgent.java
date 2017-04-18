@@ -219,7 +219,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idNsr the ID of the NetworkServiceRecord to which the VirtualNetworkFunctionRecord shall
    *     be added
    * @param virtualNetworkFunctionRecord the new VirtualNetworkFunctionRecord
-   * @return
+   * @return the VirtualNetworkFunctionRecord
    * @throws SDKException
    */
   @Help(help = "create VirtualNetworkFunctionRecord")
@@ -323,199 +323,250 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
   }
 
   /** TODO (check the orchestrator) */
+  /**
+   * Updates a VirtualNetworkFunctionRecord.
+   *
+   * @param idNsr the ID of the NetworkServiceRecord containing the VirtualNetworkFunctionRecord
+   * @param idVnfr the ID of the VirtualNetworkFunctionRecord to update
+   * @param virtualNetworkFunctionRecord the updated version of the VirtualNetworkFunctionRecord
+   * @return the updated VirtualNetworkFunctionRecord
+   * @throws SDKException
+   */
   @Help(help = "update VirtualNetworkFunctionRecord")
   public String updateVNFR(
-      final String idNSR,
-      final String id_vnfr,
+      final String idNsr,
+      final String idVnfr,
       final VirtualNetworkFunctionRecord virtualNetworkFunctionRecord)
       throws SDKException {
-    String url = idNSR + "/vnfrecords" + "/" + id_vnfr;
+    String url = idNsr + "/vnfrecords" + "/" + idVnfr;
     return requestPut(url, virtualNetworkFunctionRecord).toString();
   }
 
-  /** */
+  /**
+   * Returns a List of all the VNFRecordDependencies contained in a particular NetworkServiceRecord.
+   *
+   * @param idNsr the ID of the NetworkServiceRecord
+   * @return a List of VNFRecordDependencies
+   * @throws SDKException
+   */
   @Help(
     help =
         "Get all the VirtualNetworkFunctionRecord dependencies of NetworkServiceRecord with specific id"
   )
-  public List<VNFRecordDependency> getVNFDependencies(final String idNSR) throws SDKException {
-    String url = idNSR + "/vnfdependencies";
+  public List<VNFRecordDependency> getVNFDependencies(final String idNsr) throws SDKException {
+    String url = idNsr + "/vnfdependencies";
     return Arrays.asList((VNFRecordDependency[]) requestGetAll(url, VNFRecordDependency.class));
   }
 
-  /** */
+  /**
+   * Returns a specific VNFRecordDependency from a particular NetworkServiceRecord.
+   *
+   * @param idNsr the ID of the NetworkServiceRecord
+   * @param idVnfrDep the ID of the requested VNFRecordDependency
+   * @return the VNFRecordDependency
+   * @throws SDKException
+   */
   @Help(
     help =
         "Get the VirtualNetworkFunctionRecord Dependency of a NetworkServiceRecord with specific id"
   )
-  public VNFRecordDependency getVNFDependency(final String idNSR, final String id_vnfrdep)
+  public VNFRecordDependency getVNFDependency(final String idNsr, final String idVnfrDep)
       throws SDKException {
-    String url = idNSR + "/vnfdependencies" + "/" + id_vnfrdep;
+    String url = idNsr + "/vnfdependencies" + "/" + idVnfrDep;
     return (VNFRecordDependency) requestGet(url, VNFRecordDependency.class);
   }
 
-  /** */
+  /**
+   * Deletes a specific VNFRecordDependency from a NetworkServiceRecord.
+   *
+   * @param idNsr the ID of the NetworkServiceRecord
+   * @param idVnfrDep the ID of the VNFRecordDependency to delete
+   * @throws SDKException
+   */
   @Help(
     help =
         "Delete the VirtualNetworkFunctionRecord Dependency of a NetworkServiceRecord with specific id"
   )
-  public void deleteVNFDependency(final String idNSR, final String id_vnfd) throws SDKException {
-    String url = idNSR + "/vnfdependencies" + "/" + id_vnfd;
+  public void deleteVNFDependency(final String idNsr, final String idVnfrDep) throws SDKException {
+    String url = idNsr + "/vnfdependencies" + "/" + idVnfrDep;
     requestDelete(url);
   }
 
   /** TODO (check the orchestrator) */
+  /**
+   * Add a new VNFRecordDependency to a NetworkServiceRecord.
+   *
+   * @param idNsr the ID of the NetworkServiceRecord
+   * @param vnfRecordDependency the new VNFRecordDependency
+   * @return the created VNFRecordDependency
+   * @throws SDKException
+   */
   @Help(
     help =
         "Create the VirtualNetworkFunctionRecord Dependency of a NetworkServiceRecord with specific id"
   )
   public VNFRecordDependency postVNFDependency(
-      final String idNSR, final VNFRecordDependency vnfDependency) throws SDKException {
-    String url = idNSR + "/vnfdependencies" + "/";
-    return (VNFRecordDependency) requestPost(url, vnfDependency);
+      final String idNsr, final VNFRecordDependency vnfRecordDependency) throws SDKException {
+    String url = idNsr + "/vnfdependencies" + "/";
+    return (VNFRecordDependency) requestPost(url, vnfRecordDependency);
   }
 
-  /** */
+  /**
+   * Update a VNFRecordDependency.
+   *
+   * @param idNsr the ID of the NetworkServiceRecord containing the VNFRecordDependency
+   * @param idVnfrDep the ID of the VNFRecordDependency to update
+   * @param vnfRecordDependency the updated version of the VNFRecordDependency
+   * @return the updated VNFRecordDependency
+   * @throws SDKException
+   */
   @Help(
     help =
         "Update the VirtualNetworkFunctionRecord Dependency of a NetworkServiceRecord with specific id"
   )
   public VNFRecordDependency updateVNFDependency(
-      final String idNSR, final String id_vnfrDep, final VNFRecordDependency vnfDependency)
+      final String idNsr, final String idVnfrDep, final VNFRecordDependency vnfRecordDependency)
       throws SDKException {
-    String url = idNSR + "/vnfdependencies" + "/" + id_vnfrDep;
-    return (VNFRecordDependency) requestPut(url, vnfDependency);
+    String url = idNsr + "/vnfdependencies" + "/" + idVnfrDep;
+    return (VNFRecordDependency) requestPut(url, vnfRecordDependency);
   }
 
   /**
-   * Starts the specified VNFC Instance
+   * Start a specific VNFCInstance.
    *
-   * @param nsrId
-   * @param vnfId
-   * @param vduId
-   * @param vnfciId
+   * @param nsrId the ID of the NetworkServiceRecord containing the VNFCInstance
+   * @param vnfrId the ID of the VirtualNetworkFunctionRecord containing the VNFCInstance
+   * @param vduId the ID of the VirtualDeploymentUnit containing the VNFCInstance
+   * @param vnfcInstanceId the ID on the VNFCInstance that shall be started
    * @throws SDKException
    */
   @Help(help = "Start the specified VNFC Instance")
   public void startVNFCInstance(
-      final String nsrId, final String vnfId, final String vduId, final String vnfciId)
+      final String nsrId, final String vnfrId, final String vduId, final String vnfcInstanceId)
       throws SDKException {
     String url =
         nsrId
             + "/vnfrecords/"
-            + vnfId
+            + vnfrId
             + "/vdunits/"
             + vduId
             + "/vnfcinstances/"
-            + vnfciId
+            + vnfcInstanceId
             + "/start";
     requestPost(url);
   }
 
   /**
-   * Stops the specified VNFC Instance
+   * Stops a specific VNFCInstance.
    *
-   * @param nsrId
-   * @param vnfId
-   * @param vduId
-   * @param vnfciId
+   * @param nsrId the ID of the NetworkServiceRecord containing the VNFCInstance
+   * @param vnfrId the ID of the VirtualNetworkFunctionRecord containing the VNFCInstance
+   * @param vduId the ID of the VirtualDeploymentUnit containing the VNFCInstance
+   * @param vnfcInstanceId the ID on the VNFCInstance that shall be stopped
    * @throws SDKException
    */
   @Help(help = "Stop the specified VNFC Instance")
   public void stopVNFCInstance(
-      final String nsrId, final String vnfId, final String vduId, final String vnfciId)
+      final String nsrId, final String vnfrId, final String vduId, final String vnfcInstanceId)
       throws SDKException {
     String url =
         nsrId
             + "/vnfrecords/"
-            + vnfId
+            + vnfrId
             + "/vdunits/"
             + vduId
             + "/vnfcinstances/"
-            + vnfciId
+            + vnfcInstanceId
             + "/stop";
     requestPost(url);
   }
 
   /**
-   * Returns the set of PhysicalNetworkFunctionRecord into a NSD with id
+   * Returns a List of all the PhysicalNetworkFunctionRecords that are contained in a particular
+   * NetworkServiceRecord.
    *
-   * @param idNSR : The id of NSD
-   * @return : The Set of PhysicalNetworkFunctionRecord into NSD
+   * @param idNsr the ID of the NetworkServiceRecord
+   * @return a List of PhysicalNetworkFunctionRecords
+   * @throws SDKException
    */
   @Help(
     help = "Get all the PhysicalNetworkFunctionRecords of a specific NetworkServiceRecord with id"
   )
-  public List<PhysicalNetworkFunctionRecord> getPhysicalNetworkFunctionRecords(final String idNSR)
+  public List<PhysicalNetworkFunctionRecord> getPhysicalNetworkFunctionRecords(final String idNsr)
       throws SDKException {
-    String url = idNSR + "/pnfrecords";
+    String url = idNsr + "/pnfrecords";
     return Arrays.asList(
         (PhysicalNetworkFunctionRecord[]) requestGetAll(url, PhysicalNetworkFunctionRecord.class));
   }
 
   /**
-   * Returns the PhysicalNetworkFunctionRecord
+   * Returns a specific PhysicalNetworkFunctionRecord.
    *
-   * @param idNSR : The NSD id
-   * @param idPnf The PhysicalNetworkFunctionRecord id
-   * @return PhysicalNetworkFunctionRecord: The PhysicalNetworkFunctionRecord selected
+   * @param idNsr the ID of the NetworkFunctionRecord containing the PhysicalNetworkFunctionRecord
+   * @param idPnfr the ID of the requested PhysicalNetworkFunctionRecord
+   * @return the PhysicalNetworkFunctionRecord
+   * @throws SDKException
    */
   @Help(help = "Get the PhysicalNetworkFunctionRecord of a NetworkServiceRecord with specific id")
   public PhysicalNetworkFunctionRecord getPhysicalNetworkFunctionRecord(
-      final String idNSR, final String idPnf) throws SDKException {
-    String url = idNSR + "/pnfrecords" + "/" + idPnf;
+      final String idNsr, final String idPnfr) throws SDKException {
+    String url = idNsr + "/pnfrecords" + "/" + idPnfr;
     return (PhysicalNetworkFunctionRecord)
         requestGetWithStatusAccepted(url, PhysicalNetworkFunctionRecord.class);
   }
 
   /**
-   * Deletes the PhysicalNetworkFunctionRecord with the idPnf
+   * Deletes a specific PhysicalNetworkFunctionRecord.
    *
-   * @param idNSR The NSD id
-   * @param idPnf The PhysicalNetworkFunctionRecord id
+   * @param idNsr the ID of the NetworkFunctionRecord containing the PhysicalNetworkFunctionRecord
+   * @param idPnfr the ID of the PhysicalNetworkFunctionRecord to delete
+   * @throws SDKException
    */
   @Help(
     help = "Delete the PhysicalNetworkFunctionRecord of a NetworkServiceRecord with specific id"
   )
-  public void deletePhysicalNetworkFunctionRecord(final String idNSR, final String idPnf)
+  public void deletePhysicalNetworkFunctionRecord(final String idNsr, final String idPnfr)
       throws SDKException {
-    String url = idNSR + "/pnfrecords" + "/" + idPnf;
+    String url = idNsr + "/pnfrecords" + "/" + idPnfr;
     requestDelete(url);
   }
 
   /**
-   * Stores the PhysicalNetworkFunctionRecord
+   * Create a new PhysicalnetworkFunctionRecord and add it ot a NetworkServiceRecord.
    *
-   * @param physicalNetworkFunctionRecord : The PhysicalNetworkFunctionRecord to be stored
-   * @param idNSR : The NSD id
-   * @return PhysicalNetworkFunctionRecord: The PhysicalNetworkFunctionRecord stored
+   * @param idNsr the ID of the NetworkServiceRecord
+   * @param physicalNetworkFunctionRecord the new PhysicalNetworkFunctionRecord
+   * @return the new PhysicalNetworkFunctionRecord
+   * @throws SDKException
    */
   @Help(
     help = "Create the PhysicalNetworkFunctionRecord of a NetworkServiceRecord with specific id"
   )
   public PhysicalNetworkFunctionRecord postPhysicalNetworkFunctionRecord(
-      final String idNSR, final PhysicalNetworkFunctionRecord physicalNetworkFunctionRecord)
+      final String idNsr, final PhysicalNetworkFunctionRecord physicalNetworkFunctionRecord)
       throws SDKException {
-    String url = idNSR + "/pnfrecords" + "/";
+    String url = idNsr + "/pnfrecords" + "/";
     return (PhysicalNetworkFunctionRecord) requestPost(url, physicalNetworkFunctionRecord);
   }
 
   /**
-   * Edits the PhysicalNetworkFunctionRecord
+   * Updates a specific PhysicalNetworkFunctionRecord.
    *
-   * @param physicalNetworkFunctionRecord : The PhysicalNetworkFunctionRecord to be edited
-   * @param idNSR : The NSD id
-   * @return PhysicalNetworkFunctionRecord: The PhysicalNetworkFunctionRecord edited
+   * @param idNsr the ID of the NetworkServiceRecord containing the PhysicalNetworkFunctionRecord
+   * @param idPnfr the ID of the PhysicalNetworkFunctionRecord to update
+   * @param physicalNetworkFunctionRecord the updated version of the PhysicalNetworkFunctionRecord
+   * @return the updated PhysicalNetworkFunctionRecord
+   * @throws SDKException
    */
   @Help(
     help = "Update the PhysicalNetworkFunctionRecord of a NetworkServiceRecord with specific id"
   )
   public PhysicalNetworkFunctionRecord updatePNFD(
-      final String idNSR,
-      final String idPnf,
+      final String idNsr,
+      final String idPnfr,
       final PhysicalNetworkFunctionRecord physicalNetworkFunctionRecord)
       throws SDKException {
-    String url = idNSR + "/pnfrecords" + "/" + idPnf;
+    String url = idNsr + "/pnfrecords" + "/" + idPnfr;
     return (PhysicalNetworkFunctionRecord) requestPut(url, physicalNetworkFunctionRecord);
   }
 }

@@ -48,17 +48,37 @@ public class UserAgent extends AbstractRestAgent<User> {
     super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, User.class);
   }
 
+  /**
+   * Use findByName instead.
+   *
+   * @param id
+   * @return null
+   */
   @Override
   @Deprecated
   public User findById(String id) {
     return null;
   }
 
+  /**
+   * Returns a User specified by his username.
+   *
+   * @param name the username
+   * @return the User
+   * @throws SDKException
+   */
   @Help(help = "Find a User by his name")
   public User findByName(String name) throws SDKException {
     return (User) requestGet(name, User.class);
   }
 
+  /**
+   * Changes a User's password.
+   *
+   * @param oldPassword the User's old password
+   * @param newPassword the User's new password
+   * @throws SDKException
+   */
   @Help(help = "Change a user's password")
   public void changePassword(String oldPassword, String newPassword) throws SDKException {
     HashMap<String, String> requestBody = new HashMap<>();

@@ -53,6 +53,12 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
     super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, VNFPackage.class);
   }
 
+  /**
+   * Use the create(String filePath) method instead.
+   *
+   * @param vnfPackage
+   * @return null
+   */
   @Override
   @Deprecated
   public VNFPackage create(VNFPackage vnfPackage) {
@@ -61,6 +67,13 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
     return null;
   }
 
+  /**
+   * Uploads a VNFPackage to the NFVO.
+   *
+   * @param filePath the path to the tar file representing the VNFPackage
+   * @return the uploaded VNFPackage
+   * @throws SDKException
+   */
   @Help(help = "Create a VNFPackage by uploading a tar file")
   public VNFPackage create(String filePath) throws SDKException {
     log.debug("Start uploading a VNFPackage using the tar at path " + filePath);
