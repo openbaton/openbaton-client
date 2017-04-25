@@ -19,6 +19,8 @@ package org.openbaton.sdk.api.rest;
 
 import java.util.Arrays;
 import java.util.List;
+
+import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.mano.common.Security;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
 import org.openbaton.catalogue.mano.descriptor.PhysicalNetworkFunctionDescriptor;
@@ -32,6 +34,7 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
  * This class is a Rest Request Agent for sending requests regarding NetworkServiceDescriptor
  * objects to the NFVO API.
  */
+@ThreadSafe
 public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServiceDescriptor> {
 
   /**

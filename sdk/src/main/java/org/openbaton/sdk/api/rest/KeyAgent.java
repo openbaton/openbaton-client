@@ -17,6 +17,7 @@
 
 package org.openbaton.sdk.api.rest;
 
+import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.security.Key;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
@@ -25,6 +26,7 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
 /**
  * This class is a Rest Request Agent for sending requests regarding Key objects to the NFVO API.
  */
+@ThreadSafe
 public class KeyAgent extends AbstractRestAgent<Key> {
 
   /**

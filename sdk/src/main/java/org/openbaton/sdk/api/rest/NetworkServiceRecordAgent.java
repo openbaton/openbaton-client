@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.mano.descriptor.VNFComponent;
 import org.openbaton.catalogue.mano.record.*;
 import org.openbaton.catalogue.nfvo.Configuration;
@@ -34,6 +36,7 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
  * This class is a Rest Request Agent for sending requests regarding NetworkServiceRecord objects to
  * the NFVO API.
  */
+@ThreadSafe
 public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceRecord> {
 
   /**

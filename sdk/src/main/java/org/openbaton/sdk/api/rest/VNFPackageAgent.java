@@ -18,6 +18,8 @@
 package org.openbaton.sdk.api.rest;
 
 import java.io.File;
+
+import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.nfvo.VNFPackage;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
@@ -29,6 +31,7 @@ import org.slf4j.LoggerFactory;
  * This class is a Rest Request Agent for sending requests regarding VNFPackage objects to the NFVO
  * API.
  */
+@ThreadSafe
 public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
 
   private Logger log = LoggerFactory.getLogger(this.getClass());
