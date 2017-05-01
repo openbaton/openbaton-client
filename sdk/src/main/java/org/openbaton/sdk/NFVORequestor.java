@@ -52,6 +52,7 @@ public final class NFVORequestor {
   private ProjectAgent projectAgent;
   private UserAgent userAgent;
   private KeyAgent keyAgent;
+  // if a new agent is added please keep in mind to update the resetAgents method
 
   /**
    * Constructor for the NFVORequestor.
@@ -110,23 +111,12 @@ public final class NFVORequestor {
     this.nfvoIp = nfvoIp;
     this.nfvoPort = nfvoPort;
     this.version = version;
-
-    this.projectId = "";
     try {
-      for (Project project : this.getProjectAgent().findAll()) {
-        if (project.getName().equals(projectName)) {
-          this.projectId = project.getId();
-          break;
-        }
-      }
-    } catch (ClassNotFoundException e) {
-      throw new SDKException(e.getCause());
-    }
-    if (this.projectId.equals(""))
+      this.projectId = getProjectIdForProjectName(projectName);
+    } catch (SDKException e) {
       throw new SDKException(
-          "Could not create the NFVORequestor",
-          null,
-          "Did not find a Project named " + projectName);
+          "Could not create the NFVORequestor", e.getStackTraceElements(), e.getReason());
+    }
   }
 
   /**
@@ -135,7 +125,7 @@ public final class NFVORequestor {
    *
    * @return a ConfigurationAgent
    */
-  public ConfigurationAgent getConfigurationAgent() {
+  public synchronized ConfigurationAgent getConfigurationAgent() {
     if (this.configurationAgent == null)
       this.configurationAgent =
           new ConfigurationAgent(
@@ -155,7 +145,7 @@ public final class NFVORequestor {
    *
    * @return a NetworkServiceDescriptorAgent
    */
-  public NetworkServiceDescriptorAgent getNetworkServiceDescriptorAgent() {
+  public synchronized NetworkServiceDescriptorAgent getNetworkServiceDescriptorAgent() {
     if (this.networkServiceDescriptorAgent == null)
       this.networkServiceDescriptorAgent =
           new NetworkServiceDescriptorAgent(
@@ -175,7 +165,8 @@ public final class NFVORequestor {
    *
    * @return a VirtualNetworkFunctionDescriptorAgent
    */
-  public VirtualNetworkFunctionDescriptorAgent getVirtualNetworkFunctionDescriptorAgent() {
+  public synchronized VirtualNetworkFunctionDescriptorAgent
+      getVirtualNetworkFunctionDescriptorAgent() {
     if (this.virtualNetworkFunctionDescriptorAgent == null)
       this.virtualNetworkFunctionDescriptorAgent =
           new VirtualNetworkFunctionDescriptorAgent(
@@ -195,7 +186,7 @@ public final class NFVORequestor {
    *
    * @return a NetworkServiceRecordAgent
    */
-  public NetworkServiceRecordAgent getNetworkServiceRecordAgent() {
+  public synchronized NetworkServiceRecordAgent getNetworkServiceRecordAgent() {
     if (this.networkServiceRecordAgent == null)
       this.networkServiceRecordAgent =
           new NetworkServiceRecordAgent(
@@ -214,7 +205,7 @@ public final class NFVORequestor {
    *
    * @return a VimInstanceAgent
    */
-  public VimInstanceAgent getVimInstanceAgent() {
+  public synchronized VimInstanceAgent getVimInstanceAgent() {
     if (this.vimInstanceAgent == null)
       this.vimInstanceAgent =
           new VimInstanceAgent(
@@ -233,7 +224,7 @@ public final class NFVORequestor {
    *
    * @return a VirtualLinkAgent
    */
-  public VirtualLinkAgent getVirtualLinkAgent() {
+  public synchronized VirtualLinkAgent getVirtualLinkAgent() {
     if (this.virtualLinkAgent == null)
       this.virtualLinkAgent =
           new VirtualLinkAgent(
@@ -253,7 +244,8 @@ public final class NFVORequestor {
    *
    * @return a VirtualNetworkFunctionDescriptorAgent
    */
-  public VirtualNetworkFunctionDescriptorAgent getVirtualNetworkFunctionDescriptorRestAgent() {
+  public synchronized VirtualNetworkFunctionDescriptorAgent
+      getVirtualNetworkFunctionDescriptorRestAgent() {
     if (this.virtualNetworkFunctionDescriptorAgent == null)
       this.virtualNetworkFunctionDescriptorAgent =
           new VirtualNetworkFunctionDescriptorAgent(
@@ -272,7 +264,7 @@ public final class NFVORequestor {
    *
    * @return a VNFFGAgent
    */
-  public VNFFGAgent getVNFFGAgent() {
+  public synchronized VNFFGAgent getVNFFGAgent() {
     if (this.vnffgAgent == null)
       this.vnffgAgent =
           new VNFFGAgent(
@@ -291,7 +283,7 @@ public final class NFVORequestor {
    *
    * @return an EventAgent
    */
-  public EventAgent getEventAgent() {
+  public synchronized EventAgent getEventAgent() {
     if (this.eventAgent == null)
       this.eventAgent =
           new EventAgent(
@@ -310,7 +302,7 @@ public final class NFVORequestor {
    *
    * @return a VNFPackageAgent
    */
-  public VNFPackageAgent getVNFPackageAgent() {
+  public synchronized VNFPackageAgent getVNFPackageAgent() {
     if (this.vnfPackageAgent == null)
       this.vnfPackageAgent =
           new VNFPackageAgent(
@@ -329,7 +321,7 @@ public final class NFVORequestor {
    *
    * @return a ProjectAgent
    */
-  public ProjectAgent getProjectAgent() {
+  public synchronized ProjectAgent getProjectAgent() {
     if (this.projectAgent == null)
       this.projectAgent =
           new ProjectAgent(
@@ -348,7 +340,7 @@ public final class NFVORequestor {
    *
    * @return a UserAgent
    */
-  public UserAgent getUserAgent() {
+  public synchronized UserAgent getUserAgent() {
     if (this.userAgent == null)
       this.userAgent =
           new UserAgent(
@@ -367,7 +359,7 @@ public final class NFVORequestor {
    *
    * @return a KeyAgent
    */
-  public KeyAgent getKeyAgent() {
+  public synchronized KeyAgent getKeyAgent() {
     if (this.keyAgent == null)
       this.keyAgent =
           new KeyAgent(
@@ -379,5 +371,84 @@ public final class NFVORequestor {
               this.nfvoPort,
               this.version);
     return this.keyAgent;
+  }
+
+  /**
+   * Set the NFVORequestor's project id. See the {@link #switchProject(String) switchProject} method
+   * for a more convenient alternative.
+   *
+   * @param projectId
+   */
+  public synchronized void setProjectId(String projectId) {
+    // Set the agents to null so that no outdated agent is returned
+    resetAgents();
+    this.projectId = projectId;
+  }
+
+  /**
+   * Get the NFVORequestor's project id.
+   *
+   * @return the current project id
+   */
+  public synchronized String getProjectId() {
+    return this.projectId;
+  }
+
+  /**
+   * Change the project related to this NFVORequestor. This is a convenient alternative for the
+   * {@link #setProjectId(String) setProjectId} method. It throws an SDKException if no project
+   * exists with the given projectName.
+   *
+   * @param projectName the name of the project to switch to
+   * @throws SDKException
+   */
+  public synchronized void switchProject(String projectName) throws SDKException {
+    try {
+      this.projectId = getProjectIdForProjectName(projectName);
+      // Set the agents to null so that no outdated agent is returned
+      resetAgents();
+    } catch (SDKException e) {
+      throw new SDKException(
+          "Could not switch to project " + projectName, e.getStackTraceElements(), e.getReason());
+    }
+  }
+
+  /**
+   * Return the project id for a given project name.
+   *
+   * @param projectName
+   * @return the project id for the given project name
+   * @throws SDKException
+   */
+  private String getProjectIdForProjectName(String projectName) throws SDKException {
+    try {
+      for (Project project : this.getProjectAgent().findAll()) {
+        if (project.getName().equals(projectName)) {
+          return project.getId();
+        }
+      }
+    } catch (ClassNotFoundException e) {
+      throw new SDKException(e.getCause());
+    }
+    throw new SDKException(
+        "Did not find a Project named " + projectName,
+        null,
+        "Did not find a Project named " + projectName);
+  }
+
+  /** Set all the agent objects to null. */
+  private void resetAgents() {
+    this.configurationAgent = null;
+    this.keyAgent = null;
+    this.userAgent = null;
+    this.vnfPackageAgent = null;
+    this.projectAgent = null;
+    this.eventAgent = null;
+    this.vnffgAgent = null;
+    this.virtualNetworkFunctionDescriptorAgent = null;
+    this.virtualLinkAgent = null;
+    this.vimInstanceAgent = null;
+    this.networkServiceDescriptorAgent = null;
+    this.networkServiceRecordAgent = null;
   }
 }
