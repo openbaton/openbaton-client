@@ -18,6 +18,7 @@
 package org.openbaton.sdk.api.rest;
 
 import java.util.HashMap;
+import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.security.User;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
@@ -27,6 +28,7 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
  * This class is a Rest Request Agent for sending requests regarding User objects to the NFVO API.
  * It is thread safe.
  */
+@ThreadSafe
 public class UserAgent extends AbstractRestAgent<User> {
 
   /**
@@ -47,6 +49,24 @@ public class UserAgent extends AbstractRestAgent<User> {
       String nfvoPort,
       String version) {
     super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, User.class);
+  }
+
+  /**
+   * @param serviceName the service name used for sending requests
+   * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
+   * @param sslEnabled true if the NFVO uses SSL
+   * @param nfvoIp the IP address of the NFVO to which the requests are sent
+   * @param nfvoPort the port on which the NFVO runs
+   * @param version the API version
+   */
+  public UserAgent(
+      String serviceName,
+      String projectId,
+      boolean sslEnabled,
+      String nfvoIp,
+      String nfvoPort,
+      String version) {
+    super(serviceName, projectId, sslEnabled, nfvoIp, nfvoPort, version, User.class);
   }
 
   /**

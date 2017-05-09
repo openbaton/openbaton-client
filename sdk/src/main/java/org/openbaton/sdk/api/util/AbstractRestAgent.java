@@ -69,6 +69,25 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
     clazz = tClass;
   }
 
+  public AbstractRestAgent(
+      String serviceName,
+      String projectId,
+      boolean sslEnabled,
+      String nfvoIp,
+      String nfvoPort,
+      String version,
+      Class<T> tClass) {
+    super(
+        serviceName,
+        projectId,
+        sslEnabled,
+        nfvoIp,
+        nfvoPort,
+        propertyReader.getRestUrl(tClass.getSimpleName()),
+        version);
+    clazz = tClass;
+  }
+
   public Class<T> getClazz() {
     return clazz;
   }
