@@ -19,7 +19,6 @@ package org.openbaton.sdk.api.rest;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.mano.common.Security;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
@@ -57,6 +56,31 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
     super(
         username,
         password,
+        projectId,
+        sslEnabled,
+        nfvoIp,
+        nfvoPort,
+        version,
+        NetworkServiceDescriptor.class);
+  }
+
+  /**
+   * @param serviceName the service name used for sending requests
+   * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
+   * @param sslEnabled true if the NFVO uses SSL
+   * @param nfvoIp the IP address of the NFVO to which the requests are sent
+   * @param nfvoPort the port on which the NFVO runs
+   * @param version the API version
+   */
+  public NetworkServiceDescriptorAgent(
+      String serviceName,
+      String projectId,
+      boolean sslEnabled,
+      String nfvoIp,
+      String nfvoPort,
+      String version) {
+    super(
+        serviceName,
         projectId,
         sslEnabled,
         nfvoIp,

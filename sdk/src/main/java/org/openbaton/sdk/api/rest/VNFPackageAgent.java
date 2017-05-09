@@ -18,7 +18,6 @@
 package org.openbaton.sdk.api.rest;
 
 import java.io.File;
-
 import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.nfvo.VNFPackage;
 import org.openbaton.sdk.api.annotations.Help;
@@ -54,6 +53,24 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
       String nfvoPort,
       String version) {
     super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, VNFPackage.class);
+  }
+
+  /**
+   * @param serviceName the service name used for sending requests
+   * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
+   * @param sslEnabled true if the NFVO uses SSL
+   * @param nfvoIp the IP address of the NFVO to which the requests are sent
+   * @param nfvoPort the port on which the NFVO runs
+   * @param version the API version
+   */
+  public VNFPackageAgent(
+      String serviceName,
+      String projectId,
+      boolean sslEnabled,
+      String nfvoIp,
+      String nfvoPort,
+      String version) {
+    super(serviceName, projectId, sslEnabled, nfvoIp, nfvoPort, version, VNFPackage.class);
   }
 
   /**

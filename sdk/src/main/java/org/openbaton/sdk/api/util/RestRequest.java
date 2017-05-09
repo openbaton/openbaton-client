@@ -76,6 +76,9 @@ public abstract class RestRequest {
   protected Gson mapper;
   private String username;
   private String password;
+  private boolean isService;
+  private String serviceName;
+  private ServiceRequestor serviceRequestor;
 
   public String getProjectId() {
     return projectId;
@@ -96,7 +99,18 @@ public abstract class RestRequest {
   private RequestConfig config =
       RequestConfig.custom().setConnectionRequestTimeout(10000).setConnectTimeout(60000).build();
 
-  /** Create a request with a given url path */
+  /**
+   * RestRequest constructor for normal users.
+   *
+   * @param username
+   * @param password
+   * @param projectId
+   * @param sslEnabled
+   * @param nfvoIp
+   * @param nfvoPort
+   * @param path
+   * @param version
+   */
   public RestRequest(
       String username,
       String password,
@@ -106,15 +120,25 @@ public abstract class RestRequest {
       String nfvoPort,
       String path,
       String version) {
+    String apiUrl;
     if (sslEnabled) {
-      this.baseUrl = "https://" + nfvoIp + ":" + nfvoPort + "/api/v" + version + path;
+      apiUrl = "https://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
+      this.baseUrl = apiUrl + path;
       this.provider = "https://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
+      this.httpClient = getHttpClientForSsl();
     } else {
-      this.baseUrl = "http://" + nfvoIp + ":" + nfvoPort + "/api/v" + version + path;
+      apiUrl = "http://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
+      this.baseUrl = apiUrl + path;
       this.provider = "http://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
+      this.httpClient =
+          HttpClientBuilder.create()
+              .setDefaultRequestConfig(config)
+              .setConnectionManager(new PoolingHttpClientConnectionManager())
+              .build();
     }
     this.username = username;
     this.password = password;
+    this.isService = false;
     this.projectId = projectId;
 
     GsonBuilder builder = new GsonBuilder();
@@ -124,14 +148,55 @@ public abstract class RestRequest {
         }
     });*/
     this.mapper = builder.setPrettyPrinting().create();
+  }
 
-    if (sslEnabled) this.httpClient = getHttpClientForSsl();
-    else
+  /**
+   * RestRequest constructor for services.
+   *
+   * @param serviceName
+   * @param projectId
+   * @param sslEnabled
+   * @param nfvoIp
+   * @param nfvoPort
+   * @param path
+   * @param version
+   */
+  public RestRequest(
+      String serviceName,
+      String projectId,
+      boolean sslEnabled,
+      final String nfvoIp,
+      String nfvoPort,
+      String path,
+      String version) {
+    String apiUrl;
+    if (sslEnabled) {
+      apiUrl = "https://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
+      this.baseUrl = apiUrl + path;
+      this.provider = "https://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
+      this.httpClient = getHttpClientForSsl();
+    } else {
+      apiUrl = "http://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
+      this.baseUrl = apiUrl + path;
+      this.provider = "http://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
       this.httpClient =
           HttpClientBuilder.create()
               .setDefaultRequestConfig(config)
               .setConnectionManager(new PoolingHttpClientConnectionManager())
               .build();
+    }
+    this.serviceName = serviceName;
+    this.isService = true;
+    this.serviceRequestor = new ServiceRequestor(httpClient, apiUrl);
+    this.projectId = projectId;
+
+    GsonBuilder builder = new GsonBuilder();
+    /*builder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
+        public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return new Date(json.getAsJsonPrimitive().getAsLong());
+        }
+    });*/
+    this.mapper = builder.setPrettyPrinting().create();
   }
 
   /**
@@ -148,29 +213,17 @@ public abstract class RestRequest {
       log.debug("baseUrl: " + baseUrl);
       log.debug("id: " + baseUrl + "/" + id);
 
-      try {
-        checkToken();
-      } catch (IOException e) {
-        log.error(e.getMessage(), e);
-        throw new SDKException(
-            "Could not get token",
-            e.getStackTrace(),
-            "Could not get token because: " + e.getMessage());
-      }
+      checkToken();
 
       // call the api here
       log.debug("Executing post on: " + this.baseUrl + "/" + id);
       httpPost = new HttpPost(this.baseUrl + "/" + id);
-      httpPost.setHeader(new BasicHeader("accept", "application/json"));
-      httpPost.setHeader(new BasicHeader("Content-Type", "application/json"));
-      httpPost.setHeader(new BasicHeader("project-id", projectId));
-      if (token != null)
-        httpPost.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+      preparePostHeader(httpPost, "application/json", "application/json");
 
       response = httpClient.execute(httpPost);
 
       // check response status
-      checkStatus(response, HttpURLConnection.HTTP_CREATED);
+      RestUtils.checkStatus(response, HttpURLConnection.HTTP_CREATED);
       // return the response of the request
       String result = "";
       if (response.getEntity() != null) result = EntityUtils.toString(response.getEntity());
@@ -221,6 +274,103 @@ public abstract class RestRequest {
     return requestPost("", object);
   }
 
+  public Serializable requestPost(
+      final String id, final Serializable object, final String acceptMime, final String contentMime)
+      throws SDKException {
+    CloseableHttpResponse response = null;
+    HttpPost httpPost = null;
+    try {
+      log.trace("Object is: " + object);
+      String fileJSONNode;
+      if (object instanceof String) fileJSONNode = (String) object;
+      else fileJSONNode = mapper.toJson(object);
+
+      log.trace("sending: " + fileJSONNode.toString());
+      log.debug("baseUrl: " + baseUrl);
+      log.debug("id: " + baseUrl + "/" + id);
+
+      checkToken();
+
+      // call the api here
+      log.debug("Executing post on: " + this.baseUrl + "/" + id);
+      httpPost = new HttpPost(this.baseUrl + "/" + id);
+      preparePostHeader(httpPost, acceptMime, contentMime);
+      httpPost.setEntity(new StringEntity(fileJSONNode));
+
+      response = httpClient.execute(httpPost);
+
+      // check response status
+      RestUtils.checkStatus(response, HttpURLConnection.HTTP_CREATED);
+      // return the response of the request
+      Serializable result = null;
+      if (response.getEntity() != null) result = EntityUtils.toByteArray(response.getEntity());
+      return result;
+
+    } catch (IOException e) {
+      // catch request exceptions here
+      log.error(e.getMessage(), e);
+      if (httpPost != null) httpPost.releaseConnection();
+      throw new SDKException(
+          "Could not http-post or open the object properly",
+          e.getStackTrace(),
+          "Could not http-post or open the object properly because: " + e.getMessage());
+    } catch (SDKException e) {
+      if (response != null
+          && response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+        token = null;
+        if (httpPost != null) httpPost.releaseConnection();
+        return requestPost(id);
+      } else if (response != null) {
+        throw e;
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  /**
+   * Add accept, content-type, projectId and token headers to an HttpPost object.
+   *
+   * @param httpPost
+   * @param acceptMimeType
+   * @param contentMimeType
+   */
+  private void preparePostHeader(HttpPost httpPost, String acceptMimeType, String contentMimeType) {
+    if (acceptMimeType != null && !acceptMimeType.equals(""))
+      httpPost.setHeader(new BasicHeader("accept", acceptMimeType));
+    if (contentMimeType != null && !contentMimeType.equals(""))
+      httpPost.setHeader(new BasicHeader("Content-Type", contentMimeType));
+    httpPost.setHeader(new BasicHeader("project-id", projectId));
+    if (token != null && bearerToken != null)
+      httpPost.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+  }
+
+  private CloseableHttpResponse genericPost(
+      String id, Serializable object, String acceptMimeType, String contentMimeType)
+      throws SDKException, IOException {
+    CloseableHttpResponse response = null;
+    HttpPost httpPost = null;
+    log.trace("Object is: " + object);
+    String fileJSONNode;
+    if (object instanceof String) fileJSONNode = (String) object;
+    else fileJSONNode = mapper.toJson(object);
+
+    log.trace("sending: " + fileJSONNode.toString());
+    log.debug("baseUrl: " + baseUrl);
+    log.debug("id: " + baseUrl + "/" + id);
+
+    checkToken();
+
+    // call the api here
+    log.debug("Executing post on: " + this.baseUrl + "/" + id);
+    httpPost = new HttpPost(this.baseUrl + "/" + id);
+    preparePostHeader(httpPost, acceptMimeType, contentMimeType);
+    httpPost.setEntity(new StringEntity(fileJSONNode));
+
+    response = httpClient.execute(httpPost);
+    return response;
+  }
+
   public Serializable requestPost(final String id, final Serializable object) throws SDKException {
     CloseableHttpResponse response = null;
     HttpPost httpPost = null;
@@ -234,32 +384,22 @@ public abstract class RestRequest {
       log.debug("baseUrl: " + baseUrl);
       log.debug("id: " + baseUrl + "/" + id);
 
-      try {
-        checkToken();
-      } catch (IOException e) {
-        log.error(e.getMessage(), e);
-        throw new SDKException(
-            "Could not get token",
-            e.getStackTrace(),
-            "Could not get token because: " + e.getMessage());
-      }
+      checkToken();
 
       // call the api here
       log.debug("Executing post on: " + this.baseUrl + "/" + id);
       httpPost = new HttpPost(this.baseUrl + "/" + id);
       if (!(object instanceof String)) {
-        httpPost.setHeader(new BasicHeader("accept", "application/json"));
-        httpPost.setHeader(new BasicHeader("Content-Type", "application/json"));
+        preparePostHeader(httpPost, "application/json", "application/json");
+      } else {
+        preparePostHeader(httpPost, null, null);
       }
-      httpPost.setHeader(new BasicHeader("project-id", projectId));
-      if (token != null)
-        httpPost.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
       httpPost.setEntity(new StringEntity(fileJSONNode));
 
       response = httpClient.execute(httpPost);
 
       // check response status
-      checkStatus(response, HttpURLConnection.HTTP_CREATED);
+      RestUtils.checkStatus(response, HttpURLConnection.HTTP_CREATED);
       // return the response of the request
       String result = "";
       if (response.getEntity() != null) result = EntityUtils.toString(response.getEntity());
@@ -320,30 +460,18 @@ public abstract class RestRequest {
       log.debug("baseUrl: " + baseUrl);
       log.debug("id: " + baseUrl + "/" + id);
 
-      try {
-        checkToken();
-      } catch (IOException e) {
-        log.error(e.getMessage(), e);
-        throw new SDKException(
-            "Could not get token",
-            e.getStackTrace(),
-            "could not get token because: " + e.getMessage());
-      }
+      checkToken();
 
       // call the api here
       log.debug("Executing post on: " + this.baseUrl + "/" + id);
       httpPost = new HttpPost(this.baseUrl + "/" + id);
-      httpPost.setHeader(new BasicHeader("accept", "application/json"));
-      httpPost.setHeader(new BasicHeader("Content-Type", "application/json"));
-      httpPost.setHeader(new BasicHeader("project-id", projectId));
-      if (token != null)
-        httpPost.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+      preparePostHeader(httpPost, "application/json", "application/json");
       httpPost.setEntity(new StringEntity(fileJSONNode));
 
       response = httpClient.execute(httpPost);
 
       // check response status
-      checkStatus(response, HttpURLConnection.HTTP_CREATED);
+      RestUtils.checkStatus(response, HttpURLConnection.HTTP_CREATED);
       // return the response of the request
       String result = "";
       if (response.getEntity() != null) result = EntityUtils.toString(response.getEntity());
@@ -403,18 +531,10 @@ public abstract class RestRequest {
     HttpPost httpPost = null;
 
     try {
-      try {
-        checkToken();
-      } catch (IOException e) {
-        log.error(e.getMessage(), e);
-        throw new SDKException("Could not get token", e.getStackTrace(), e.getMessage());
-      }
+      checkToken();
       log.debug("Executing post on " + baseUrl);
       httpPost = new HttpPost(this.baseUrl);
-      httpPost.setHeader(new BasicHeader("accept", "multipart/form-data"));
-      httpPost.setHeader(new BasicHeader("project-id", projectId));
-      if (token != null)
-        httpPost.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+      preparePostHeader(httpPost, "multipart/form-data", null);
 
       MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
       multipartEntityBuilder.addBinaryBody("file", f);
@@ -436,7 +556,7 @@ public abstract class RestRequest {
     }
 
     // check response status
-    checkStatus(response, HttpURLConnection.HTTP_OK);
+    RestUtils.checkStatus(response, HttpURLConnection.HTTP_OK);
     // return the response of the request
     String result = "";
     if (response.getEntity() != null)
@@ -461,11 +581,20 @@ public abstract class RestRequest {
     return null;
   }
 
-  private void checkToken() throws IOException, SDKException {
-    if (!(this.username == null || this.password == null))
-      if (token == null && (!this.username.equals("") || !this.password.equals(""))) {
-        getAccessToken();
-      }
+  private void checkToken() throws SDKException {
+    try {
+      if (this.token == null
+          && ((isService && this.serviceName != null && !this.serviceName.equals(""))
+              || (!((this.username == null && this.username.equals(""))
+                  || (this.password == null || this.password.equals("")))))) getAccessToken();
+
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw new SDKException(
+          (isService ? "Could not get service token" : "Could not get user token"),
+          e.getStackTrace(),
+          e.getMessage());
+    }
   }
 
   private JsonNode getJsonNode(Serializable object) throws IOException {
@@ -484,12 +613,7 @@ public abstract class RestRequest {
       log.debug("baseUrl: " + baseUrl);
       log.debug("id: " + baseUrl + "/" + id);
 
-      try {
-        checkToken();
-      } catch (IOException e) {
-        log.error(e.getMessage(), e);
-        throw new SDKException("Could not get token", e.getStackTrace(), e.getMessage());
-      }
+      checkToken();
 
       // call the api here
       log.info("Executing delete on: " + this.baseUrl + "/" + id);
@@ -501,7 +625,7 @@ public abstract class RestRequest {
       response = httpClient.execute(httpDelete);
 
       // check response status
-      checkStatus(response, HttpURLConnection.HTTP_NO_CONTENT);
+      RestUtils.checkStatus(response, HttpURLConnection.HTTP_NO_CONTENT);
       httpDelete.releaseConnection();
       // return the response of the request
 
@@ -547,12 +671,7 @@ public abstract class RestRequest {
     CloseableHttpResponse response = null;
     HttpGet httpGet = null;
     try {
-      try {
-        checkToken();
-      } catch (IOException e) {
-        log.error(e.getMessage(), e);
-        throw new SDKException("Could not get token", e.getStackTrace(), e.getMessage());
-      }
+      checkToken();
 
       // call the api here
       log.debug("Executing get on: " + url);
@@ -565,9 +684,9 @@ public abstract class RestRequest {
 
       // check response status
       if (httpStatus != null) {
-        checkStatus(response, httpStatus);
+        RestUtils.checkStatus(response, httpStatus);
       } else {
-        checkStatus(response, HttpURLConnection.HTTP_OK);
+        RestUtils.checkStatus(response, HttpURLConnection.HTTP_OK);
       }
       // return the response of the request
       String result = "";
@@ -620,12 +739,7 @@ public abstract class RestRequest {
     CloseableHttpResponse response = null;
     HttpGet httpGet = null;
     try {
-      try {
-        checkToken();
-      } catch (IOException e) {
-        log.error(e.getMessage(), e);
-        throw new SDKException("Could not get token", e.getStackTrace(), e.getMessage());
-      }
+      checkToken();
 
       // call the api here
       log.debug("Executing get on: " + url);
@@ -638,9 +752,9 @@ public abstract class RestRequest {
 
       // check response status
       if (httpStatus != null) {
-        checkStatus(response, httpStatus);
+        RestUtils.checkStatus(response, httpStatus);
       } else {
-        checkStatus(response, HttpURLConnection.HTTP_OK);
+        RestUtils.checkStatus(response, HttpURLConnection.HTTP_OK);
       }
       // return the response of the request
       String result = "";
@@ -710,12 +824,7 @@ public abstract class RestRequest {
       log.trace("Object is: " + object);
       String fileJSONNode = mapper.toJson(object);
 
-      try {
-        checkToken();
-      } catch (IOException e) {
-        log.error(e.getMessage(), e);
-        throw new SDKException("Could not get token", e.getStackTrace(), e.getMessage());
-      }
+      checkToken();
 
       // call the api here
       log.debug("Executing put on: " + this.baseUrl + "/" + id);
@@ -730,7 +839,7 @@ public abstract class RestRequest {
       response = httpClient.execute(httpPut);
 
       // check response status
-      checkStatus(response, HttpURLConnection.HTTP_ACCEPTED);
+      RestUtils.checkStatus(response, HttpURLConnection.HTTP_ACCEPTED);
       // return the response of the request
       String result = "";
       if (response.getEntity() != null) result = EntityUtils.toString(response.getEntity());
@@ -774,106 +883,80 @@ public abstract class RestRequest {
     }
   }
 
-  /**
-   * Check wether a json repsonse has the right http status. If not, an SDKException is thrown.
-   *
-   * @param httpResponse the http response
-   * @param httpStatus the (desired) http status of the repsonse
-   */
-  private void checkStatus(CloseableHttpResponse httpResponse, final int httpStatus)
-      throws SDKException {
-
-    if (httpResponse.getStatusLine().getStatusCode() != httpStatus) {
-      log.error(
-          "Status expected: "
-              + httpStatus
-              + " obtained: "
-              + httpResponse.getStatusLine().getStatusCode());
-      log.error("httpresponse: " + httpResponse.toString());
-      String body;
-      try {
-        body = EntityUtils.toString(httpResponse.getEntity());
-      } catch (IOException e) {
-        e.printStackTrace();
-        throw new SDKException(
-            "Status is " + httpResponse.getStatusLine().getStatusCode(),
-            new StackTraceElement[0],
-            "could not provide reason because: " + e.getMessage());
-      }
-      log.error("Body: " + body);
-      throw new SDKException(
-          "Status is " + httpResponse.getStatusLine().getStatusCode(),
-          new StackTraceElement[0],
-          body);
-    }
-  }
-
   private void getAccessToken() throws IOException, SDKException {
-
     HttpPost httpPost = new HttpPost(provider);
-
     httpPost.setHeader("Authorization", "Basic " + encoding);
-    List<BasicNameValuePair> parametersBody = new ArrayList<>();
-    parametersBody.add(new BasicNameValuePair("grant_type", "password"));
-    parametersBody.add(new BasicNameValuePair("username", this.username));
-    parametersBody.add(new BasicNameValuePair("password", this.password));
+    if (isService) {
+      try {
+        this.token = serviceRequestor.requestRegisterService(this.serviceName);
+      } catch (Exception e) {
+        throw new SDKException(e);
+      }
+      this.bearerToken = "Bearer " + this.token;
+    } else {
 
-    log.debug("Username is: " + username);
-    log.debug("Password is: " + password);
+      List<BasicNameValuePair> parametersBody = new ArrayList<>();
+      parametersBody.add(new BasicNameValuePair("grant_type", "password"));
+      parametersBody.add(new BasicNameValuePair("username", this.username));
+      parametersBody.add(new BasicNameValuePair("password", this.password));
 
-    httpPost.setEntity(new UrlEncodedFormEntity(parametersBody, StandardCharsets.UTF_8));
+      log.debug("Username is: " + username);
+      log.debug("Password is: " + password);
 
-    CloseableHttpResponse response = null;
-    log.debug("httpPost is: " + httpPost.toString());
-    response = httpClient.execute(httpPost);
-    String responseString = null;
-    responseString = EntityUtils.toString(response.getEntity());
-    int statusCode = response.getStatusLine().getStatusCode();
-    response.close();
-    httpPost.releaseConnection();
-    log.trace(statusCode + ": " + responseString);
+      httpPost.setEntity(new UrlEncodedFormEntity(parametersBody, StandardCharsets.UTF_8));
 
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    if (statusCode != 200) {
-      JsonObject error = gson.fromJson(responseString, JsonObject.class);
+      CloseableHttpResponse response = null;
+      log.debug("httpPost is: " + httpPost.toString());
+      response = httpClient.execute(httpPost);
+      String responseString = null;
+      responseString = EntityUtils.toString(response.getEntity());
+      int statusCode = response.getStatusLine().getStatusCode();
+      response.close();
+      httpPost.releaseConnection();
+      log.trace(statusCode + ": " + responseString);
 
-      JsonElement detailMessage = error.get("detailMessage");
-      if (detailMessage == null) detailMessage = error.get("errorMessage");
-      if (detailMessage == null) detailMessage = error.get("message");
-      if (detailMessage == null) detailMessage = error.get("description");
-      if (detailMessage == null) detailMessage = error.get("errorDescription");
+      Gson gson = new GsonBuilder().setPrettyPrinting().create();
+      if (statusCode != 200) {
+        JsonObject error = gson.fromJson(responseString, JsonObject.class);
 
-      log.error(
-          "Status Code ["
-              + statusCode
-              + "]: Error signing-in ["
-              + (detailMessage != null ? detailMessage.getAsString() : "no error description")
-              + "]");
+        JsonElement detailMessage = error.get("detailMessage");
+        if (detailMessage == null) detailMessage = error.get("errorMessage");
+        if (detailMessage == null) detailMessage = error.get("message");
+        if (detailMessage == null) detailMessage = error.get("description");
+        if (detailMessage == null) detailMessage = error.get("errorDescription");
 
-      if (detailMessage == null) log.error("Got Error from server: \n" + gson.toJson(error));
-      throw new SDKException(
-          "Status Code ["
-              + statusCode
-              + "]: Error signing-in ["
-              + (detailMessage != null ? detailMessage.getAsString() : "no error description")
-              + "]",
-          new StackTraceElement[0],
-          (detailMessage != null ? detailMessage.getAsString() : "no error description"));
-    }
-    JsonObject jobj = new Gson().fromJson(responseString, JsonObject.class);
-    log.trace("JsonTokeAccess is: " + jobj.toString());
-    try {
-      String token = jobj.get("value").getAsString();
-      log.trace(token);
-      bearerToken = "Bearer " + token;
-      this.token = token;
-    } catch (NullPointerException e) {
-      String error = jobj.get("error").getAsString();
-      if (error.equals("invalid_grant")) {
+        log.error(
+            "Status Code ["
+                + statusCode
+                + "]: Error signing-in ["
+                + (detailMessage != null ? detailMessage.getAsString() : "no error description")
+                + "]");
+
+        if (detailMessage == null) log.error("Got Error from server: \n" + gson.toJson(error));
         throw new SDKException(
-            "Error during authentication: " + jobj.get("error_description").getAsString(),
-            e.getStackTrace(),
-            e.getMessage());
+            "Status Code ["
+                + statusCode
+                + "]: Error signing-in ["
+                + (detailMessage != null ? detailMessage.getAsString() : "no error description")
+                + "]",
+            new StackTraceElement[0],
+            (detailMessage != null ? detailMessage.getAsString() : "no error description"));
+      }
+      JsonObject jobj = new Gson().fromJson(responseString, JsonObject.class);
+      log.trace("JsonTokenAccess is: " + jobj.toString());
+      try {
+        String token = jobj.get("value").getAsString();
+        log.trace(token);
+        bearerToken = "Bearer " + token;
+        this.token = token;
+      } catch (NullPointerException e) {
+        String error = jobj.get("error").getAsString();
+        if (error.equals("invalid_grant")) {
+          throw new SDKException(
+              "Error during authentication: " + jobj.get("error_description").getAsString(),
+              e.getStackTrace(),
+              e.getMessage());
+        }
       }
     }
   }

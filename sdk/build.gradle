@@ -17,6 +17,7 @@
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots/"
     }
@@ -36,7 +37,9 @@ test {
 }
 
 dependencies {
-    compile 'org.openbaton:catalogue:3.2.1'
+    compile 'org.openbaton:catalogue:3.2.2-SNAPSHOT'
+
+    compile 'org.openbaton:utils:3.2.2-SNAPSHOT'
 
     compile 'org.slf4j:slf4j-api:1.7.12'
 

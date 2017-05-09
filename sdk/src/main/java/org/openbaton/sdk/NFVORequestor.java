@@ -34,6 +34,8 @@ public final class NFVORequestor {
 
   private String username;
   private String password;
+  private boolean isService;
+  private String serviceName;
   private String projectId;
   private boolean sslEnabled;
   private String nfvoIp;
@@ -80,6 +82,7 @@ public final class NFVORequestor {
     this.nfvoIp = nfvoIp;
     this.nfvoPort = nfvoPort;
     this.version = version;
+    this.isService = false;
   }
 
   /**
@@ -111,6 +114,68 @@ public final class NFVORequestor {
     this.nfvoIp = nfvoIp;
     this.nfvoPort = nfvoPort;
     this.version = version;
+    this.isService = false;
+    try {
+      this.projectId = getProjectIdForProjectName(projectName);
+    } catch (SDKException e) {
+      throw new SDKException(
+          "Could not create the NFVORequestor", e.getStackTraceElements(), e.getReason());
+    }
+  }
+
+  /**
+   * Constructor for the NFVORequestor in service mode.
+   *
+   * @param serviceName the name of the service to use for requests
+   * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
+   * @param sslEnabled true if the NFVO uses SSL
+   * @param nfvoIp the IP address of the NFVO to which the requests are sent
+   * @param nfvoPort the port on which the NFVO runs
+   * @param version the API version
+   * @throws SDKException
+   */
+  public NFVORequestor(
+      String serviceName,
+      String projectId,
+      boolean sslEnabled,
+      String nfvoIp,
+      String nfvoPort,
+      String version)
+      throws SDKException {
+    this.serviceName = serviceName;
+    this.isService = true;
+    this.projectId = projectId;
+    this.sslEnabled = sslEnabled;
+    this.nfvoIp = nfvoIp;
+    this.nfvoPort = nfvoPort;
+    this.version = version;
+  }
+
+  /**
+   * Constructor for the NFVORequestor in service mode.
+   *
+   * @param serviceName the service name to be used in requests
+   * @param sslEnabled true if the NFVO uses SSL
+   * @param projectName the name of the NFVO Project that will be used in the requests to the NFVO
+   * @param nfvoIp the IP address of the NFVO to which the requests are sent
+   * @param nfvoPort the port on which the NFVO runs
+   * @param version the API version
+   * @throws SDKException
+   */
+  public NFVORequestor(
+      String serviceName,
+      boolean sslEnabled,
+      String projectName,
+      String nfvoIp,
+      String nfvoPort,
+      String version)
+      throws SDKException {
+    this.serviceName = serviceName;
+    this.isService = true;
+    this.sslEnabled = sslEnabled;
+    this.nfvoIp = nfvoIp;
+    this.nfvoPort = nfvoPort;
+    this.version = version;
     try {
       this.projectId = getProjectIdForProjectName(projectName);
     } catch (SDKException e) {
@@ -127,15 +192,25 @@ public final class NFVORequestor {
    */
   public synchronized ConfigurationAgent getConfigurationAgent() {
     if (this.configurationAgent == null)
-      this.configurationAgent =
-          new ConfigurationAgent(
-              this.username,
-              this.password,
-              this.projectId,
-              this.sslEnabled,
-              this.nfvoIp,
-              this.nfvoPort,
-              this.version);
+      if (isService)
+        this.configurationAgent =
+            new ConfigurationAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      else
+        this.configurationAgent =
+            new ConfigurationAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
     return this.configurationAgent;
   }
 
@@ -147,15 +222,25 @@ public final class NFVORequestor {
    */
   public synchronized NetworkServiceDescriptorAgent getNetworkServiceDescriptorAgent() {
     if (this.networkServiceDescriptorAgent == null)
-      this.networkServiceDescriptorAgent =
-          new NetworkServiceDescriptorAgent(
-              this.username,
-              this.password,
-              this.projectId,
-              this.sslEnabled,
-              this.nfvoIp,
-              this.nfvoPort,
-              this.version);
+      if (isService)
+        this.networkServiceDescriptorAgent =
+            new NetworkServiceDescriptorAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      else
+        this.networkServiceDescriptorAgent =
+            new NetworkServiceDescriptorAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
     return this.networkServiceDescriptorAgent;
   }
 
@@ -168,15 +253,25 @@ public final class NFVORequestor {
   public synchronized VirtualNetworkFunctionDescriptorAgent
       getVirtualNetworkFunctionDescriptorAgent() {
     if (this.virtualNetworkFunctionDescriptorAgent == null)
-      this.virtualNetworkFunctionDescriptorAgent =
-          new VirtualNetworkFunctionDescriptorAgent(
-              this.username,
-              this.password,
-              this.projectId,
-              this.sslEnabled,
-              this.nfvoIp,
-              this.nfvoPort,
-              this.version);
+      if (isService)
+        this.virtualNetworkFunctionDescriptorAgent =
+            new VirtualNetworkFunctionDescriptorAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      else
+        this.virtualNetworkFunctionDescriptorAgent =
+            new VirtualNetworkFunctionDescriptorAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
     return this.virtualNetworkFunctionDescriptorAgent;
   }
 
@@ -188,15 +283,25 @@ public final class NFVORequestor {
    */
   public synchronized NetworkServiceRecordAgent getNetworkServiceRecordAgent() {
     if (this.networkServiceRecordAgent == null)
-      this.networkServiceRecordAgent =
-          new NetworkServiceRecordAgent(
-              this.username,
-              this.password,
-              this.projectId,
-              this.sslEnabled,
-              this.nfvoIp,
-              this.nfvoPort,
-              this.version);
+      if (isService)
+        this.networkServiceRecordAgent =
+            new NetworkServiceRecordAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      else
+        this.networkServiceRecordAgent =
+            new NetworkServiceRecordAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
     return this.networkServiceRecordAgent;
   }
 
@@ -207,15 +312,25 @@ public final class NFVORequestor {
    */
   public synchronized VimInstanceAgent getVimInstanceAgent() {
     if (this.vimInstanceAgent == null)
-      this.vimInstanceAgent =
-          new VimInstanceAgent(
-              this.username,
-              this.password,
-              this.projectId,
-              this.sslEnabled,
-              this.nfvoIp,
-              this.nfvoPort,
-              this.version);
+      if (isService)
+        this.vimInstanceAgent =
+            new VimInstanceAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      else
+        this.vimInstanceAgent =
+            new VimInstanceAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
     return this.vimInstanceAgent;
   }
 
@@ -226,15 +341,25 @@ public final class NFVORequestor {
    */
   public synchronized VirtualLinkAgent getVirtualLinkAgent() {
     if (this.virtualLinkAgent == null)
-      this.virtualLinkAgent =
-          new VirtualLinkAgent(
-              this.username,
-              this.password,
-              this.projectId,
-              this.sslEnabled,
-              this.nfvoIp,
-              this.nfvoPort,
-              this.version);
+      if (isService)
+        this.virtualLinkAgent =
+            new VirtualLinkAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      else
+        this.virtualLinkAgent =
+            new VirtualLinkAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
     return this.virtualLinkAgent;
   }
 
@@ -247,15 +372,25 @@ public final class NFVORequestor {
   public synchronized VirtualNetworkFunctionDescriptorAgent
       getVirtualNetworkFunctionDescriptorRestAgent() {
     if (this.virtualNetworkFunctionDescriptorAgent == null)
-      this.virtualNetworkFunctionDescriptorAgent =
-          new VirtualNetworkFunctionDescriptorAgent(
-              this.username,
-              this.password,
-              this.projectId,
-              this.sslEnabled,
-              this.nfvoIp,
-              this.nfvoPort,
-              this.version);
+      if (isService)
+        this.virtualNetworkFunctionDescriptorAgent =
+            new VirtualNetworkFunctionDescriptorAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      else
+        this.virtualNetworkFunctionDescriptorAgent =
+            new VirtualNetworkFunctionDescriptorAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
     return this.virtualNetworkFunctionDescriptorAgent;
   }
 
@@ -266,15 +401,25 @@ public final class NFVORequestor {
    */
   public synchronized VNFFGAgent getVNFFGAgent() {
     if (this.vnffgAgent == null)
-      this.vnffgAgent =
-          new VNFFGAgent(
-              this.username,
-              this.password,
-              this.projectId,
-              this.sslEnabled,
-              this.nfvoIp,
-              this.nfvoPort,
-              this.version);
+      if (isService)
+        this.vnffgAgent =
+            new VNFFGAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      else
+        this.vnffgAgent =
+            new VNFFGAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
     return this.vnffgAgent;
   }
 
@@ -285,15 +430,25 @@ public final class NFVORequestor {
    */
   public synchronized EventAgent getEventAgent() {
     if (this.eventAgent == null)
-      this.eventAgent =
-          new EventAgent(
-              this.username,
-              this.password,
-              this.projectId,
-              this.sslEnabled,
-              this.nfvoIp,
-              this.nfvoPort,
-              this.version);
+      if (isService)
+        this.eventAgent =
+            new EventAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      else
+        this.eventAgent =
+            new EventAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
     return this.eventAgent;
   }
 
@@ -304,15 +459,25 @@ public final class NFVORequestor {
    */
   public synchronized VNFPackageAgent getVNFPackageAgent() {
     if (this.vnfPackageAgent == null)
-      this.vnfPackageAgent =
-          new VNFPackageAgent(
-              this.username,
-              this.password,
-              this.projectId,
-              this.sslEnabled,
-              this.nfvoIp,
-              this.nfvoPort,
-              this.version);
+      if (isService)
+        this.vnfPackageAgent =
+            new VNFPackageAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      else
+        this.vnfPackageAgent =
+            new VNFPackageAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
     return this.vnfPackageAgent;
   }
 
@@ -323,15 +488,25 @@ public final class NFVORequestor {
    */
   public synchronized ProjectAgent getProjectAgent() {
     if (this.projectAgent == null)
-      this.projectAgent =
-          new ProjectAgent(
-              this.username,
-              this.password,
-              this.projectId,
-              this.sslEnabled,
-              this.nfvoIp,
-              this.nfvoPort,
-              this.version);
+      if (isService)
+        this.projectAgent =
+            new ProjectAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      else
+        this.projectAgent =
+            new ProjectAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
     return this.projectAgent;
   }
 
@@ -342,15 +517,25 @@ public final class NFVORequestor {
    */
   public synchronized UserAgent getUserAgent() {
     if (this.userAgent == null)
-      this.userAgent =
-          new UserAgent(
-              this.username,
-              this.password,
-              this.projectId,
-              this.sslEnabled,
-              this.nfvoIp,
-              this.nfvoPort,
-              this.version);
+      if (isService)
+        this.userAgent =
+            new UserAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      else
+        this.userAgent =
+            new UserAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
     return this.userAgent;
   }
 
@@ -361,15 +546,25 @@ public final class NFVORequestor {
    */
   public synchronized KeyAgent getKeyAgent() {
     if (this.keyAgent == null)
-      this.keyAgent =
-          new KeyAgent(
-              this.username,
-              this.password,
-              this.projectId,
-              this.sslEnabled,
-              this.nfvoIp,
-              this.nfvoPort,
-              this.version);
+      if (isService)
+        this.keyAgent =
+            new KeyAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      else
+        this.keyAgent =
+            new KeyAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
     return this.keyAgent;
   }
 
