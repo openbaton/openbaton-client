@@ -40,7 +40,7 @@ task logDebianPackageJavaDependency() {
 }
 
 task makeDeb(type: Deb, dependsOn: [jar, build, logDebianPackageJavaDependency]) {
-    packageName = (applicationRelease) ? "${fullName}-${versionName}" : "${fullName}-${versionName}-nightly"
+    packageName = (applicationRelease) ? "${fullName}" : "${fullName}-nightly"
     version = debianApplicationVersionFull
     //release = 1 
     priority = 'optional'
@@ -77,21 +77,5 @@ task makeDeb(type: Deb, dependsOn: [jar, build, logDebianPackageJavaDependency])
         into '/usr/bin/'
         rename("openbaton.sh", "openbaton")
     }
-}
-
-task makeMetaDeb(type: Deb) {
-    packageName = (applicationRelease) ? "${fullName}" : "${fullName}-nightly"
-    version = debianApplicationVersionFull
-    //release = 1 
-    priority = 'optional'
-    arch = 'all'
-    maintainer = 'Open Baton Team <dev@openbaton.org>'
-    vendor = 'Open Source (Implemented by Fraunhofer FOKUS and TUB)'
-    license = 'Apache 2.0 License'
-    url = 'http://openbaton.github.io/index.html'
-    summary = 'Open Baton Command Line Interface (CLI) (metapackage depending on the latest version)'
-    packageDescription = 'The Open Baton CLI is a feature of the Open Baton project, which is an ETSI compliant implementation of a NFV Management and Orchestration (MANO). It allows to use the Open Baton NFVO\'s API and send commands to it.'
-
-    requires("${fullName}-${version}")
 }
 
