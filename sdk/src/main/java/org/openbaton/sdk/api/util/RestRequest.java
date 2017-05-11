@@ -30,6 +30,9 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.Key;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -52,6 +55,7 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -63,13 +67,19 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.openbaton.catalogue.nfvo.VNFPackage;
 import org.openbaton.sdk.api.exception.SDKException;
+import org.openbaton.utils.key.KeyHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** OpenBaton api request abstraction for all requester. Shares common data and methods. */
 public abstract class RestRequest {
+
+  private static final String KEY_FILE_PATH = "/etc/openbaton/service-key";
+  private static final String SDK_PROPERTIES_FILE = "sdk.api.properties";
+
   private Logger log = LoggerFactory.getLogger(this.getClass());
   protected final String baseUrl;
+  protected final String pathUrl;
 
   //	protected final String url;
 
@@ -78,7 +88,8 @@ public abstract class RestRequest {
   private String password;
   private boolean isService;
   private String serviceName;
-  private ServiceRequestor serviceRequestor;
+  private String serviceTokenUrl;
+  private static final PropertyReader propertyReader = new PropertyReader(SDK_PROPERTIES_FILE);
 
   public String getProjectId() {
     return projectId;
@@ -120,15 +131,12 @@ public abstract class RestRequest {
       String nfvoPort,
       String path,
       String version) {
-    String apiUrl;
     if (sslEnabled) {
-      apiUrl = "https://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
-      this.baseUrl = apiUrl + path;
+      this.baseUrl = "https://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
       this.provider = "https://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
       this.httpClient = getHttpClientForSsl();
     } else {
-      apiUrl = "http://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
-      this.baseUrl = apiUrl + path;
+      this.baseUrl = "http://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
       this.provider = "http://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
       this.httpClient =
           HttpClientBuilder.create()
@@ -136,6 +144,8 @@ public abstract class RestRequest {
               .setConnectionManager(new PoolingHttpClientConnectionManager())
               .build();
     }
+    this.pathUrl = this.baseUrl + path;
+    this.serviceTokenUrl = this.baseUrl + propertyReader.getRestUrl("Service") + "/register";
     this.username = username;
     this.password = password;
     this.isService = false;
@@ -169,15 +179,12 @@ public abstract class RestRequest {
       String nfvoPort,
       String path,
       String version) {
-    String apiUrl;
     if (sslEnabled) {
-      apiUrl = "https://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
-      this.baseUrl = apiUrl + path;
+      this.baseUrl = "https://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
       this.provider = "https://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
       this.httpClient = getHttpClientForSsl();
     } else {
-      apiUrl = "http://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
-      this.baseUrl = apiUrl + path;
+      this.baseUrl = "http://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
       this.provider = "http://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
       this.httpClient =
           HttpClientBuilder.create()
@@ -185,9 +192,10 @@ public abstract class RestRequest {
               .setConnectionManager(new PoolingHttpClientConnectionManager())
               .build();
     }
+    this.pathUrl = this.baseUrl + path;
+    this.serviceTokenUrl = this.baseUrl + propertyReader.getRestUrl("Service") + "/register";
     this.serviceName = serviceName;
     this.isService = true;
-    this.serviceRequestor = new ServiceRequestor(httpClient, apiUrl);
     this.projectId = projectId;
 
     GsonBuilder builder = new GsonBuilder();
@@ -210,14 +218,14 @@ public abstract class RestRequest {
     CloseableHttpResponse response = null;
     HttpPost httpPost = null;
     try {
-      log.debug("baseUrl: " + baseUrl);
-      log.debug("id: " + baseUrl + "/" + id);
+      log.debug("pathUrl: " + pathUrl);
+      log.debug("id: " + pathUrl + "/" + id);
 
       checkToken();
 
       // call the api here
-      log.debug("Executing post on: " + this.baseUrl + "/" + id);
-      httpPost = new HttpPost(this.baseUrl + "/" + id);
+      log.debug("Executing post on: " + this.pathUrl + "/" + id);
+      httpPost = new HttpPost(this.pathUrl + "/" + id);
       preparePostHeader(httpPost, "application/json", "application/json");
 
       response = httpClient.execute(httpPost);
@@ -286,14 +294,14 @@ public abstract class RestRequest {
       else fileJSONNode = mapper.toJson(object);
 
       log.trace("sending: " + fileJSONNode.toString());
-      log.debug("baseUrl: " + baseUrl);
-      log.debug("id: " + baseUrl + "/" + id);
+      log.debug("pathUrl: " + pathUrl);
+      log.debug("id: " + pathUrl + "/" + id);
 
       checkToken();
 
       // call the api here
-      log.debug("Executing post on: " + this.baseUrl + "/" + id);
-      httpPost = new HttpPost(this.baseUrl + "/" + id);
+      log.debug("Executing post on: " + this.pathUrl + "/" + id);
+      httpPost = new HttpPost(this.pathUrl + "/" + id);
       preparePostHeader(httpPost, acceptMime, contentMime);
       httpPost.setEntity(new StringEntity(fileJSONNode));
 
@@ -356,14 +364,14 @@ public abstract class RestRequest {
     else fileJSONNode = mapper.toJson(object);
 
     log.trace("sending: " + fileJSONNode.toString());
-    log.debug("baseUrl: " + baseUrl);
-    log.debug("id: " + baseUrl + "/" + id);
+    log.debug("pathUrl: " + pathUrl);
+    log.debug("id: " + pathUrl + "/" + id);
 
     checkToken();
 
     // call the api here
-    log.debug("Executing post on: " + this.baseUrl + "/" + id);
-    httpPost = new HttpPost(this.baseUrl + "/" + id);
+    log.debug("Executing post on: " + this.pathUrl + "/" + id);
+    httpPost = new HttpPost(this.pathUrl + "/" + id);
     preparePostHeader(httpPost, acceptMimeType, contentMimeType);
     httpPost.setEntity(new StringEntity(fileJSONNode));
 
@@ -381,14 +389,14 @@ public abstract class RestRequest {
       else fileJSONNode = mapper.toJson(object);
 
       log.trace("sending: " + fileJSONNode.toString());
-      log.debug("baseUrl: " + baseUrl);
-      log.debug("id: " + baseUrl + "/" + id);
+      log.debug("pathUrl: " + pathUrl);
+      log.debug("id: " + pathUrl + "/" + id);
 
       checkToken();
 
       // call the api here
-      log.debug("Executing post on: " + this.baseUrl + "/" + id);
-      httpPost = new HttpPost(this.baseUrl + "/" + id);
+      log.debug("Executing post on: " + this.pathUrl + "/" + id);
+      httpPost = new HttpPost(this.pathUrl + "/" + id);
       if (!(object instanceof String)) {
         preparePostHeader(httpPost, "application/json", "application/json");
       } else {
@@ -457,14 +465,14 @@ public abstract class RestRequest {
       log.trace("Object is: " + object);
       String fileJSONNode = mapper.toJson(object);
       log.trace("sending: " + fileJSONNode.toString());
-      log.debug("baseUrl: " + baseUrl);
-      log.debug("id: " + baseUrl + "/" + id);
+      log.debug("pathUrl: " + pathUrl);
+      log.debug("id: " + pathUrl + "/" + id);
 
       checkToken();
 
       // call the api here
-      log.debug("Executing post on: " + this.baseUrl + "/" + id);
-      httpPost = new HttpPost(this.baseUrl + "/" + id);
+      log.debug("Executing post on: " + this.pathUrl + "/" + id);
+      httpPost = new HttpPost(this.pathUrl + "/" + id);
       preparePostHeader(httpPost, "application/json", "application/json");
       httpPost.setEntity(new StringEntity(fileJSONNode));
 
@@ -532,8 +540,8 @@ public abstract class RestRequest {
 
     try {
       checkToken();
-      log.debug("Executing post on " + baseUrl);
-      httpPost = new HttpPost(this.baseUrl);
+      log.debug("Executing post on " + pathUrl);
+      httpPost = new HttpPost(this.pathUrl);
       preparePostHeader(httpPost, "multipart/form-data", null);
 
       MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
@@ -610,14 +618,14 @@ public abstract class RestRequest {
     CloseableHttpResponse response = null;
     HttpDelete httpDelete = null;
     try {
-      log.debug("baseUrl: " + baseUrl);
-      log.debug("id: " + baseUrl + "/" + id);
+      log.debug("pathUrl: " + pathUrl);
+      log.debug("id: " + pathUrl + "/" + id);
 
       checkToken();
 
       // call the api here
-      log.info("Executing delete on: " + this.baseUrl + "/" + id);
-      httpDelete = new HttpDelete(this.baseUrl + "/" + id);
+      log.info("Executing delete on: " + this.pathUrl + "/" + id);
+      httpDelete = new HttpDelete(this.pathUrl + "/" + id);
       httpDelete.setHeader(new BasicHeader("project-id", projectId));
       if (token != null)
         httpDelete.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
@@ -654,7 +662,7 @@ public abstract class RestRequest {
    * @return a string containing he response content
    */
   public Object requestGet(final String id, Class type) throws SDKException {
-    String url = this.baseUrl;
+    String url = this.pathUrl;
     if (id != null) {
       url += "/" + id;
       return requestGetWithStatus(url, null, type);
@@ -662,7 +670,7 @@ public abstract class RestRequest {
   }
 
   protected Object requestGetAll(String url, Class type) throws SDKException {
-    url = this.baseUrl + "/" + url;
+    url = this.pathUrl + "/" + url;
     return requestGetAll(url, type, null);
   }
 
@@ -805,7 +813,7 @@ public abstract class RestRequest {
    * @return a string containing the response content
    */
   public Object requestGetWithStatusAccepted(String url, Class type) throws SDKException {
-    url = this.baseUrl + "/" + url;
+    url = this.pathUrl + "/" + url;
     return requestGetWithStatus(url, new Integer(HttpURLConnection.HTTP_ACCEPTED), type);
   }
 
@@ -827,8 +835,8 @@ public abstract class RestRequest {
       checkToken();
 
       // call the api here
-      log.debug("Executing put on: " + this.baseUrl + "/" + id);
-      httpPut = new HttpPut(this.baseUrl + "/" + id);
+      log.debug("Executing put on: " + this.pathUrl + "/" + id);
+      httpPut = new HttpPut(this.pathUrl + "/" + id);
       httpPut.setHeader(new BasicHeader("accept", "application/json"));
       httpPut.setHeader(new BasicHeader("Content-Type", "application/json"));
       httpPut.setHeader(new BasicHeader("project-id", projectId));
@@ -884,17 +892,41 @@ public abstract class RestRequest {
   }
 
   private void getAccessToken() throws IOException, SDKException {
-    HttpPost httpPost = new HttpPost(provider);
-    httpPost.setHeader("Authorization", "Basic " + encoding);
     if (isService) {
       try {
-        this.token = serviceRequestor.requestRegisterService(this.serviceName);
+        log.debug("Registering Service " + serviceName);
+        byte[] key_data = Files.readAllBytes(Paths.get(KEY_FILE_PATH));
+        Key key = KeyHelper.restoreKey(key_data);
+        byte[] encryptedMessage =
+            KeyHelper.encrypt("{\"name\":\"" + serviceName + "\",\"action\":\"register\"}", key);
+
+        CloseableHttpResponse response = null;
+        HttpPost httpPost = new HttpPost(this.serviceTokenUrl);
+        httpPost.setHeader(new BasicHeader("accept", "text/plain,application/json"));
+        httpPost.setHeader(new BasicHeader("Content-Type", "application/octet-stream"));
+
+        httpPost.setEntity(new ByteArrayEntity(encryptedMessage));
+
+        log.debug("Post: " + httpPost.getURI());
+        response = httpClient.execute(httpPost);
+        RestUtils.checkStatus(response, HttpURLConnection.HTTP_CREATED);
+        String encryptedToken = "";
+        if (response.getEntity() != null)
+          encryptedToken = EntityUtils.toString(response.getEntity());
+        response.close();
+        httpPost.releaseConnection();
+
+        String decryptedToken = KeyHelper.decrypt(encryptedToken, KeyHelper.restoreKey(key_data));
+        log.trace("Token is: " + decryptedToken);
+        this.token = decryptedToken;
+        this.bearerToken = "Bearer " + this.token;
       } catch (Exception e) {
         throw new SDKException(e);
       }
-      this.bearerToken = "Bearer " + this.token;
     } else {
 
+      HttpPost httpPost = new HttpPost(provider);
+      httpPost.setHeader("Authorization", "Basic " + encoding);
       List<BasicNameValuePair> parametersBody = new ArrayList<>();
       parametersBody.add(new BasicNameValuePair("grant_type", "password"));
       parametersBody.add(new BasicNameValuePair("username", this.username));
