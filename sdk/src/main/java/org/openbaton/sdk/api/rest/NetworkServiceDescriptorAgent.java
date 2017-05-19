@@ -19,7 +19,6 @@ package org.openbaton.sdk.api.rest;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.mano.common.Security;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;

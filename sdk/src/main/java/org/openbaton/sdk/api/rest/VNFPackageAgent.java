@@ -18,7 +18,6 @@
 package org.openbaton.sdk.api.rest;
 
 import java.io.File;
-
 import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.nfvo.VNFPackage;
 import org.openbaton.sdk.api.annotations.Help;

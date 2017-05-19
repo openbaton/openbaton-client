@@ -18,7 +18,6 @@
 package org.openbaton.sdk.api.rest;
 
 import java.util.HashMap;
-
 import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.security.User;
 import org.openbaton.sdk.api.annotations.Help;
