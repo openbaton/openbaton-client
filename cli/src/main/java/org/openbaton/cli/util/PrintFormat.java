@@ -207,7 +207,8 @@ public class PrintFormat {
                   objectHash.add(lvlDown);
 
                 } else {
-                  objectHash = (Set<Object>) lvlDown;
+                  if (lvlDown instanceof ArrayList) objectHash = new HashSet<>((ArrayList) lvlDown);
+                  else objectHash = (Set<Object>) lvlDown;
                 }
 
                 for (Object obj : objectHash) {
