@@ -52,7 +52,8 @@ public class PrintFormat {
       if (!command.contains("delete")
           && !command.contains("changePassword")
           && !command.contains("startVNFCInstance")
-          && !command.contains("stopVNFCInstance")) {
+          && !command.contains("stopVNFCInstance")
+          && !command.contains("createVNFCInstance")) {
         result = "Error: invalid command line";
       }
       return result;
