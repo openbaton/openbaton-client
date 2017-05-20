@@ -17,7 +17,6 @@
 
 package org.openbaton.sdk;
 
-import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.security.Project;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.openbaton.sdk.api.rest.*;
@@ -27,9 +26,8 @@ import org.openbaton.sdk.api.rest.*;
  * get methods and provide methods for sending requests to the NFVO API. The agents have the same
  * configuration as the NFVORequestor object from which they are obtained. In this way it is easier
  * to get the appropriate agents that are needed without calling the particular constructors each
- * time.
+ * time. The NFVORequestor class is thread safe.
  */
-@ThreadSafe
 public final class NFVORequestor {
 
   private String username;

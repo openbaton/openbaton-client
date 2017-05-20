@@ -17,15 +17,13 @@
 
 package org.openbaton.sdk.api.rest;
 
-import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.mano.descriptor.VirtualLinkDescriptor;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
  * This class is a Rest Request Agent for sending requests regarding VirtualLink objects to the NFVO
- * API.
+ * API. It is thread safe.
  */
-@ThreadSafe
 public class VirtualLinkAgent extends AbstractRestAgent<VirtualLinkDescriptor> {
 
   /**

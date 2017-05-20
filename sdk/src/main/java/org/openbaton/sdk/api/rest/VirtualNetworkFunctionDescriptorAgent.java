@@ -17,15 +17,13 @@
 
 package org.openbaton.sdk.api.rest;
 
-import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
  * This class is a Rest Request Agent for sending requests regarding
- * VirtualNetworkFunctionDescriptor objects to the NFVO API.
+ * VirtualNetworkFunctionDescriptor objects to the NFVO API. It is thread safe.
  */
-@ThreadSafe
 public class VirtualNetworkFunctionDescriptorAgent
     extends AbstractRestAgent<VirtualNetworkFunctionDescriptor> {
 

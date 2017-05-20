@@ -17,14 +17,13 @@
 
 package org.openbaton.sdk.api.rest;
 
-import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.mano.descriptor.VNFForwardingGraphDescriptor;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
  * This class is a Rest Request Agent for sending requests regarding VNFFG objects to the NFVO API.
+ * It is thread safe.
  */
-@ThreadSafe
 public class VNFFGAgent extends AbstractRestAgent<VNFForwardingGraphDescriptor> {
 
   /**

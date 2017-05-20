@@ -17,15 +17,13 @@
 
 package org.openbaton.sdk.api.rest;
 
-import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.nfvo.VimInstance;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
  * This class is a Rest Request Agent for sending requests regarding VimInstance objects to the NFVO
- * API.
+ * API. It is thread safe.
  */
-@ThreadSafe
 public class VimInstanceAgent extends AbstractRestAgent<VimInstance> {
 
   /**
