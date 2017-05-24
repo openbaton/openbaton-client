@@ -19,9 +19,7 @@ package org.openbaton.sdk.api.annotations;
 
 import java.lang.annotation.*;
 
-/**
- * Created by lto on 14/07/15.
- */
+/** Created by lto on 14/07/15. */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 @Inherited

@@ -17,20 +17,27 @@
 
 package org.openbaton.sdk.api.rest;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import java.util.HashMap;
 import org.openbaton.catalogue.security.User;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
-import java.util.HashMap;
-
 /**
- * OpenBaton user-related api requester.
+ * This class is a Rest Request Agent for sending requests regarding User objects to the NFVO API.
+ * It is thread safe.
  */
 public class UserAgent extends AbstractRestAgent<User> {
 
+  /**
+   * @param username the username used for sending requests
+   * @param password the password used for sending requests
+   * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
+   * @param sslEnabled true if the NFVO uses SSL
+   * @param nfvoIp the IP address of the NFVO to which the requests are sent
+   * @param nfvoPort the port on which the NFVO runs
+   * @param version the API version
+   */
   public UserAgent(
       String username,
       String password,
@@ -38,22 +45,41 @@ public class UserAgent extends AbstractRestAgent<User> {
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String path,
       String version) {
-    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, path, version, User.class);
+    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, User.class);
   }
 
+  /**
+   * Use findByName instead.
+   *
+   * @param id
+   * @return null
+   */
   @Override
   @Deprecated
   public User findById(String id) {
     return null;
   }
 
+  /**
+   * Returns a User specified by his username.
+   *
+   * @param name the username
+   * @return the User
+   * @throws SDKException
+   */
   @Help(help = "Find a User by his name")
   public User findByName(String name) throws SDKException {
     return (User) requestGet(name, User.class);
   }
 
+  /**
+   * Changes a User's password.
+   *
+   * @param oldPassword the User's old password
+   * @param newPassword the User's new password
+   * @throws SDKException
+   */
   @Help(help = "Change a user's password")
   public void changePassword(String oldPassword, String newPassword) throws SDKException {
     HashMap<String, String> requestBody = new HashMap<>();

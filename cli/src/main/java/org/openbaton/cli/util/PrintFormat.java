@@ -17,6 +17,10 @@
 
 package org.openbaton.cli.util;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openbaton.cli.model.GeneralName;
@@ -25,15 +29,10 @@ import org.openbaton.cli.model.GeneralVimInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
-
 /**
  * Created by tce on 25.08.15.
  *
- * Used to print out the results of a cli command to the console.
+ * <p>Used to print out the results of a cli command to the console.
  */
 public class PrintFormat {
 

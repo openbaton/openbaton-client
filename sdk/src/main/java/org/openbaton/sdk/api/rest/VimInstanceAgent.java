@@ -17,38 +17,32 @@
 
 package org.openbaton.sdk.api.rest;
 
-import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
+import org.openbaton.catalogue.nfvo.VimInstance;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
- * OpenBaton VirtualNetworkFunctionDescriptor-related api requester.
+ * This class is a Rest Request Agent for sending requests regarding VimInstance objects to the NFVO
+ * API. It is thread safe.
  */
-public class VirtualNetworkFunctionDescriptorRestAgent
-    extends AbstractRestAgent<VirtualNetworkFunctionDescriptor> {
+public class VimInstanceAgent extends AbstractRestAgent<VimInstance> {
 
   /**
-   * Create a VirtualNetworkFunctionDescriptor requester with a given url path
-   *
-   * @param nfvoIp the url path used for the api requests
+   * @param username the username used for sending requests
+   * @param password the password used for sending requests
+   * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
+   * @param sslEnabled true if the NFVO uses SSL
+   * @param nfvoIp the IP address of the NFVO to which the requests are sent
+   * @param nfvoPort the port on which the NFVO runs
+   * @param version the API version
    */
-  public VirtualNetworkFunctionDescriptorRestAgent(
+  public VimInstanceAgent(
       String username,
       String password,
       String projectId,
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String path,
       String version) {
-    super(
-        username,
-        password,
-        projectId,
-        sslEnabled,
-        nfvoIp,
-        nfvoPort,
-        path,
-        version,
-        VirtualNetworkFunctionDescriptor.class);
+    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, VimInstance.class);
   }
 }

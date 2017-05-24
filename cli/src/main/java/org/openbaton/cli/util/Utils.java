@@ -17,13 +17,10 @@
 
 package org.openbaton.cli.util;
 
+import java.lang.reflect.Method;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.lang.reflect.Method;
-
-/**
- * Created by tbr on 26.05.16.
- */
+/** Created by tbr on 26.05.16. */
 public class Utils {
 
   /**

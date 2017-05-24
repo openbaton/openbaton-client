@@ -21,33 +21,29 @@ import org.openbaton.catalogue.nfvo.Configuration;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
- * OpenBaton configuration-related api requester.
+ * This class is a Rest Request Agent for sending requests regarding Configuration objects to the
+ * NFVO API. It is thread safe.
  */
-public class ConfigurationRestRequest extends AbstractRestAgent<Configuration> {
+public class ConfigurationAgent extends AbstractRestAgent<Configuration> {
 
   /**
-   * Create a configuration requester with a given url path
-   *
-   * @param url the url path used for the api requests
+   * @param username the username used for sending requests
+   * @param password the password used for sending requests
+   * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
+   * @param sslEnabled true if the NFVO uses SSL
+   * @param nfvoIp the IP address of the NFVO to which the requests are sent
+   * @param nfvoPort the port on which the NFVO runs
+   * @param version the API version
    */
-  public ConfigurationRestRequest(
+  public ConfigurationAgent(
       String username,
       String password,
       String projectId,
       boolean sslEnabled,
-      String url,
       String nfvoIp,
       String nfvoPort,
       String version) {
     super(
-        username,
-        password,
-        projectId,
-        sslEnabled,
-        nfvoIp,
-        nfvoPort,
-        url,
-        version,
-        Configuration.class);
+        username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, Configuration.class);
   }
 }

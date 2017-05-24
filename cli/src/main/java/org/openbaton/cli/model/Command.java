@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 /**
  * Created by lto on 14/07/15.
  *
- * This class represents a user's command from the cli.
+ * <p>This class represents a user's command from the cli.
  */
 public class Command {
 

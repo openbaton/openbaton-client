@@ -19,8 +19,6 @@ package org.openbaton.sdk.api.exception;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-
 import java.lang.Exception;
 import java.lang.Throwable;
 
@@ -53,7 +51,7 @@ public class SDKException extends Exception {
   private String reason;
 
   /**
-   * Creates an sdk exeption with an exception message as string
+   * Creates an SDKException with an Exception message as String.
    *
    * @param message custom message
    */
@@ -64,7 +62,7 @@ public class SDKException extends Exception {
   }
 
   /**
-   * Creates an sdk exeption with a throwable cause
+   * Creates an SDKException with a throwable cause.
    *
    * @param cause the throwable cause
    */
