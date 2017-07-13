@@ -17,18 +17,23 @@
 
 package org.openbaton.sdk.api.rest;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import org.openbaton.catalogue.mano.descriptor.VNFComponent;
-import org.openbaton.catalogue.mano.record.*;
+import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
+import org.openbaton.catalogue.mano.record.PhysicalNetworkFunctionRecord;
+import org.openbaton.catalogue.mano.record.VNFCInstance;
+import org.openbaton.catalogue.mano.record.VNFRecordDependency;
+import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 import org.openbaton.catalogue.nfvo.Configuration;
 import org.openbaton.catalogue.nfvo.messages.Interfaces.NFVMessage;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * This class is a Rest Request Agent for sending requests regarding NetworkServiceRecord objects to
@@ -141,14 +146,18 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    *     added
    * @param idVdu the ID of the VirtualDeploymentUnit to which the VNFCInstance shall be added
    * @param vnfComponent the VNFComponent from which the VNFCInstance shall be created
+   * @param vimInstanceNames the list of vimInstanceNames where you want to deploy the new vnf component
    * @throws SDKException
    */
   @Help(help = "Create VNFCInstance in standby")
   public void createVNFCInstanceInStandby(
-      final String idNsr, final String idVnfr, final String idVdu, final VNFComponent vnfComponent)
+      final String idNsr, final String idVnfr, final String idVdu, final VNFComponent vnfComponent, ArrayList<String> vimInstanceNames)
       throws SDKException {
     String url = idNsr + "/vnfrecords/" + idVnfr + "/vdunits/" + idVdu + "/vnfcinstances/standby";
-    requestPost(url, vnfComponent);
+    HashMap<String, Serializable> body = new HashMap<>();
+    body.put("vnfComponent", vnfComponent);
+    body.put("vimInstanceNames", vimInstanceNames);
+    requestPost(url, body);
   }
 
   /**
@@ -238,14 +247,18 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idVnfr the ID of the VirtualNetworkFunctionRecord to which the new VNFCInstance shall be
    *     added
    * @param vnfComponent the VNFComponent from which the new VNFCInstance shall be created
+   * @param vimInstanceNames the list of vimInstanceNames where you want to deploy the new vnf component
    * @throws SDKException
    */
   @Help(help = "create VNFCInstance. Aka SCALE OUT")
   public void createVNFCInstance(
-      final String idNsr, final String idVnfr, final VNFComponent vnfComponent)
+      final String idNsr, final String idVnfr, final VNFComponent vnfComponent, ArrayList<String> vimInstanceNames)
       throws SDKException {
     String url = idNsr + "/vnfrecords/" + idVnfr + "/vdunits/vnfcinstances";
-    requestPost(url, vnfComponent);
+    HashMap<String, Serializable> body = new HashMap<>();
+    body.put("vnfComponent", vnfComponent);
+    body.put("vimInstanceNames", vimInstanceNames);
+    requestPost(url, body);
   }
 
   /**
@@ -257,14 +270,18 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    *     added
    * @param idVdu the VirtualDeploymentUnit to which the new VNFCInstance shall be added
    * @param vnfComponent the VNFComponent from which the new VNFCInstance shall be created
+   * @param vimInstanceNames the list of vimInstanceNames where you want to deploy the new vnf component
    * @throws SDKException
    */
   @Help(help = "create VNFCInstance. Aka SCALE OUT")
   public void createVNFCInstance(
-      final String idNsr, final String idVnfr, final String idVdu, final VNFComponent vnfComponent)
+      final String idNsr, final String idVnfr, final String idVdu, final VNFComponent vnfComponent, ArrayList<String> vimInstanceNames)
       throws SDKException {
     String url = idNsr + "/vnfrecords/" + idVnfr + "/vdunits/" + idVdu + "/vnfcinstances";
-    requestPost(url, vnfComponent);
+    HashMap<String, Serializable> body = new HashMap<>();
+    body.put("vnfComponent", vnfComponent);
+    body.put("vimInstanceNames", vimInstanceNames);
+    requestPost(url, body);
   }
 
   /**

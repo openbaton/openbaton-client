@@ -264,7 +264,13 @@ Of course you do not have to specify VIMs, keys and configurations. If you do no
 *  **createVNFCInstance**                                      
   * Add a VNFCInstance to a VNF by performing a SCALE_OUT operation on the VNF
   ```sh
-  $ openbaton.sh NetworkServiceRecord-createVNFCInstance id-network-service-record id-virtual-network-function-record file.json
+  $ openbaton.sh NetworkServiceRecord-createVNFCInstance id-network-service-record id-virtual-network-function-record vnfcomponent-file.json vim-list-file.json
+  ```
+  
+*  **createVNFCInstance**                                      
+  * Add a VNFCInstance to a specific VDU by performing a SCALE_OUT operation on the VNF
+  ```sh
+  $ openbaton.sh NetworkServiceRecord-createVNFCInstance id-network-service-record id-virtual-network-function-record id-vdu vnfcomponent-file.json vim-list-file.json
   ```
   
 *  **deleteVNFCInstance**
