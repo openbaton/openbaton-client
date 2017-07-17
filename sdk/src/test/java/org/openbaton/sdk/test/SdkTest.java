@@ -19,9 +19,7 @@ package org.openbaton.sdk.test;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.HashSet;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
@@ -30,13 +28,21 @@ import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.PhysicalNetworkFunctionRecord;
 import org.openbaton.catalogue.mano.record.VNFRecordDependency;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
+import org.openbaton.catalogue.nfvo.Action;
+import org.openbaton.catalogue.nfvo.EndpointType;
+import org.openbaton.catalogue.nfvo.EventEndpoint;
 import org.openbaton.catalogue.nfvo.Location;
 import org.openbaton.catalogue.nfvo.VimInstance;
 import org.openbaton.catalogue.security.Project;
 import org.openbaton.sdk.NFVORequestor;
 import org.openbaton.sdk.api.exception.SDKException;
+import org.openbaton.sdk.api.rest.EventAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.HashSet;
 
 /** Created by lto on 03/07/15. */
 public class SdkTest {
@@ -62,6 +68,15 @@ public class SdkTest {
           projectId = project.getId();
         }
       }
+
+      EventAgent eventAgent = requestor.getEventAgent();
+      EventEndpoint eventEndpoint = new EventEndpoint();
+      eventEndpoint.setEvent(Action.INSTANTIATE_FINISH);
+      eventEndpoint.setName("name");
+      eventEndpoint.setType(EndpointType.REST);
+      eventEndpoint.setEndpoint("http://localhost:8080/event");
+      eventAgent.create(eventEndpoint);
+
     } catch (SDKException e) {
       e.printStackTrace();
     } catch (ClassNotFoundException e) {

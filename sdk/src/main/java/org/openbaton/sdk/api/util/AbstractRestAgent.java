@@ -17,13 +17,14 @@
 
 package org.openbaton.sdk.api.util;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class can be extended by explicit request agents which then obtain methods for sending
