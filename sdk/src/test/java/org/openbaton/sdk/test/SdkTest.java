@@ -19,7 +19,9 @@ package org.openbaton.sdk.test;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.HashSet;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
@@ -39,10 +41,6 @@ import org.openbaton.sdk.api.exception.SDKException;
 import org.openbaton.sdk.api.rest.EventAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.HashSet;
 
 /** Created by lto on 03/07/15. */
 public class SdkTest {
