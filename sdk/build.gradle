@@ -16,12 +16,13 @@
  */
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots/"
     }
     maven {
-                 url "https://oss.sonatype.org/content/repositories/releases/"
+        url "https://oss.sonatype.org/content/repositories/releases/"
     }
 }
 
@@ -36,16 +37,11 @@ test {
 }
 
 dependencies {
-    compile 'org.openbaton:catalogue:3.2.3-SNAPSHOT'
-
+    compile 'org.openbaton:catalogue:4.0.0'
     compile 'org.slf4j:slf4j-api:1.7.12'
-
     compile 'com.google.code.gson:gson:2.5'
-
     compile 'com.mashape.unirest:unirest-java:1.4.5'
-
     compile 'net.minidev:json-smart:2.2'
-
     compile 'org.apache.httpcomponents:httpclient:4.5.2'
 
     testCompile 'org.slf4j:slf4j-api:1.7.12'
