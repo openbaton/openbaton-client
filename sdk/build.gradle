@@ -36,7 +36,8 @@ test {
 }
 
 dependencies {
-    compile 'org.openbaton:catalogue:4.0.0'
+    compile 'org.openbaton:catalogue:4.0.1-SNAPSHOT'
+    compile 'org.openbaton:utils:4.0.1-SNAPSHOT'
 
     compile 'org.slf4j:slf4j-api:1.7.12'
     compile 'com.google.code.gson:gson:2.5'
