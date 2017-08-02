@@ -19,7 +19,8 @@ package org.openbaton.sdk.test;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
+import java.io.FileNotFoundException;
+import java.util.HashSet;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
@@ -35,9 +36,6 @@ import org.openbaton.sdk.NFVORequestor;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.FileNotFoundException;
-import java.util.HashSet;
 
 /** Created by lto on 03/07/15. */
 public class SdkTest {
@@ -56,8 +54,13 @@ public class SdkTest {
     NFVORequestor requestor = null;
     try {
       requestor =
-          new NFVORequestor("autoscaling-engine", "017175e7-807c-41e5-b5bd-8b5d4871a909", false, "localhost", "8080",
-                            "1");
+          new NFVORequestor(
+              "autoscaling-engine",
+              "017175e7-807c-41e5-b5bd-8b5d4871a909",
+              false,
+              "localhost",
+              "8080",
+              "1");
     } catch (SDKException e) {
       e.printStackTrace();
     }
@@ -70,13 +73,13 @@ public class SdkTest {
         }
       }
 
-//      EventAgent eventAgent = requestor.getEventAgent();
-//      EventEndpoint eventEndpoint = new EventEndpoint();
-//      eventEndpoint.setEvent(Action.INSTANTIATE_FINISH);
-//      eventEndpoint.setName("name");
-//      eventEndpoint.setType(EndpointType.REST);
-//      eventEndpoint.setEndpoint("http://localhost:8080/event");
-//      eventAgent.create(eventEndpoint);
+      //      EventAgent eventAgent = requestor.getEventAgent();
+      //      EventEndpoint eventEndpoint = new EventEndpoint();
+      //      eventEndpoint.setEvent(Action.INSTANTIATE_FINISH);
+      //      eventEndpoint.setName("name");
+      //      eventEndpoint.setType(EndpointType.REST);
+      //      eventEndpoint.setEndpoint("http://localhost:8080/event");
+      //      eventAgent.create(eventEndpoint);
 
     } catch (SDKException e) {
       e.printStackTrace();
@@ -85,50 +88,50 @@ public class SdkTest {
       System.exit(1);
     }
 
-//    requestor = new NFVORequestor("admin", "openbaton", projectId, false, "localhost", "8080", "1");
-//
-//    /** VimInsance */
-//    vimInstance = createVimInstance();
-//
-//    //    System.out.println(gson.toJson(vimInstance));
-//    try {
-//      vimInstance = requestor.getVimInstanceAgent().create(vimInstance);
-//    } catch (SDKException e) {
-//      e.printStackTrace();
-//      System.err.println("Reason: " + e.getReason());
-//      System.exit(1);
-//    }
-//    log.debug("Result is: " + vimInstance);
-//
-//    /** Descriptors */
-//    NetworkServiceDescriptor networkServiceDescriptor =
-//        gson.fromJson(new FileReader(descriptorFileName), NetworkServiceDescriptor.class);
-//    log.debug("Sending: " + networkServiceDescriptor.getName());
-//    NetworkServiceDescriptor res2 = null;
-//    try {
-//      res2 = requestor.getNetworkServiceDescriptorAgent().create(networkServiceDescriptor);
-//    } catch (SDKException e) {
-//      e.printStackTrace();
-//      System.err.println("Reason: " + e.getReason());
-//      System.exit(2);
-//    }
-//    System.out.println("DESCRIPTOR: " + res2);
-//
-//    try {
-//      requestor.getNetworkServiceDescriptorAgent().delete(res2.getId());
-//    } catch (SDKException e) {
-//      e.printStackTrace();
-//      System.err.println("Reason: " + e.getReason());
-//      System.exit(2);
-//    }
-//
-//    try {
-//      requestor.getVimInstanceAgent().delete(vimInstance.getId());
-//    } catch (SDKException e) {
-//      e.printStackTrace();
-//      System.err.println("Reason: " + e.getReason());
-//      System.exit(2);
-//    }
+    //    requestor = new NFVORequestor("admin", "openbaton", projectId, false, "localhost", "8080", "1");
+    //
+    //    /** VimInsance */
+    //    vimInstance = createVimInstance();
+    //
+    //    //    System.out.println(gson.toJson(vimInstance));
+    //    try {
+    //      vimInstance = requestor.getVimInstanceAgent().create(vimInstance);
+    //    } catch (SDKException e) {
+    //      e.printStackTrace();
+    //      System.err.println("Reason: " + e.getReason());
+    //      System.exit(1);
+    //    }
+    //    log.debug("Result is: " + vimInstance);
+    //
+    //    /** Descriptors */
+    //    NetworkServiceDescriptor networkServiceDescriptor =
+    //        gson.fromJson(new FileReader(descriptorFileName), NetworkServiceDescriptor.class);
+    //    log.debug("Sending: " + networkServiceDescriptor.getName());
+    //    NetworkServiceDescriptor res2 = null;
+    //    try {
+    //      res2 = requestor.getNetworkServiceDescriptorAgent().create(networkServiceDescriptor);
+    //    } catch (SDKException e) {
+    //      e.printStackTrace();
+    //      System.err.println("Reason: " + e.getReason());
+    //      System.exit(2);
+    //    }
+    //    System.out.println("DESCRIPTOR: " + res2);
+    //
+    //    try {
+    //      requestor.getNetworkServiceDescriptorAgent().delete(res2.getId());
+    //    } catch (SDKException e) {
+    //      e.printStackTrace();
+    //      System.err.println("Reason: " + e.getReason());
+    //      System.exit(2);
+    //    }
+    //
+    //    try {
+    //      requestor.getVimInstanceAgent().delete(vimInstance.getId());
+    //    } catch (SDKException e) {
+    //      e.printStackTrace();
+    //      System.err.println("Reason: " + e.getReason());
+    //      System.exit(2);
+    //    }
     /** Event */
 
     //    EventAgent eventAgent = requestor.getEventAgent();

@@ -23,7 +23,21 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mashape.unirest.http.JsonNode;
-
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.net.ssl.SSLContext;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
@@ -54,23 +68,6 @@ import org.openbaton.sdk.api.exception.SDKException;
 import org.openbaton.utils.key.KeyHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.net.ssl.SSLContext;
 
 /** OpenBaton api request abstraction for all requester. Shares common data and methods. */
 public abstract class RestRequest {
