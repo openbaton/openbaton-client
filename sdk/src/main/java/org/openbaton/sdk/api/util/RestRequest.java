@@ -23,22 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mashape.unirest.http.JsonNode;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.Key;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-import javax.net.ssl.SSLContext;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
@@ -55,7 +40,6 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -71,11 +55,29 @@ import org.openbaton.utils.key.KeyHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.net.ssl.SSLContext;
+
 /** OpenBaton api request abstraction for all requester. Shares common data and methods. */
 public abstract class RestRequest {
 
   private static final String KEY_FILE_PATH = "/etc/openbaton/service-key";
   private static final String SDK_PROPERTIES_FILE = "sdk.api.properties";
+  private String keyFilePath;
 
   private Logger log = LoggerFactory.getLogger(this.getClass());
   protected final String baseUrl;
@@ -152,11 +154,6 @@ public abstract class RestRequest {
     this.projectId = projectId;
 
     GsonBuilder builder = new GsonBuilder();
-    /*builder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
-        public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            return new Date(json.getAsJsonPrimitive().getAsLong());
-        }
-    });*/
     this.mapper = builder.setPrettyPrinting().create();
   }
 
@@ -199,12 +196,8 @@ public abstract class RestRequest {
     this.projectId = projectId;
 
     GsonBuilder builder = new GsonBuilder();
-    /*builder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
-        public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            return new Date(json.getAsJsonPrimitive().getAsLong());
-        }
-    });*/
     this.mapper = builder.setPrettyPrinting().create();
+    this.keyFilePath = propertyReader.getSimpleProperty("key-file-location", KEY_FILE_PATH);
   }
 
   /**
@@ -234,7 +227,9 @@ public abstract class RestRequest {
       RestUtils.checkStatus(response, HttpURLConnection.HTTP_CREATED);
       // return the response of the request
       String result = "";
-      if (response.getEntity() != null) result = EntityUtils.toString(response.getEntity());
+      if (response.getEntity() != null) {
+        result = EntityUtils.toString(response.getEntity());
+      }
       response.close();
       log.trace("received: " + result);
 
@@ -243,7 +238,9 @@ public abstract class RestRequest {
     } catch (IOException e) {
       // catch request exceptions here
       log.error(e.getMessage(), e);
-      if (httpPost != null) httpPost.releaseConnection();
+      if (httpPost != null) {
+        httpPost.releaseConnection();
+      }
       throw new SDKException(
           "Could not http-post or open the object properly",
           e.getStackTrace(),
@@ -251,10 +248,14 @@ public abstract class RestRequest {
     } catch (SDKException e) {
       if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
         token = null;
-        if (httpPost != null) httpPost.releaseConnection();
+        if (httpPost != null) {
+          httpPost.releaseConnection();
+        }
         return requestPost(id);
       } else {
-        if (httpPost != null) httpPost.releaseConnection();
+        if (httpPost != null) {
+          httpPost.releaseConnection();
+        }
         try {
           throw new SDKException(
               "Status is " + response.getStatusLine().getStatusCode(),
@@ -290,8 +291,11 @@ public abstract class RestRequest {
     try {
       log.trace("Object is: " + object);
       String fileJSONNode;
-      if (object instanceof String) fileJSONNode = (String) object;
-      else fileJSONNode = mapper.toJson(object);
+      if (object instanceof String) {
+        fileJSONNode = (String) object;
+      } else {
+        fileJSONNode = mapper.toJson(object);
+      }
 
       log.trace("sending: " + fileJSONNode.toString());
       log.debug("pathUrl: " + pathUrl);
@@ -311,13 +315,16 @@ public abstract class RestRequest {
       RestUtils.checkStatus(response, HttpURLConnection.HTTP_CREATED);
       // return the response of the request
       Serializable result = null;
-      if (response.getEntity() != null) result = EntityUtils.toByteArray(response.getEntity());
+      if (response.getEntity() != null) {
+        result = EntityUtils.toByteArray(response.getEntity());
+      }
       return result;
-
     } catch (IOException e) {
       // catch request exceptions here
       log.error(e.getMessage(), e);
-      if (httpPost != null) httpPost.releaseConnection();
+      if (httpPost != null) {
+        httpPost.releaseConnection();
+      }
       throw new SDKException(
           "Could not http-post or open the object properly",
           e.getStackTrace(),
@@ -326,7 +333,9 @@ public abstract class RestRequest {
       if (response != null
           && response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
         token = null;
-        if (httpPost != null) httpPost.releaseConnection();
+        if (httpPost != null) {
+          httpPost.releaseConnection();
+        }
         return requestPost(id);
       } else if (response != null) {
         throw e;
@@ -344,13 +353,16 @@ public abstract class RestRequest {
    * @param contentMimeType
    */
   private void preparePostHeader(HttpPost httpPost, String acceptMimeType, String contentMimeType) {
-    if (acceptMimeType != null && !acceptMimeType.equals(""))
+    if (acceptMimeType != null && !acceptMimeType.equals("")) {
       httpPost.setHeader(new BasicHeader("accept", acceptMimeType));
-    if (contentMimeType != null && !contentMimeType.equals(""))
+    }
+    if (contentMimeType != null && !contentMimeType.equals("")) {
       httpPost.setHeader(new BasicHeader("Content-Type", contentMimeType));
+    }
     httpPost.setHeader(new BasicHeader("project-id", projectId));
-    if (token != null && bearerToken != null)
+    if (token != null && bearerToken != null) {
       httpPost.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+    }
   }
 
   private CloseableHttpResponse genericPost(
@@ -360,8 +372,11 @@ public abstract class RestRequest {
     HttpPost httpPost = null;
     log.trace("Object is: " + object);
     String fileJSONNode;
-    if (object instanceof String) fileJSONNode = (String) object;
-    else fileJSONNode = mapper.toJson(object);
+    if (object instanceof String) {
+      fileJSONNode = (String) object;
+    } else {
+      fileJSONNode = mapper.toJson(object);
+    }
 
     log.trace("sending: " + fileJSONNode.toString());
     log.debug("pathUrl: " + pathUrl);
@@ -385,8 +400,11 @@ public abstract class RestRequest {
     try {
       log.trace("Object is: " + object);
       String fileJSONNode;
-      if (object instanceof String) fileJSONNode = (String) object;
-      else fileJSONNode = mapper.toJson(object);
+      if (object instanceof String) {
+        fileJSONNode = (String) object;
+      } else {
+        fileJSONNode = mapper.toJson(object);
+      }
 
       log.trace("sending: " + fileJSONNode.toString());
       log.debug("pathUrl: " + pathUrl);
@@ -410,10 +428,14 @@ public abstract class RestRequest {
       RestUtils.checkStatus(response, HttpURLConnection.HTTP_CREATED);
       // return the response of the request
       String result = "";
-      if (response.getEntity() != null) result = EntityUtils.toString(response.getEntity());
+      if (response.getEntity() != null) {
+        result = EntityUtils.toString(response.getEntity());
+      }
 
       if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_NO_CONTENT) {
-        if (object instanceof String) return result;
+        if (object instanceof String) {
+          return result;
+        }
         JsonParser jsonParser = new JsonParser();
         JsonElement jsonElement = jsonParser.parse(result);
         result = mapper.toJson(jsonElement);
@@ -428,7 +450,9 @@ public abstract class RestRequest {
     } catch (IOException e) {
       // catch request exceptions here
       log.error(e.getMessage(), e);
-      if (httpPost != null) httpPost.releaseConnection();
+      if (httpPost != null) {
+        httpPost.releaseConnection();
+      }
       throw new SDKException(
           "Could not http-post or open the object properly",
           e.getStackTrace(),
@@ -437,7 +461,9 @@ public abstract class RestRequest {
       if (response != null
           && response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
         token = null;
-        if (httpPost != null) httpPost.releaseConnection();
+        if (httpPost != null) {
+          httpPost.releaseConnection();
+        }
         return requestPost(id);
       } else if (response != null) {
         throw e;
@@ -482,7 +508,9 @@ public abstract class RestRequest {
       RestUtils.checkStatus(response, HttpURLConnection.HTTP_CREATED);
       // return the response of the request
       String result = "";
-      if (response.getEntity() != null) result = EntityUtils.toString(response.getEntity());
+      if (response.getEntity() != null) {
+        result = EntityUtils.toString(response.getEntity());
+      }
 
       if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_NO_CONTENT) {
         JsonParser jsonParser = new JsonParser();
@@ -499,7 +527,9 @@ public abstract class RestRequest {
     } catch (IOException e) {
       // catch request exceptions here
       log.error(e.getMessage(), e);
-      if (httpPost != null) httpPost.releaseConnection();
+      if (httpPost != null) {
+        httpPost.releaseConnection();
+      }
       throw new SDKException(
           "Could not http-post or open the object properly",
           e.getStackTrace(),
@@ -507,10 +537,14 @@ public abstract class RestRequest {
     } catch (SDKException e) {
       if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
         token = null;
-        if (httpPost != null) httpPost.releaseConnection();
+        if (httpPost != null) {
+          httpPost.releaseConnection();
+        }
         return requestPost(id);
       } else {
-        if (httpPost != null) httpPost.releaseConnection();
+        if (httpPost != null) {
+          httpPost.releaseConnection();
+        }
         try {
           throw new SDKException(
               "Status is " + response.getStatusLine().getStatusCode(),
@@ -567,12 +601,13 @@ public abstract class RestRequest {
     RestUtils.checkStatus(response, HttpURLConnection.HTTP_OK);
     // return the response of the request
     String result = "";
-    if (response.getEntity() != null)
+    if (response.getEntity() != null) {
       try {
         result = EntityUtils.toString(response.getEntity());
       } catch (IOException e) {
         e.printStackTrace();
       }
+    }
 
     if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_NO_CONTENT) {
       JsonParser jsonParser = new JsonParser();
@@ -594,8 +629,9 @@ public abstract class RestRequest {
       if (this.token == null
           && ((isService && this.serviceName != null && !this.serviceName.equals(""))
               || (!((this.username == null && this.username.equals(""))
-                  || (this.password == null || this.password.equals("")))))) getAccessToken();
-
+                  || (this.password == null || this.password.equals("")))))) {
+        getAccessToken();
+      }
     } catch (Exception e) {
       log.error(e.getMessage(), e);
       throw new SDKException(
@@ -627,8 +663,9 @@ public abstract class RestRequest {
       log.info("Executing delete on: " + this.pathUrl + "/" + id);
       httpDelete = new HttpDelete(this.pathUrl + "/" + id);
       httpDelete.setHeader(new BasicHeader("project-id", projectId));
-      if (token != null)
+      if (token != null) {
         httpDelete.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+      }
 
       response = httpClient.execute(httpDelete);
 
@@ -640,16 +677,22 @@ public abstract class RestRequest {
     } catch (IOException e) {
       // catch request exceptions here
       log.error(e.getMessage(), e);
-      if (httpDelete != null) httpDelete.releaseConnection();
+      if (httpDelete != null) {
+        httpDelete.releaseConnection();
+      }
       throw new SDKException("Could not http-delete", e.getStackTrace(), e.getMessage());
     } catch (SDKException e) {
       if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
         token = null;
-        if (httpDelete != null) httpDelete.releaseConnection();
+        if (httpDelete != null) {
+          httpDelete.releaseConnection();
+        }
         requestDelete(id);
         return;
       }
-      if (httpDelete != null) httpDelete.releaseConnection();
+      if (httpDelete != null) {
+        httpDelete.releaseConnection();
+      }
       throw new SDKException(
           "Could not http-delete or the api response was wrong", e.getStackTrace(), e.getMessage());
     }
@@ -666,7 +709,9 @@ public abstract class RestRequest {
     if (id != null) {
       url += "/" + id;
       return requestGetWithStatus(url, null, type);
-    } else return requestGetAll(url, type, null);
+    } else {
+      return requestGetAll(url, type, null);
+    }
   }
 
   protected Object requestGetAll(String url, Class type) throws SDKException {
@@ -685,8 +730,9 @@ public abstract class RestRequest {
       log.debug("Executing get on: " + url);
       httpGet = new HttpGet(url);
       httpGet.setHeader(new BasicHeader("project-id", projectId));
-      if (token != null)
+      if (token != null) {
         httpGet.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+      }
 
       response = httpClient.execute(httpGet);
 
@@ -698,7 +744,9 @@ public abstract class RestRequest {
       }
       // return the response of the request
       String result = "";
-      if (response.getEntity() != null) result = EntityUtils.toString(response.getEntity());
+      if (response.getEntity() != null) {
+        result = EntityUtils.toString(response.getEntity());
+      }
       response.close();
       httpGet.releaseConnection();
       log.trace("result is: " + result);
@@ -712,22 +760,30 @@ public abstract class RestRequest {
     } catch (IOException e) {
       // catch request exceptions here
       log.error(e.getMessage(), e);
-      if (httpGet != null) httpGet.releaseConnection();
+      if (httpGet != null) {
+        httpGet.releaseConnection();
+      }
       throw new SDKException("Could not http-get", e.getStackTrace(), e.getMessage());
     } catch (SDKException e) {
       if (response != null) {
         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
           token = null;
-          if (httpGet != null) httpGet.releaseConnection();
+          if (httpGet != null) {
+            httpGet.releaseConnection();
+          }
           return requestGetAll(url, type, httpStatus);
         } else {
           log.error(e.getMessage(), e);
-          if (httpGet != null) httpGet.releaseConnection();
+          if (httpGet != null) {
+            httpGet.releaseConnection();
+          }
           throw new SDKException("Could not authorize", e.getStackTrace(), e.getMessage());
         }
       } else {
         log.error(e.getMessage(), e);
-        if (httpGet != null) httpGet.releaseConnection();
+        if (httpGet != null) {
+          httpGet.releaseConnection();
+        }
         throw e;
       }
     }
@@ -753,8 +809,9 @@ public abstract class RestRequest {
       log.debug("Executing get on: " + url);
       httpGet = new HttpGet(url);
       httpGet.setHeader(new BasicHeader("project-id", projectId));
-      if (token != null)
+      if (token != null) {
         httpGet.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+      }
 
       response = httpClient.execute(httpGet);
 
@@ -766,7 +823,9 @@ public abstract class RestRequest {
       }
       // return the response of the request
       String result = "";
-      if (response.getEntity() != null) result = EntityUtils.toString(response.getEntity());
+      if (response.getEntity() != null) {
+        result = EntityUtils.toString(response.getEntity());
+      }
       response.close();
       httpGet.releaseConnection();
       log.trace("result is: " + result);
@@ -782,26 +841,36 @@ public abstract class RestRequest {
     } catch (IOException e) {
       // catch request exceptions here
       log.error(e.getMessage(), e);
-      if (httpGet != null) httpGet.releaseConnection();
+      if (httpGet != null) {
+        httpGet.releaseConnection();
+      }
       throw new SDKException("Could not http-get", e.getStackTrace(), e.getMessage());
     } catch (SDKException e) {
       if (response != null) {
         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
           token = null;
-          if (httpGet != null) httpGet.releaseConnection();
+          if (httpGet != null) {
+            httpGet.releaseConnection();
+          }
           return requestGetWithStatus(url, httpStatus, type);
         } else {
           log.error(e.getMessage(), e);
-          if (httpGet != null) httpGet.releaseConnection();
+          if (httpGet != null) {
+            httpGet.releaseConnection();
+          }
           throw new SDKException("Could not authorize", e.getStackTrace(), e.getMessage());
         }
       } else {
         log.error(e.getMessage(), e);
-        if (httpGet != null) httpGet.releaseConnection();
+        if (httpGet != null) {
+          httpGet.releaseConnection();
+        }
         throw e;
       }
     } finally {
-      if (httpGet != null) httpGet.releaseConnection();
+      if (httpGet != null) {
+        httpGet.releaseConnection();
+      }
     }
   }
 
@@ -840,8 +909,9 @@ public abstract class RestRequest {
       httpPut.setHeader(new BasicHeader("accept", "application/json"));
       httpPut.setHeader(new BasicHeader("Content-Type", "application/json"));
       httpPut.setHeader(new BasicHeader("project-id", projectId));
-      if (token != null)
+      if (token != null) {
         httpPut.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
+      }
       httpPut.setEntity(new StringEntity(fileJSONNode));
 
       response = httpClient.execute(httpPut);
@@ -850,7 +920,9 @@ public abstract class RestRequest {
       RestUtils.checkStatus(response, HttpURLConnection.HTTP_ACCEPTED);
       // return the response of the request
       String result = "";
-      if (response.getEntity() != null) result = EntityUtils.toString(response.getEntity());
+      if (response.getEntity() != null) {
+        result = EntityUtils.toString(response.getEntity());
+      }
 
       if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_NO_CONTENT) {
         response.close();
@@ -869,7 +941,9 @@ public abstract class RestRequest {
     } catch (IOException e) {
       // catch request exceptions here
       log.error(e.getMessage(), e);
-      if (httpPut != null) httpPut.releaseConnection();
+      if (httpPut != null) {
+        httpPut.releaseConnection();
+      }
       throw new SDKException(
           "Could not http-put or the api response was wrong or open the object properly",
           e.getStackTrace(),
@@ -877,17 +951,23 @@ public abstract class RestRequest {
     } catch (SDKException e) {
       if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
         token = null;
-        if (httpPut != null) httpPut.releaseConnection();
+        if (httpPut != null) {
+          httpPut.releaseConnection();
+        }
         return requestPut(id, object);
       } else {
-        if (httpPut != null) httpPut.releaseConnection();
+        if (httpPut != null) {
+          httpPut.releaseConnection();
+        }
         throw new SDKException(
             "Could not http-put or the api response was wrong or open the object properly",
             e.getStackTrace(),
             e.getMessage());
       }
     } finally {
-      if (httpPut != null) httpPut.releaseConnection();
+      if (httpPut != null) {
+        httpPut.releaseConnection();
+      }
     }
   }
 
@@ -895,28 +975,31 @@ public abstract class RestRequest {
     if (isService) {
       try {
         log.debug("Registering Service " + serviceName);
-        byte[] key_data = Files.readAllBytes(Paths.get(KEY_FILE_PATH));
-        Key key = KeyHelper.restoreKey(key_data);
-        byte[] encryptedMessage =
-            KeyHelper.encrypt("{\"name\":\"" + serviceName + "\",\"action\":\"register\"}", key);
+        String key_data =
+            new String(Files.readAllBytes(Paths.get(this.keyFilePath)), StandardCharsets.UTF_8);
+
+        String encryptedMessage =
+            KeyHelper.encryptNew(
+                "{\"name\":\"" + serviceName + "\",\"action\":\"register\"}", key_data);
 
         CloseableHttpResponse response = null;
         HttpPost httpPost = new HttpPost(this.serviceTokenUrl);
         httpPost.setHeader(new BasicHeader("accept", "text/plain,application/json"));
-        httpPost.setHeader(new BasicHeader("Content-Type", "application/octet-stream"));
+        httpPost.setHeader(new BasicHeader("Content-Type", "text/plain"));
 
-        httpPost.setEntity(new ByteArrayEntity(encryptedMessage));
+        httpPost.setEntity(new StringEntity(encryptedMessage));
 
         log.debug("Post: " + httpPost.getURI());
         response = httpClient.execute(httpPost);
         RestUtils.checkStatus(response, HttpURLConnection.HTTP_CREATED);
         String encryptedToken = "";
-        if (response.getEntity() != null)
+        if (response.getEntity() != null) {
           encryptedToken = EntityUtils.toString(response.getEntity());
+        }
         response.close();
         httpPost.releaseConnection();
 
-        String decryptedToken = KeyHelper.decrypt(encryptedToken, KeyHelper.restoreKey(key_data));
+        String decryptedToken = KeyHelper.decryptNew(encryptedToken, key_data);
         log.trace("Token is: " + decryptedToken);
         this.token = decryptedToken;
         this.bearerToken = "Bearer " + this.token;
@@ -952,10 +1035,18 @@ public abstract class RestRequest {
         JsonObject error = gson.fromJson(responseString, JsonObject.class);
 
         JsonElement detailMessage = error.get("detailMessage");
-        if (detailMessage == null) detailMessage = error.get("errorMessage");
-        if (detailMessage == null) detailMessage = error.get("message");
-        if (detailMessage == null) detailMessage = error.get("description");
-        if (detailMessage == null) detailMessage = error.get("errorDescription");
+        if (detailMessage == null) {
+          detailMessage = error.get("errorMessage");
+        }
+        if (detailMessage == null) {
+          detailMessage = error.get("message");
+        }
+        if (detailMessage == null) {
+          detailMessage = error.get("description");
+        }
+        if (detailMessage == null) {
+          detailMessage = error.get("errorDescription");
+        }
 
         log.error(
             "Status Code ["
@@ -964,7 +1055,9 @@ public abstract class RestRequest {
                 + (detailMessage != null ? detailMessage.getAsString() : "no error description")
                 + "]");
 
-        if (detailMessage == null) log.error("Got Error from server: \n" + gson.toJson(error));
+        if (detailMessage == null) {
+          log.error("Got Error from server: \n" + gson.toJson(error));
+        }
         throw new SDKException(
             "Status Code ["
                 + statusCode
@@ -1026,8 +1119,5 @@ public abstract class RestRequest {
         .build();
   }
 
-  private class ParseComError implements Serializable {
-    String error_description;
-    String error;
-  }
+  public static void main(String[] args) {}
 }

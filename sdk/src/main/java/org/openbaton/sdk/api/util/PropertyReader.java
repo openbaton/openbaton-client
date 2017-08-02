@@ -71,4 +71,8 @@ public class PropertyReader {
   public String getRestUrl(String className) {
     return sdkProperties.getProperty("rest" + className + "Path");
   }
+
+  public String getSimpleProperty(String key, String def) {
+    return sdkProperties.getProperty(key, def);
+  }
 }
