@@ -17,6 +17,7 @@
 
 package org.openbaton.sdk.api.rest;
 
+import java.io.FileNotFoundException;
 import org.openbaton.catalogue.nfvo.Configuration;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
@@ -54,6 +55,7 @@ public class ConfigurationAgent extends AbstractRestAgent<Configuration> {
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
+   * @param keyFilePath
    */
   public ConfigurationAgent(
       String serviceName,
@@ -61,7 +63,17 @@ public class ConfigurationAgent extends AbstractRestAgent<Configuration> {
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String version) {
-    super(serviceName, projectId, sslEnabled, nfvoIp, nfvoPort, version, Configuration.class);
+      String version,
+      String keyFilePath)
+      throws FileNotFoundException {
+    super(
+        serviceName,
+        projectId,
+        sslEnabled,
+        nfvoIp,
+        nfvoPort,
+        version,
+        keyFilePath,
+        Configuration.class);
   }
 }

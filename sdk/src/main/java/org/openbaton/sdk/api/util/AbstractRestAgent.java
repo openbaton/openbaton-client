@@ -17,6 +17,7 @@
 
 package org.openbaton.sdk.api.util;
 
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
@@ -76,7 +77,9 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
       String nfvoIp,
       String nfvoPort,
       String version,
-      Class<T> tClass) {
+      String keyFilePath,
+      Class<T> tClass)
+      throws FileNotFoundException {
     super(
         serviceName,
         projectId,
@@ -84,7 +87,8 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
         nfvoIp,
         nfvoPort,
         propertyReader.getRestUrl(tClass.getSimpleName()),
-        version);
+        version,
+        keyFilePath);
     clazz = tClass;
   }
 

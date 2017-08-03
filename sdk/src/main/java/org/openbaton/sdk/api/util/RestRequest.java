@@ -24,6 +24,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mashape.unirest.http.JsonNode;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -164,6 +165,7 @@ public abstract class RestRequest {
    * @param nfvoPort
    * @param path
    * @param version
+   * @param keyFilePath
    */
   public RestRequest(
       String serviceName,
@@ -172,7 +174,9 @@ public abstract class RestRequest {
       final String nfvoIp,
       String nfvoPort,
       String path,
-      String version) {
+      String version,
+      String keyFilePath)
+      throws FileNotFoundException {
     if (sslEnabled) {
       this.baseUrl = "https://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
       this.provider = "https://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
@@ -194,7 +198,12 @@ public abstract class RestRequest {
 
     GsonBuilder builder = new GsonBuilder();
     this.mapper = builder.setPrettyPrinting().create();
-    this.keyFilePath = propertyReader.getSimpleProperty("key-file-location", KEY_FILE_PATH);
+    if (keyFilePath != null) this.keyFilePath = keyFilePath;
+    else this.keyFilePath = propertyReader.getSimpleProperty("key-file-location", KEY_FILE_PATH);
+    if (!new File(this.keyFilePath).exists()) {
+      log.error("missing key file for services");
+      throw new FileNotFoundException("missing key file for services");
+    }
   }
 
   /**

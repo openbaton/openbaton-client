@@ -18,6 +18,7 @@
 package org.openbaton.sdk.api.rest;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.nfvo.VNFPackage;
 import org.openbaton.sdk.api.annotations.Help;
@@ -62,6 +63,7 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
+   * @param keyFilePath
    */
   public VNFPackageAgent(
       String serviceName,
@@ -69,8 +71,18 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String version) {
-    super(serviceName, projectId, sslEnabled, nfvoIp, nfvoPort, version, VNFPackage.class);
+      String version,
+      String keyFilePath)
+      throws FileNotFoundException {
+    super(
+        serviceName,
+        projectId,
+        sslEnabled,
+        nfvoIp,
+        nfvoPort,
+        version,
+        keyFilePath,
+        VNFPackage.class);
   }
 
   /**

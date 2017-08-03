@@ -17,6 +17,7 @@
 
 package org.openbaton.sdk.api.rest;
 
+import java.io.FileNotFoundException;
 import org.openbaton.catalogue.mano.descriptor.VirtualLinkDescriptor;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
@@ -61,6 +62,7 @@ public class VirtualLinkAgent extends AbstractRestAgent<VirtualLinkDescriptor> {
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
+   * @param keyFilePath
    */
   public VirtualLinkAgent(
       String serviceName,
@@ -68,8 +70,17 @@ public class VirtualLinkAgent extends AbstractRestAgent<VirtualLinkDescriptor> {
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String version) {
+      String version,
+      String keyFilePath)
+      throws FileNotFoundException {
     super(
-        serviceName, projectId, sslEnabled, nfvoIp, nfvoPort, version, VirtualLinkDescriptor.class);
+        serviceName,
+        projectId,
+        sslEnabled,
+        nfvoIp,
+        nfvoPort,
+        version,
+        keyFilePath,
+        VirtualLinkDescriptor.class);
   }
 }

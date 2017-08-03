@@ -30,7 +30,15 @@ import java.lang.reflect.Type;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import jline.console.ConsoleReader;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.Completer;
@@ -438,7 +446,7 @@ public class NFVOCommandLineInterface {
    *
    * @param nfvoRequestor
    */
-  private static void fillCommands(NFVORequestor nfvoRequestor) {
+  private static void fillCommands(NFVORequestor nfvoRequestor) throws FileNotFoundException {
     getMethods(nfvoRequestor.getNetworkServiceRecordAgent());
     getMethods(nfvoRequestor.getConfigurationAgent());
     getMethods(nfvoRequestor.getEventAgent());

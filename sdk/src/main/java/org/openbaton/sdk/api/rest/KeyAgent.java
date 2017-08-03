@@ -17,6 +17,7 @@
 
 package org.openbaton.sdk.api.rest;
 
+import java.io.FileNotFoundException;
 import org.openbaton.catalogue.security.Key;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
@@ -62,8 +63,10 @@ public class KeyAgent extends AbstractRestAgent<Key> {
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String version) {
-    super(serviceName, projectId, sslEnabled, nfvoIp, nfvoPort, version, Key.class);
+      String version,
+      String keyFilePath)
+      throws FileNotFoundException {
+    super(serviceName, projectId, sslEnabled, nfvoIp, nfvoPort, version, keyFilePath, Key.class);
   }
 
   /**

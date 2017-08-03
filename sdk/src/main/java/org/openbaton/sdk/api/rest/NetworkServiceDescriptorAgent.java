@@ -17,6 +17,7 @@
 
 package org.openbaton.sdk.api.rest;
 
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.http.annotation.ThreadSafe;
@@ -71,6 +72,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
+   * @param keyFilePath
    */
   public NetworkServiceDescriptorAgent(
       String serviceName,
@@ -78,7 +80,9 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String version) {
+      String version,
+      String keyFilePath)
+      throws FileNotFoundException {
     super(
         serviceName,
         projectId,
@@ -86,6 +90,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
         nfvoIp,
         nfvoPort,
         version,
+        keyFilePath,
         NetworkServiceDescriptor.class);
   }
 

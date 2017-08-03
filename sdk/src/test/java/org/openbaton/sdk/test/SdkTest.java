@@ -57,10 +57,11 @@ public class SdkTest {
           new NFVORequestor(
               "autoscaling-engine",
               "017175e7-807c-41e5-b5bd-8b5d4871a909",
-              false,
               "localhost",
               "8080",
-              "1");
+              "1",
+              false,
+              null);
     } catch (SDKException e) {
       e.printStackTrace();
     }

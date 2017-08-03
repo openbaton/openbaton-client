@@ -30,6 +30,10 @@ public class SDKException extends Exception {
 
   private static final Gson gson = new GsonBuilder().create();
 
+  public SDKException(String message) {
+    this.reason = message;
+  }
+
   public StackTraceElement[] getStackTraceElements() {
     return stackTraceElements;
   }

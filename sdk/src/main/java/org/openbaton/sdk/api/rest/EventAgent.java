@@ -17,6 +17,7 @@
 
 package org.openbaton.sdk.api.rest;
 
+import java.io.FileNotFoundException;
 import org.openbaton.catalogue.nfvo.EventEndpoint;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
@@ -54,6 +55,7 @@ public class EventAgent extends AbstractRestAgent<EventEndpoint> {
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
+   * @param keyFilePath
    */
   public EventAgent(
       String serviceName,
@@ -61,7 +63,17 @@ public class EventAgent extends AbstractRestAgent<EventEndpoint> {
       boolean sslEnabled,
       String nfvoIp,
       String nfvoPort,
-      String version) {
-    super(serviceName, projectId, sslEnabled, nfvoIp, nfvoPort, version, EventEndpoint.class);
+      String version,
+      String keyFilePath)
+      throws FileNotFoundException {
+    super(
+        serviceName,
+        projectId,
+        sslEnabled,
+        nfvoIp,
+        nfvoPort,
+        version,
+        keyFilePath,
+        EventEndpoint.class);
   }
 }
