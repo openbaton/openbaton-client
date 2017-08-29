@@ -37,6 +37,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.net.ssl.SSLContext;
 import org.apache.commons.codec.binary.Base64;
@@ -65,8 +66,10 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.openbaton.catalogue.nfvo.VNFPackage;
+import org.openbaton.nfvo.common.configuration.GsonDeserializerDate;
+import org.openbaton.nfvo.common.configuration.GsonSerializerDate;
+import org.openbaton.nfvo.common.utils.key.KeyHelper;
 import org.openbaton.sdk.api.exception.SDKException;
-import org.openbaton.utils.key.KeyHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,6 +155,8 @@ public abstract class RestRequest {
     this.projectId = projectId;
 
     GsonBuilder builder = new GsonBuilder();
+    builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
+    builder.registerTypeAdapter(Date.class, new GsonDeserializerDate());
     this.mapper = builder.setPrettyPrinting().create();
   }
 
