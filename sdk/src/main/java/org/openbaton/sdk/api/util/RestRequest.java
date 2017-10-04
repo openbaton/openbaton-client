@@ -202,6 +202,8 @@ public abstract class RestRequest {
     this.projectId = projectId;
 
     GsonBuilder builder = new GsonBuilder();
+    builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
+    builder.registerTypeAdapter(Date.class, new GsonDeserializerDate());
     this.mapper = builder.setPrettyPrinting().create();
     if (keyFilePath != null) this.keyFilePath = keyFilePath;
     else this.keyFilePath = propertyReader.getSimpleProperty("key-file-location", KEY_FILE_PATH);
@@ -764,7 +766,7 @@ public abstract class RestRequest {
 
       Class<?> aClass = Array.newInstance(type, 3).getClass();
       log.trace("class is: " + aClass);
-      Object[] o = (Object[]) mapper.fromJson(result, aClass);
+      Object[] o = (Object[]) this.mapper.fromJson(result, aClass);
       log.trace("deserialized is: " + o);
 
       return o;
