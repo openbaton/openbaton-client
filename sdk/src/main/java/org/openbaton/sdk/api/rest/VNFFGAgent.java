@@ -62,7 +62,7 @@ public class VNFFGAgent extends AbstractRestAgent<VNFForwardingGraphDescriptor> 
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
-   * @param keyFilePath
+   * @param serviceKey the key for authenticating the service
    */
   public VNFFGAgent(
       String serviceName,
@@ -71,7 +71,7 @@ public class VNFFGAgent extends AbstractRestAgent<VNFForwardingGraphDescriptor> 
       String nfvoIp,
       String nfvoPort,
       String version,
-      String keyFilePath)
+      String serviceKey)
       throws FileNotFoundException {
     super(
         serviceName,
@@ -80,7 +80,7 @@ public class VNFFGAgent extends AbstractRestAgent<VNFForwardingGraphDescriptor> 
         nfvoIp,
         nfvoPort,
         version,
-        keyFilePath,
+        serviceKey,
         VNFForwardingGraphDescriptor.class);
   }
 }

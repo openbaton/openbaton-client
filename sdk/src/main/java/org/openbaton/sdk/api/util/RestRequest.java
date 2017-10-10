@@ -31,8 +31,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -66,6 +64,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.openbaton.catalogue.nfvo.VNFPackage;
+import org.openbaton.exceptions.NotFoundException;
 import org.openbaton.nfvo.common.configuration.GsonDeserializerDate;
 import org.openbaton.nfvo.common.configuration.GsonSerializerDate;
 import org.openbaton.nfvo.common.utils.key.KeyHelper;
@@ -78,7 +77,7 @@ public abstract class RestRequest {
 
   private static final String KEY_FILE_PATH = "/etc/openbaton/service-key";
   private static final String SDK_PROPERTIES_FILE = "sdk.api.properties";
-  private String keyFilePath;
+  private String serviceKey;
 
   private Logger log = LoggerFactory.getLogger(this.getClass());
   protected final String baseUrl;
@@ -170,7 +169,7 @@ public abstract class RestRequest {
    * @param nfvoPort
    * @param path
    * @param version
-   * @param keyFilePath
+   * @param serviceKey
    */
   public RestRequest(
       String serviceName,
@@ -180,8 +179,9 @@ public abstract class RestRequest {
       String nfvoPort,
       String path,
       String version,
-      String keyFilePath)
+      String serviceKey)
       throws FileNotFoundException {
+    if (serviceKey == null) throw new IllegalArgumentException("The service key must not be null");
     if (sslEnabled) {
       this.baseUrl = "https://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
       this.provider = "https://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
@@ -200,17 +200,12 @@ public abstract class RestRequest {
     this.serviceName = serviceName;
     this.isService = true;
     this.projectId = projectId;
+    this.serviceKey = serviceKey;
 
     GsonBuilder builder = new GsonBuilder();
     builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
     builder.registerTypeAdapter(Date.class, new GsonDeserializerDate());
     this.mapper = builder.setPrettyPrinting().create();
-    if (keyFilePath != null) this.keyFilePath = keyFilePath;
-    else this.keyFilePath = propertyReader.getSimpleProperty("key-file-location", KEY_FILE_PATH);
-    if (!new File(this.keyFilePath).exists()) {
-      log.error("missing key file for services");
-      throw new FileNotFoundException("missing key file for services");
-    }
   }
 
   /**
@@ -988,16 +983,14 @@ public abstract class RestRequest {
     if (isService) {
       try {
         log.debug("Registering Service " + serviceName);
-        String key_data =
-            new String(Files.readAllBytes(Paths.get(this.keyFilePath)), StandardCharsets.UTF_8);
 
         String encryptedMessage =
             KeyHelper.encryptNew(
-                "{\"name\":\"" + serviceName + "\",\"action\":\"register\"}", key_data);
+                "{\"name\":\"" + serviceName + "\",\"action\":\"register\"}", serviceKey);
 
         CloseableHttpResponse response = null;
         HttpPost httpPost = new HttpPost(this.serviceTokenUrl);
-        httpPost.setHeader(new BasicHeader("accept", "text/plain,application/json"));
+        httpPost.setHeader(new BasicHeader("accept", "application/json"));
         httpPost.setHeader(new BasicHeader("Content-Type", "text/plain"));
 
         httpPost.setEntity(new StringEntity(encryptedMessage));
@@ -1005,14 +998,43 @@ public abstract class RestRequest {
         log.debug("Post: " + httpPost.getURI());
         response = httpClient.execute(httpPost);
         RestUtils.checkStatus(response, HttpURLConnection.HTTP_CREATED);
+        String responseString = "";
+        if (response.getEntity() == null) {
+          log.error("The response entity is null when trying to get the access token.");
+          response.close();
+          httpPost.releaseConnection();
+          throw new NullPointerException(
+              "The response entity is null when trying to get the access token.");
+        }
+        responseString = EntityUtils.toString(response.getEntity());
+        JsonObject responseJson;
+        try {
+          responseJson = mapper.fromJson(responseString, JsonObject.class);
+        } catch (Exception e) {
+          log.error("The response does not seem to be valid Json: " + responseString);
+          response.close();
+          httpPost.releaseConnection();
+          throw e;
+        }
+        if (!responseJson.has("token"))
+          throw new NotFoundException(
+              "Did not find the 'token' field in the NFVO's response: "
+                  + mapper.toJson(responseJson));
         String encryptedToken = "";
-        if (response.getEntity() != null) {
-          encryptedToken = EntityUtils.toString(response.getEntity());
+        try {
+          encryptedToken = responseJson.getAsJsonPrimitive("token").getAsString();
+        } catch (Exception e) {
+          log.error(
+              "The 'token' field in the NFVO's response does not seem to be of type String: "
+                  + mapper.toJson(responseJson));
+          response.close();
+          httpPost.releaseConnection();
+          throw e;
         }
         response.close();
         httpPost.releaseConnection();
 
-        String decryptedToken = KeyHelper.decryptNew(encryptedToken, key_data);
+        String decryptedToken = KeyHelper.decryptNew(encryptedToken, serviceKey);
         log.trace("Token is: " + decryptedToken);
         this.token = decryptedToken;
         this.bearerToken = "Bearer " + this.token;

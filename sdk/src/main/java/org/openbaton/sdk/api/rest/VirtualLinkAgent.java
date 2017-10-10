@@ -62,7 +62,7 @@ public class VirtualLinkAgent extends AbstractRestAgent<VirtualLinkDescriptor> {
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
-   * @param keyFilePath
+   * @param serviceKey the key for authenticating the service
    */
   public VirtualLinkAgent(
       String serviceName,
@@ -71,7 +71,7 @@ public class VirtualLinkAgent extends AbstractRestAgent<VirtualLinkDescriptor> {
       String nfvoIp,
       String nfvoPort,
       String version,
-      String keyFilePath)
+      String serviceKey)
       throws FileNotFoundException {
     super(
         serviceName,
@@ -80,7 +80,7 @@ public class VirtualLinkAgent extends AbstractRestAgent<VirtualLinkDescriptor> {
         nfvoIp,
         nfvoPort,
         version,
-        keyFilePath,
+        serviceKey,
         VirtualLinkDescriptor.class);
   }
 }

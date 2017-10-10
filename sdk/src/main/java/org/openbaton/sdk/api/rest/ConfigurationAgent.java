@@ -55,7 +55,7 @@ public class ConfigurationAgent extends AbstractRestAgent<Configuration> {
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
-   * @param keyFilePath
+   * @param serviceKey the key for authenticating the service
    */
   public ConfigurationAgent(
       String serviceName,
@@ -64,7 +64,7 @@ public class ConfigurationAgent extends AbstractRestAgent<Configuration> {
       String nfvoIp,
       String nfvoPort,
       String version,
-      String keyFilePath)
+      String serviceKey)
       throws FileNotFoundException {
     super(
         serviceName,
@@ -73,7 +73,7 @@ public class ConfigurationAgent extends AbstractRestAgent<Configuration> {
         nfvoIp,
         nfvoPort,
         version,
-        keyFilePath,
+        serviceKey,
         Configuration.class);
   }
 }

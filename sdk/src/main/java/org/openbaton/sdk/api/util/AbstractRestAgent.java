@@ -77,7 +77,7 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
       String nfvoIp,
       String nfvoPort,
       String version,
-      String keyFilePath,
+      String serviceKey,
       Class<T> tClass)
       throws FileNotFoundException {
     super(
@@ -88,7 +88,7 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
         nfvoPort,
         propertyReader.getRestUrl(tClass.getSimpleName()),
         version,
-        keyFilePath);
+        serviceKey);
     clazz = tClass;
   }
 

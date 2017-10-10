@@ -59,7 +59,7 @@ public class UserAgent extends AbstractRestAgent<User> {
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
-   * @param keyFilePath
+   * @param serviceKey the key for authenticating the service
    */
   public UserAgent(
       String serviceName,
@@ -68,9 +68,9 @@ public class UserAgent extends AbstractRestAgent<User> {
       String nfvoIp,
       String nfvoPort,
       String version,
-      String keyFilePath)
+      String serviceKey)
       throws FileNotFoundException {
-    super(serviceName, projectId, sslEnabled, nfvoIp, nfvoPort, version, keyFilePath, User.class);
+    super(serviceName, projectId, sslEnabled, nfvoIp, nfvoPort, version, serviceKey, User.class);
   }
 
   /**

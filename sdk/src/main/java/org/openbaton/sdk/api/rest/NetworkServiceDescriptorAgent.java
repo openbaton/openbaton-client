@@ -72,7 +72,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
-   * @param keyFilePath
+   * @param serviceKey the key for authenticating the service
    */
   public NetworkServiceDescriptorAgent(
       String serviceName,
@@ -81,7 +81,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
       String nfvoIp,
       String nfvoPort,
       String version,
-      String keyFilePath)
+      String serviceKey)
       throws FileNotFoundException {
     super(
         serviceName,
@@ -90,7 +90,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
         nfvoIp,
         nfvoPort,
         version,
-        keyFilePath,
+        serviceKey,
         NetworkServiceDescriptor.class);
   }
 
