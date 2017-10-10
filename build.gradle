@@ -34,6 +34,7 @@ allprojects {
     apply plugin: 'maven'
 
     repositories {
+        mavenLocal()
         mavenCentral()
         maven {
             url "https://oss.sonatype.org/content/repositories/snapshots/"
@@ -42,6 +43,7 @@ allprojects {
             url "https://oss.sonatype.org/content/repositories/releases/"
         }
     }
+
 }
 project.ext {
     //------------------------------------------------//
@@ -61,16 +63,6 @@ subprojects {
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    repositories {
-        mavenCentral()
-        maven {
-            url "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
-        maven {
-            url "https://oss.sonatype.org/content/repositories/releases/"
-        }
-    }
 
     sourceSets {
         main {
