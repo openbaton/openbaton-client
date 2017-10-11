@@ -24,7 +24,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mashape.unirest.http.JsonNode;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -35,7 +34,6 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.net.ssl.SSLContext;
 import org.apache.commons.codec.binary.Base64;
@@ -65,8 +63,6 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.openbaton.catalogue.nfvo.VNFPackage;
 import org.openbaton.exceptions.NotFoundException;
-import org.openbaton.nfvo.common.configuration.GsonDeserializerDate;
-import org.openbaton.nfvo.common.configuration.GsonSerializerDate;
 import org.openbaton.nfvo.common.utils.key.KeyHelper;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.slf4j.Logger;
@@ -154,8 +150,8 @@ public abstract class RestRequest {
     this.projectId = projectId;
 
     GsonBuilder builder = new GsonBuilder();
-    builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
-    builder.registerTypeAdapter(Date.class, new GsonDeserializerDate());
+    //    builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
+    //    builder.registerTypeAdapter(Date.class, new GsonDeserializerDate());
     this.mapper = builder.setPrettyPrinting().create();
   }
 
@@ -170,6 +166,7 @@ public abstract class RestRequest {
    * @param path
    * @param version
    * @param serviceKey
+   * @throws IllegalArgumentException if the service key is null
    */
   public RestRequest(
       String serviceName,
@@ -179,8 +176,7 @@ public abstract class RestRequest {
       String nfvoPort,
       String path,
       String version,
-      String serviceKey)
-      throws FileNotFoundException {
+      String serviceKey) {
     if (serviceKey == null) throw new IllegalArgumentException("The service key must not be null");
     if (sslEnabled) {
       this.baseUrl = "https://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
@@ -203,17 +199,17 @@ public abstract class RestRequest {
     this.serviceKey = serviceKey;
 
     GsonBuilder builder = new GsonBuilder();
-    builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
-    builder.registerTypeAdapter(Date.class, new GsonDeserializerDate());
+    //    builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
+    //    builder.registerTypeAdapter(Date.class, new GsonDeserializerDate());
     this.mapper = builder.setPrettyPrinting().create();
   }
 
   /**
    * Does the POST Request
    *
-   * @param id
-   * @return String
-   * @throws SDKException
+   * @param id specifies the entity on which to perform the post request
+   * @return a String containing the response content
+   * @throws SDKException if the request fails
    */
   public String requestPost(final String id) throws SDKException {
     CloseableHttpResponse response = null;
@@ -285,7 +281,8 @@ public abstract class RestRequest {
    * returning the response
    *
    * @param object the object content to be serialized as json
-   * @return a string containing the response content
+   * @return a String containing the response content
+   * @throws SDKException if the request fails
    */
   public Serializable requestPost(final Serializable object) throws SDKException {
     return requestPost("", object);
@@ -487,9 +484,11 @@ public abstract class RestRequest {
    * returning it. This can be useful if the method's return type is not the same as the type of the
    * object parameter.
    *
+   * @param id specifies the entity on which to perform the post request
    * @param object the object content to be serialized as json
    * @param type the object type to which the response should be mapped
-   * @return a string containing the response content
+   * @return a String containing the response content
+   * @throws SDKException if the request fails
    */
   public Serializable requestPost(final String id, final Serializable object, final Type type)
       throws SDKException {
@@ -574,7 +573,7 @@ public abstract class RestRequest {
    *
    * @param f the tar file containing the VNFPackage
    * @return the created VNFPackage object
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   public VNFPackage requestPostPackage(final File f) throws SDKException {
     CloseableHttpResponse response = null;
@@ -657,6 +656,7 @@ public abstract class RestRequest {
    * Executes a http delete with to a given id
    *
    * @param id the id path used for the api request
+   * @throws SDKException if the request fails
    */
   public void requestDelete(final String id) throws SDKException {
     CloseableHttpResponse response = null;
@@ -710,7 +710,9 @@ public abstract class RestRequest {
    * Executes a http get with to a given id
    *
    * @param id the id path used for the api request
+   * @param type the class of the requested entity
    * @return a string containing he response content
+   * @throws SDKException if the request fails
    */
   public Object requestGet(final String id, Class type) throws SDKException {
     String url = this.pathUrl;
@@ -887,7 +889,9 @@ public abstract class RestRequest {
    * status check of the response
    *
    * @param url the url path used for the api request
+   * @param type the class of the requested entity
    * @return a string containing the response content
+   * @throws SDKException if the request fails
    */
   public Object requestGetWithStatusAccepted(String url, Class type) throws SDKException {
     url = this.pathUrl + "/" + url;
@@ -901,6 +905,7 @@ public abstract class RestRequest {
    * @param id the id path used for the api request
    * @param object the object content to be serialized as json
    * @return a string containing the response content
+   * @throws SDKException if the request fails
    */
   public Serializable requestPut(final String id, final Serializable object) throws SDKException {
     CloseableHttpResponse response = null;

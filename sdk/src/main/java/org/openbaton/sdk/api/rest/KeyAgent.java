@@ -17,7 +17,6 @@
 
 package org.openbaton.sdk.api.rest;
 
-import java.io.FileNotFoundException;
 import org.openbaton.catalogue.security.Key;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
@@ -55,7 +54,9 @@ public class KeyAgent extends AbstractRestAgent<Key> {
    * @param sslEnabled true if the NFVO uses SSL
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
+   * @param version the API version
    * @param serviceKey the key for authenticating the service
+   * @throws IllegalArgumentException if the service key is null
    */
   public KeyAgent(
       String serviceName,
@@ -65,14 +66,14 @@ public class KeyAgent extends AbstractRestAgent<Key> {
       String nfvoPort,
       String version,
       String serviceKey)
-      throws FileNotFoundException {
+      throws IllegalArgumentException {
     super(serviceName, projectId, sslEnabled, nfvoIp, nfvoPort, version, serviceKey, Key.class);
   }
 
   /**
    * Use the generateKey method instead.
    *
-   * @param key
+   * @param key do not use this method!
    * @return null
    */
   @Override
@@ -86,6 +87,7 @@ public class KeyAgent extends AbstractRestAgent<Key> {
    *
    * @param name the name of the new Key
    * @return the private Key
+   * @throws SDKException if the request fails
    */
   @Help(help = "Generate a new Key in the NFVO")
   public String generateKey(String name) throws SDKException {
@@ -98,7 +100,7 @@ public class KeyAgent extends AbstractRestAgent<Key> {
    * @param name the name of the Key
    * @param publicKey the public Key
    * @return the imported Key
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Import a Key into the NFVO by providing name and public key")
   public Key importKey(String name, String publicKey) throws SDKException {

@@ -17,7 +17,6 @@
 
 package org.openbaton.sdk.api.rest;
 
-import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,6 +78,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
    * @param serviceKey the key for authenticating the service
+   * @throws IllegalArgumentException if the service key is null
    */
   public NetworkServiceRecordAgent(
       String serviceName,
@@ -88,7 +88,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
       String nfvoPort,
       String version,
       String serviceKey)
-      throws FileNotFoundException {
+      throws IllegalArgumentException {
     super(
         serviceName,
         projectId,

@@ -642,14 +642,10 @@ public final class NFVORequestor {
    */
   private String getProjectIdForProjectName(String projectName)
       throws SDKException, FileNotFoundException {
-    try {
-      for (Project project : this.getProjectAgent().findAll()) {
-        if (project.getName().equals(projectName)) {
-          return project.getId();
-        }
+    for (Project project : this.getProjectAgent().findAll()) {
+      if (project.getName().equals(projectName)) {
+        return project.getId();
       }
-    } catch (ClassNotFoundException e) {
-      throw new SDKException(e.getCause());
     }
     throw new SDKException(
         "Did not find a Project named " + projectName,

@@ -17,7 +17,6 @@
 
 package org.openbaton.sdk.api.rest;
 
-import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.http.annotation.ThreadSafe;
@@ -73,6 +72,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
    * @param serviceKey the key for authenticating the service
+   * @throws IllegalArgumentException if the service key is null
    */
   public NetworkServiceDescriptorAgent(
       String serviceName,
@@ -82,7 +82,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
       String nfvoPort,
       String version,
       String serviceKey)
-      throws FileNotFoundException {
+      throws IllegalArgumentException {
     super(
         serviceName,
         projectId,
@@ -101,7 +101,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param idNSD the NetworkServiceDescriptor's id
    * @return a List of all VirtualNetworkServiceDescriptors contained in the
    *     NetworkServiceDescriptor
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -123,7 +123,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param idNSD the ID of the NetworkServiceDescriptor
    * @param idVfn the id of the VirtualNetworkFunctionDescriptor
    * @return the VirtualNetworkFunctionDescriptor
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -143,7 +143,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    *
    * @param idNSD the ID of the NetworkServiceDescriptor
    * @param idVnf the id of the VirtualNetworkFunctionDescriptor
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -161,7 +161,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    *
    * @param idNSD : The id of the networkServiceDescriptor the vnfd shall be created at
    * @param virtualNetworkFunctionDescriptor : : the Network Service Descriptor to be updated
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -184,7 +184,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param virtualNetworkFunctionDescriptor the updated version of the
    *     VirtualNetworkFunctionDescriptor
    * @return the updated VirtualNetworkFunctionDescriptor
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -206,7 +206,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    *
    * @param idNSD the ID of the NetworkServiceDescriptor
    * @return the List of VNFDependencies
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -240,7 +240,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    *
    * @param idNSD the ID of the NetworkServiceDescriptor which contains the VNFDependency
    * @param idVnfd the ID of the VNFDependency that shall be deleted
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -276,7 +276,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param idVnfDep the ID of the VNFDependency which shall be updated
    * @param vnfDependency the updated version of the VNFDependency
    * @return the updated VNFDependency
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -316,7 +316,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param idNsd the NetworkServiceDescriptr's ID
    * @param idPnf the PhysicalNetworkFunctionDescriptor's ID
    * @return the PhysicalNetworkFunctionDescriptor
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -335,7 +335,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    *
    * @param idNsd the NetworkServiceDescriptor's ID
    * @param idPnf :the PhysicalNetworkFunctionDescriptor's ID
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -353,7 +353,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param idNsd the NetworkServiceDescriptor's ID
    * @param physicalNetworkFunctionDescriptor the new PhysicalNetworkFunctionDescriptor
    * @return the created PhysicalNetworkFunctionDescriptor
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -374,7 +374,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param physicalNetworkFunctionDescriptor the updated version of the
    *     PhysicalNetworkFunctionDescriptor
    * @return the updated PhysicalNetworkFunctionDescriptor
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -395,7 +395,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    *
    * @param idNsd the ID of the NetworkServiceDescriptor
    * @return the List of Security objects
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Get all the Security of a NetworkServiceDescriptor with specific id")
   public Security getSecurities(final String idNsd) throws SDKException {
@@ -408,7 +408,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    *
    * @param idNsd the NetworkServiceDescriptor's ID
    * @param idSecurity the Security object's ID
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Delete the Security of a NetworkServiceDescriptor with specific id")
   public void deleteSecurity(final String idNsd, final String idSecurity) throws SDKException {
@@ -422,7 +422,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param idNSD the ID of the NetworkServiceDescriptor
    * @param security the Security object to add
    * @return the new Security object
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Create the Security of a NetworkServiceDescriptor with specific id")
   public Security createSecurity(final String idNSD, final Security security) throws SDKException {
@@ -437,7 +437,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param idSecurity the ID of the Security object which shall be updated
    * @param updatedSecurity the updated version of the Security object
    * @return the updated Security object
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Update the Security of a NetworkServiceDescriptor with specific id")
   public Security updateSecurity(
