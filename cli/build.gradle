@@ -45,10 +45,6 @@ apply from: 'gradle/gradle/distribution.gradle'
 apply from: 'gradle/gradle/brew.formula.creator.gradle'
 //################
 
-
-repositories {
-    mavenCentral()
-}
 dependencies {
     compile project(":sdk")
     compile 'org.slf4j:slf4j-log4j12:1.7.12'
