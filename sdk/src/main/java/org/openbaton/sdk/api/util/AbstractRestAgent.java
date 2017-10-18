@@ -17,7 +17,6 @@
 
 package org.openbaton.sdk.api.util;
 
-import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
@@ -77,9 +76,8 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
       String nfvoIp,
       String nfvoPort,
       String version,
-      String keyFilePath,
-      Class<T> tClass)
-      throws FileNotFoundException {
+      String serviceKey,
+      Class<T> tClass) {
     super(
         serviceName,
         projectId,
@@ -88,7 +86,7 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
         nfvoPort,
         propertyReader.getRestUrl(tClass.getSimpleName()),
         version,
-        keyFilePath);
+        serviceKey);
     clazz = tClass;
   }
 
@@ -101,7 +99,7 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
    *
    * @param object the object that is sent in the create request
    * @return the created object
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Create the object of type {#}")
   public T create(final T object) throws SDKException {
@@ -112,7 +110,7 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
    * Sends a request to the NFVO API for deleting an instance of type T specified by its ID.
    *
    * @param id the ID of the object that shall be deleted
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Delete the object of type {#} passing the id")
   public void delete(final String id) throws SDKException {
@@ -123,11 +121,10 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
    * Sends a request for finding all instances of type T to the NFVO API.
    *
    * @return the list of found objects
-   * @throws SDKException
-   * @throws ClassNotFoundException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Find all the objects of type {#}")
-  public List<T> findAll() throws SDKException, ClassNotFoundException {
+  public List<T> findAll() throws SDKException {
     return Arrays.asList((T[]) requestGet(null, clazz));
   }
 
@@ -136,11 +133,10 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
    *
    * @param id the ID of the object that shall be retrieved
    * @return the found object
-   * @throws SDKException
-   * @throws ClassNotFoundException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Find the object of type {#} through the id")
-  public T findById(final String id) throws SDKException, ClassNotFoundException {
+  public T findById(final String id) throws SDKException {
     return (T) requestGet(id, clazz);
   }
 
@@ -150,7 +146,7 @@ public class AbstractRestAgent<T extends Serializable> extends RestRequest {
    * @param object the new object that is sent in the update request
    * @param id the ID of the object to update
    * @return the updated object
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Update the object of type {#} passing the new object and the id of the old object")
   public T update(final T object, final String id) throws SDKException {

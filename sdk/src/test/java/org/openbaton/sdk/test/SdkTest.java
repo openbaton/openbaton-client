@@ -61,7 +61,7 @@ public class SdkTest {
               "8080",
               "1",
               false,
-              null);
+              "c_oVfU`iWZftbmbP");
     } catch (SDKException e) {
       e.printStackTrace();
     }
@@ -84,9 +84,6 @@ public class SdkTest {
 
     } catch (SDKException e) {
       e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-      System.exit(1);
     }
 
     //    requestor = new NFVORequestor("admin", "openbaton", projectId, false, "localhost", "8080", "1");

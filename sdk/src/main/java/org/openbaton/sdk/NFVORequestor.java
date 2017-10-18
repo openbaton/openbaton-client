@@ -42,7 +42,7 @@ import org.openbaton.sdk.api.rest.VirtualNetworkFunctionDescriptorAgent;
  */
 public final class NFVORequestor {
 
-  private String keyFilePath;
+  private String serviceKey;
   private String username;
   private String password;
   private boolean isService;
@@ -145,8 +145,7 @@ public final class NFVORequestor {
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
-   * @param keyFilePath the path to the text file containing the key for that specific service. if
-   *     null default location will be used (/etc/openbaton/service-key)
+   * @param serviceKey the key for authenticating the service
    * @throws SDKException
    */
   public NFVORequestor(
@@ -156,7 +155,7 @@ public final class NFVORequestor {
       String nfvoPort,
       String version,
       boolean sslEnabled,
-      String keyFilePath)
+      String serviceKey)
       throws SDKException {
     this.serviceName = serviceName;
     this.isService = true;
@@ -165,7 +164,7 @@ public final class NFVORequestor {
     this.nfvoIp = nfvoIp;
     this.nfvoPort = nfvoPort;
     this.version = version;
-    this.keyFilePath = keyFilePath;
+    this.serviceKey = serviceKey;
   }
 
   /**
@@ -185,7 +184,7 @@ public final class NFVORequestor {
                 this.nfvoIp,
                 this.nfvoPort,
                 this.version,
-                this.keyFilePath);
+                this.serviceKey);
       } else {
         this.configurationAgent =
             new ConfigurationAgent(
@@ -219,7 +218,7 @@ public final class NFVORequestor {
                 this.nfvoIp,
                 this.nfvoPort,
                 this.version,
-                this.keyFilePath);
+                this.serviceKey);
       } else {
         this.networkServiceDescriptorAgent =
             new NetworkServiceDescriptorAgent(
@@ -253,7 +252,7 @@ public final class NFVORequestor {
                 this.nfvoIp,
                 this.nfvoPort,
                 this.version,
-                this.keyFilePath);
+                this.serviceKey);
       } else {
         this.virtualNetworkFunctionDescriptorAgent =
             new VirtualNetworkFunctionDescriptorAgent(
@@ -287,7 +286,7 @@ public final class NFVORequestor {
                 this.nfvoIp,
                 this.nfvoPort,
                 this.version,
-                this.keyFilePath);
+                this.serviceKey);
       } else {
         this.networkServiceRecordAgent =
             new NetworkServiceRecordAgent(
@@ -319,7 +318,7 @@ public final class NFVORequestor {
                 this.nfvoIp,
                 this.nfvoPort,
                 this.version,
-                this.keyFilePath);
+                this.serviceKey);
       } else {
         this.vimInstanceAgent =
             new VimInstanceAgent(
@@ -351,7 +350,7 @@ public final class NFVORequestor {
                 this.nfvoIp,
                 this.nfvoPort,
                 this.version,
-                this.keyFilePath);
+                this.serviceKey);
       } else {
         this.virtualLinkAgent =
             new VirtualLinkAgent(
@@ -385,7 +384,7 @@ public final class NFVORequestor {
                 this.nfvoIp,
                 this.nfvoPort,
                 this.version,
-                this.keyFilePath);
+                this.serviceKey);
       } else {
         this.virtualNetworkFunctionDescriptorAgent =
             new VirtualNetworkFunctionDescriptorAgent(
@@ -417,7 +416,7 @@ public final class NFVORequestor {
                 this.nfvoIp,
                 this.nfvoPort,
                 this.version,
-                this.keyFilePath);
+                this.serviceKey);
       } else {
         this.vnffgAgent =
             new VNFFGAgent(
@@ -449,7 +448,7 @@ public final class NFVORequestor {
                 this.nfvoIp,
                 this.nfvoPort,
                 this.version,
-                this.keyFilePath);
+                this.serviceKey);
       } else {
         this.eventAgent =
             new EventAgent(
@@ -481,7 +480,7 @@ public final class NFVORequestor {
                 this.nfvoIp,
                 this.nfvoPort,
                 this.version,
-                this.keyFilePath);
+                this.serviceKey);
       } else {
         this.vnfPackageAgent =
             new VNFPackageAgent(
@@ -513,7 +512,7 @@ public final class NFVORequestor {
                 this.nfvoIp,
                 this.nfvoPort,
                 this.version,
-                this.keyFilePath);
+                this.serviceKey);
       } else {
         this.projectAgent =
             new ProjectAgent(
@@ -545,7 +544,7 @@ public final class NFVORequestor {
                 this.nfvoIp,
                 this.nfvoPort,
                 this.version,
-                this.keyFilePath);
+                this.serviceKey);
       } else {
         this.userAgent =
             new UserAgent(
@@ -577,7 +576,7 @@ public final class NFVORequestor {
                 this.nfvoIp,
                 this.nfvoPort,
                 this.version,
-                this.keyFilePath);
+                this.serviceKey);
       } else {
         this.keyAgent =
             new KeyAgent(
@@ -643,14 +642,10 @@ public final class NFVORequestor {
    */
   private String getProjectIdForProjectName(String projectName)
       throws SDKException, FileNotFoundException {
-    try {
-      for (Project project : this.getProjectAgent().findAll()) {
-        if (project.getName().equals(projectName)) {
-          return project.getId();
-        }
+    for (Project project : this.getProjectAgent().findAll()) {
+      if (project.getName().equals(projectName)) {
+        return project.getId();
       }
-    } catch (ClassNotFoundException e) {
-      throw new SDKException(e.getCause());
     }
     throw new SDKException(
         "Did not find a Project named " + projectName,

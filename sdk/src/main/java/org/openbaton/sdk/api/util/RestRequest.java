@@ -24,15 +24,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mashape.unirest.http.JsonNode;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -65,6 +62,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.openbaton.catalogue.nfvo.VNFPackage;
+import org.openbaton.exceptions.NotFoundException;
 import org.openbaton.nfvo.common.utils.key.KeyHelper;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.slf4j.Logger;
@@ -75,7 +73,7 @@ public abstract class RestRequest {
 
   private static final String KEY_FILE_PATH = "/etc/openbaton/service-key";
   private static final String SDK_PROPERTIES_FILE = "sdk.api.properties";
-  private String keyFilePath;
+  private String serviceKey;
 
   private Logger log = LoggerFactory.getLogger(this.getClass());
   protected final String baseUrl;
@@ -152,8 +150,8 @@ public abstract class RestRequest {
     this.projectId = projectId;
 
     GsonBuilder builder = new GsonBuilder();
-    //builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
-    //builder.registerTypeAdapter(Date.class, new GsonDeserializerDate());
+    //    builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
+    //    builder.registerTypeAdapter(Date.class, new GsonDeserializerDate());
     this.mapper = builder.setPrettyPrinting().create();
   }
 
@@ -167,7 +165,8 @@ public abstract class RestRequest {
    * @param nfvoPort
    * @param path
    * @param version
-   * @param keyFilePath
+   * @param serviceKey
+   * @throws IllegalArgumentException if the service key is null
    */
   public RestRequest(
       String serviceName,
@@ -177,8 +176,8 @@ public abstract class RestRequest {
       String nfvoPort,
       String path,
       String version,
-      String keyFilePath)
-      throws FileNotFoundException {
+      String serviceKey) {
+    if (serviceKey == null) throw new IllegalArgumentException("The service key must not be null");
     if (sslEnabled) {
       this.baseUrl = "https://" + nfvoIp + ":" + nfvoPort + "/api/v" + version;
       this.provider = "https://" + nfvoIp + ":" + nfvoPort + "/oauth/token";
@@ -197,25 +196,20 @@ public abstract class RestRequest {
     this.serviceName = serviceName;
     this.isService = true;
     this.projectId = projectId;
+    this.serviceKey = serviceKey;
 
     GsonBuilder builder = new GsonBuilder();
-    //builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
-    //builder.registerTypeAdapter(Date.class, new GsonDeserializerDate());
+    //    builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
+    //    builder.registerTypeAdapter(Date.class, new GsonDeserializerDate());
     this.mapper = builder.setPrettyPrinting().create();
-    if (keyFilePath != null) this.keyFilePath = keyFilePath;
-    else this.keyFilePath = propertyReader.getSimpleProperty("key-file-location", KEY_FILE_PATH);
-    if (!new File(this.keyFilePath).exists()) {
-      log.error("missing key file for services");
-      throw new FileNotFoundException("missing key file for services");
-    }
   }
 
   /**
    * Does the POST Request
    *
-   * @param id
-   * @return String
-   * @throws SDKException
+   * @param id specifies the entity on which to perform the post request
+   * @return a String containing the response content
+   * @throws SDKException if the request fails
    */
   public String requestPost(final String id) throws SDKException {
     CloseableHttpResponse response = null;
@@ -287,7 +281,8 @@ public abstract class RestRequest {
    * returning the response
    *
    * @param object the object content to be serialized as json
-   * @return a string containing the response content
+   * @return a String containing the response content
+   * @throws SDKException if the request fails
    */
   public Serializable requestPost(final Serializable object) throws SDKException {
     return requestPost("", object);
@@ -489,9 +484,11 @@ public abstract class RestRequest {
    * returning it. This can be useful if the method's return type is not the same as the type of the
    * object parameter.
    *
+   * @param id specifies the entity on which to perform the post request
    * @param object the object content to be serialized as json
    * @param type the object type to which the response should be mapped
-   * @return a string containing the response content
+   * @return a String containing the response content
+   * @throws SDKException if the request fails
    */
   public Serializable requestPost(final String id, final Serializable object, final Type type)
       throws SDKException {
@@ -576,7 +573,7 @@ public abstract class RestRequest {
    *
    * @param f the tar file containing the VNFPackage
    * @return the created VNFPackage object
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   public VNFPackage requestPostPackage(final File f) throws SDKException {
     CloseableHttpResponse response = null;
@@ -659,6 +656,7 @@ public abstract class RestRequest {
    * Executes a http delete with to a given id
    *
    * @param id the id path used for the api request
+   * @throws SDKException if the request fails
    */
   public void requestDelete(final String id) throws SDKException {
     CloseableHttpResponse response = null;
@@ -712,7 +710,9 @@ public abstract class RestRequest {
    * Executes a http get with to a given id
    *
    * @param id the id path used for the api request
+   * @param type the class of the requested entity
    * @return a string containing he response content
+   * @throws SDKException if the request fails
    */
   public Object requestGet(final String id, Class type) throws SDKException {
     String url = this.pathUrl;
@@ -889,7 +889,9 @@ public abstract class RestRequest {
    * status check of the response
    *
    * @param url the url path used for the api request
+   * @param type the class of the requested entity
    * @return a string containing the response content
+   * @throws SDKException if the request fails
    */
   public Object requestGetWithStatusAccepted(String url, Class type) throws SDKException {
     url = this.pathUrl + "/" + url;
@@ -903,6 +905,7 @@ public abstract class RestRequest {
    * @param id the id path used for the api request
    * @param object the object content to be serialized as json
    * @return a string containing the response content
+   * @throws SDKException if the request fails
    */
   public Serializable requestPut(final String id, final Serializable object) throws SDKException {
     CloseableHttpResponse response = null;
@@ -985,16 +988,14 @@ public abstract class RestRequest {
     if (isService) {
       try {
         log.debug("Registering Service " + serviceName);
-        String key_data =
-            new String(Files.readAllBytes(Paths.get(this.keyFilePath)), StandardCharsets.UTF_8);
 
         String encryptedMessage =
             KeyHelper.encryptNew(
-                "{\"name\":\"" + serviceName + "\",\"action\":\"register\"}", key_data);
+                "{\"name\":\"" + serviceName + "\",\"action\":\"register\"}", serviceKey);
 
         CloseableHttpResponse response = null;
         HttpPost httpPost = new HttpPost(this.serviceTokenUrl);
-        httpPost.setHeader(new BasicHeader("accept", "text/plain,application/json"));
+        httpPost.setHeader(new BasicHeader("accept", "application/json"));
         httpPost.setHeader(new BasicHeader("Content-Type", "text/plain"));
 
         httpPost.setEntity(new StringEntity(encryptedMessage));
@@ -1002,14 +1003,43 @@ public abstract class RestRequest {
         log.debug("Post: " + httpPost.getURI());
         response = httpClient.execute(httpPost);
         RestUtils.checkStatus(response, HttpURLConnection.HTTP_CREATED);
+        String responseString = "";
+        if (response.getEntity() == null) {
+          log.error("The response entity is null when trying to get the access token.");
+          response.close();
+          httpPost.releaseConnection();
+          throw new NullPointerException(
+              "The response entity is null when trying to get the access token.");
+        }
+        responseString = EntityUtils.toString(response.getEntity());
+        JsonObject responseJson;
+        try {
+          responseJson = mapper.fromJson(responseString, JsonObject.class);
+        } catch (Exception e) {
+          log.error("The response does not seem to be valid Json: " + responseString);
+          response.close();
+          httpPost.releaseConnection();
+          throw e;
+        }
+        if (!responseJson.has("token"))
+          throw new NotFoundException(
+              "Did not find the 'token' field in the NFVO's response: "
+                  + mapper.toJson(responseJson));
         String encryptedToken = "";
-        if (response.getEntity() != null) {
-          encryptedToken = EntityUtils.toString(response.getEntity());
+        try {
+          encryptedToken = responseJson.getAsJsonPrimitive("token").getAsString();
+        } catch (Exception e) {
+          log.error(
+              "The 'token' field in the NFVO's response does not seem to be of type String: "
+                  + mapper.toJson(responseJson));
+          response.close();
+          httpPost.releaseConnection();
+          throw e;
         }
         response.close();
         httpPost.releaseConnection();
 
-        String decryptedToken = KeyHelper.decryptNew(encryptedToken, key_data);
+        String decryptedToken = KeyHelper.decryptNew(encryptedToken, serviceKey);
         log.trace("Token is: " + decryptedToken);
         this.token = decryptedToken;
         this.bearerToken = "Bearer " + this.token;
