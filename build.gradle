@@ -27,6 +27,7 @@ plugins {
     id "com.github.sherter.google-java-format" version "0.5"
 }
 apply from: 'gradle/gradle/nexus.upload.plugin.gradle'
+apply from: 'gradle/gradle/git.release.gradle'
 
 allprojects {
     apply plugin: 'idea'
