@@ -196,7 +196,7 @@ public abstract class RestRequest {
     this.serviceName = serviceName;
     this.isService = true;
     this.projectId = projectId;
-    this.serviceKey = serviceKey;
+    this.serviceKey = serviceKey.trim();
 
     GsonBuilder builder = new GsonBuilder();
     //    builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
@@ -1158,6 +1158,4 @@ public abstract class RestRequest {
         .setSSLSocketFactory(sslConnectionSocketFactory)
         .build();
   }
-
-  public static void main(String[] args) {}
 }
