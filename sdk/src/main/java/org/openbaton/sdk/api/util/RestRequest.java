@@ -48,6 +48,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -690,7 +691,8 @@ public abstract class RestRequest {
       }
       throw new SDKException("Could not http-delete", e.getStackTrace(), e.getMessage());
     } catch (SDKException e) {
-      if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+      if (response != null
+          && (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED)) {
         token = null;
         if (httpDelete != null) {
           httpDelete.releaseConnection();
@@ -698,11 +700,12 @@ public abstract class RestRequest {
         requestDelete(id);
         return;
       }
+      throw new SDKException(
+          "Could not http-delete or the api response was wrong", e.getStackTrace(), e.getMessage());
+    } finally {
       if (httpDelete != null) {
         httpDelete.releaseConnection();
       }
-      throw new SDKException(
-          "Could not http-delete or the api response was wrong", e.getStackTrace(), e.getMessage());
     }
   }
 
@@ -1043,6 +1046,8 @@ public abstract class RestRequest {
         log.trace("Token is: " + decryptedToken);
         this.token = decryptedToken;
         this.bearerToken = "Bearer " + this.token;
+      } catch (HttpHostConnectException httpHostConnectException) {
+        throw new SDKException("Host unreachable: " + httpHostConnectException.getMessage());
       } catch (Exception e) {
         throw new SDKException(e);
       }

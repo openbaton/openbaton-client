@@ -17,21 +17,9 @@
 
 package org.openbaton.sdk;
 
-import java.io.FileNotFoundException;
 import org.openbaton.catalogue.security.Project;
 import org.openbaton.sdk.api.exception.SDKException;
-import org.openbaton.sdk.api.rest.ConfigurationAgent;
-import org.openbaton.sdk.api.rest.EventAgent;
-import org.openbaton.sdk.api.rest.KeyAgent;
-import org.openbaton.sdk.api.rest.NetworkServiceDescriptorAgent;
-import org.openbaton.sdk.api.rest.NetworkServiceRecordAgent;
-import org.openbaton.sdk.api.rest.ProjectAgent;
-import org.openbaton.sdk.api.rest.UserAgent;
-import org.openbaton.sdk.api.rest.VNFFGAgent;
-import org.openbaton.sdk.api.rest.VNFPackageAgent;
-import org.openbaton.sdk.api.rest.VimInstanceAgent;
-import org.openbaton.sdk.api.rest.VirtualLinkAgent;
-import org.openbaton.sdk.api.rest.VirtualNetworkFunctionDescriptorAgent;
+import org.openbaton.sdk.api.rest.*;
 
 /**
  * This class serves as a creator of request agents for the NFVO. These agents can be obtained by
@@ -131,8 +119,6 @@ public final class NFVORequestor {
     } catch (SDKException e) {
       throw new SDKException(
           "Could not create the NFVORequestor", e.getStackTraceElements(), e.getReason());
-    } catch (FileNotFoundException ignore) {
-      ignore.printStackTrace();
     }
   }
 
@@ -173,7 +159,7 @@ public final class NFVORequestor {
    *
    * @return a ConfigurationAgent
    */
-  public synchronized ConfigurationAgent getConfigurationAgent() throws FileNotFoundException {
+  public synchronized ConfigurationAgent getConfigurationAgent() {
     if (this.configurationAgent == null) {
       if (isService) {
         this.configurationAgent =
@@ -206,8 +192,7 @@ public final class NFVORequestor {
    *
    * @return a NetworkServiceDescriptorAgent
    */
-  public synchronized NetworkServiceDescriptorAgent getNetworkServiceDescriptorAgent()
-      throws FileNotFoundException {
+  public synchronized NetworkServiceDescriptorAgent getNetworkServiceDescriptorAgent() {
     if (this.networkServiceDescriptorAgent == null) {
       if (isService) {
         this.networkServiceDescriptorAgent =
@@ -241,7 +226,7 @@ public final class NFVORequestor {
    * @return a VirtualNetworkFunctionDescriptorAgent
    */
   public synchronized VirtualNetworkFunctionDescriptorAgent
-      getVirtualNetworkFunctionDescriptorAgent() throws FileNotFoundException {
+      getVirtualNetworkFunctionDescriptorAgent() {
     if (this.virtualNetworkFunctionDescriptorAgent == null) {
       if (isService) {
         this.virtualNetworkFunctionDescriptorAgent =
@@ -274,8 +259,7 @@ public final class NFVORequestor {
    *
    * @return a NetworkServiceRecordAgent
    */
-  public synchronized NetworkServiceRecordAgent getNetworkServiceRecordAgent()
-      throws FileNotFoundException {
+  public synchronized NetworkServiceRecordAgent getNetworkServiceRecordAgent() {
     if (this.networkServiceRecordAgent == null) {
       if (isService) {
         this.networkServiceRecordAgent =
@@ -307,7 +291,7 @@ public final class NFVORequestor {
    *
    * @return a VimInstanceAgent
    */
-  public synchronized VimInstanceAgent getVimInstanceAgent() throws FileNotFoundException {
+  public synchronized VimInstanceAgent getVimInstanceAgent() {
     if (this.vimInstanceAgent == null) {
       if (isService) {
         this.vimInstanceAgent =
@@ -339,7 +323,7 @@ public final class NFVORequestor {
    *
    * @return a VirtualLinkAgent
    */
-  public synchronized VirtualLinkAgent getVirtualLinkAgent() throws FileNotFoundException {
+  public synchronized VirtualLinkAgent getVirtualLinkAgent() {
     if (this.virtualLinkAgent == null) {
       if (isService) {
         this.virtualLinkAgent =
@@ -373,7 +357,7 @@ public final class NFVORequestor {
    * @return a VirtualNetworkFunctionDescriptorAgent
    */
   public synchronized VirtualNetworkFunctionDescriptorAgent
-      getVirtualNetworkFunctionDescriptorRestAgent() throws FileNotFoundException {
+      getVirtualNetworkFunctionDescriptorRestAgent() {
     if (this.virtualNetworkFunctionDescriptorAgent == null) {
       if (isService) {
         this.virtualNetworkFunctionDescriptorAgent =
@@ -405,7 +389,7 @@ public final class NFVORequestor {
    *
    * @return a VNFFGAgent
    */
-  public synchronized VNFFGAgent getVNFFGAgent() throws FileNotFoundException {
+  public synchronized VNFFGAgent getVNFFGAgent() {
     if (this.vnffgAgent == null) {
       if (isService) {
         this.vnffgAgent =
@@ -437,7 +421,7 @@ public final class NFVORequestor {
    *
    * @return an EventAgent
    */
-  public synchronized EventAgent getEventAgent() throws FileNotFoundException {
+  public synchronized EventAgent getEventAgent() {
     if (this.eventAgent == null) {
       if (isService) {
         this.eventAgent =
@@ -469,7 +453,7 @@ public final class NFVORequestor {
    *
    * @return a VNFPackageAgent
    */
-  public synchronized VNFPackageAgent getVNFPackageAgent() throws FileNotFoundException {
+  public synchronized VNFPackageAgent getVNFPackageAgent() {
     if (this.vnfPackageAgent == null) {
       if (isService) {
         this.vnfPackageAgent =
@@ -501,7 +485,7 @@ public final class NFVORequestor {
    *
    * @return a ProjectAgent
    */
-  public synchronized ProjectAgent getProjectAgent() throws FileNotFoundException {
+  public synchronized ProjectAgent getProjectAgent() {
     if (this.projectAgent == null) {
       if (isService) {
         this.projectAgent =
@@ -533,7 +517,7 @@ public final class NFVORequestor {
    *
    * @return a UserAgent
    */
-  public synchronized UserAgent getUserAgent() throws FileNotFoundException {
+  public synchronized UserAgent getUserAgent() {
     if (this.userAgent == null) {
       if (isService) {
         this.userAgent =
@@ -565,7 +549,7 @@ public final class NFVORequestor {
    *
    * @return a KeyAgent
    */
-  public synchronized KeyAgent getKeyAgent() throws FileNotFoundException {
+  public synchronized KeyAgent getKeyAgent() {
     if (this.keyAgent == null) {
       if (isService) {
         this.keyAgent =
@@ -621,8 +605,7 @@ public final class NFVORequestor {
    * @param projectName the name of the project to switch to
    * @throws SDKException
    */
-  public synchronized void switchProject(String projectName)
-      throws SDKException, FileNotFoundException {
+  public synchronized void switchProject(String projectName) throws SDKException {
     try {
       this.projectId = getProjectIdForProjectName(projectName);
       // Set the agents to null so that no outdated agent is returned
@@ -640,8 +623,7 @@ public final class NFVORequestor {
    * @return the project id for the given project name
    * @throws SDKException
    */
-  private String getProjectIdForProjectName(String projectName)
-      throws SDKException, FileNotFoundException {
+  private String getProjectIdForProjectName(String projectName) throws SDKException {
     for (Project project : this.getProjectAgent().findAll()) {
       if (project.getName().equals(projectName)) {
         return project.getId();
