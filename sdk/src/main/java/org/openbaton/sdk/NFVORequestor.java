@@ -58,6 +58,8 @@ public final class NFVORequestor {
   /**
    * Constructor for the NFVORequestor.
    *
+   * @deprecated Please use NfvoRequestorBuilder
+   * @see NfvoRequestorBuilder
    * @param username the username used for sending requests
    * @param password the password used for sending requests
    * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
@@ -66,6 +68,7 @@ public final class NFVORequestor {
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
    */
+  @Deprecated
   public NFVORequestor(
       String username,
       String password,
@@ -89,6 +92,8 @@ public final class NFVORequestor {
    * This constructor sends a request to the NFVO and checks if a Project with the given name
    * exists.
    *
+   * @deprecated Please use NfvoRequestorBuilder
+   * @see NfvoRequestorBuilder
    * @param username the username used for sending requests
    * @param password the password used for sending requests
    * @param sslEnabled true if the NFVO uses SSL
@@ -96,8 +101,9 @@ public final class NFVORequestor {
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
-   * @throws SDKException
+   * @throws SDKException in case of exception
    */
+  @Deprecated
   public NFVORequestor(
       String username,
       String password,
@@ -125,6 +131,8 @@ public final class NFVORequestor {
   /**
    * Constructor for the NFVORequestor in service mode.
    *
+   * @deprecated Please use NfvoRequestorBuilder
+   * @see NfvoRequestorBuilder
    * @param serviceName the name of the service to use for requests
    * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
    * @param sslEnabled true if the NFVO uses SSL
@@ -132,8 +140,9 @@ public final class NFVORequestor {
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
    * @param serviceKey the key for authenticating the service
-   * @throws SDKException
+   * @throws SDKException in case of exception
    */
+  @Deprecated
   public NFVORequestor(
       String serviceName,
       String projectId,
@@ -580,7 +589,7 @@ public final class NFVORequestor {
    * Set the NFVORequestor's project id. See the {@link #switchProject(String) switchProject} method
    * for a more convenient alternative.
    *
-   * @param projectId
+   * @param projectId the project id
    */
   public synchronized void setProjectId(String projectId) {
     // Set the agents to null so that no outdated agent is returned
@@ -603,7 +612,7 @@ public final class NFVORequestor {
    * exists with the given projectName.
    *
    * @param projectName the name of the project to switch to
-   * @throws SDKException
+   * @throws SDKException in case of exception
    */
   public synchronized void switchProject(String projectName) throws SDKException {
     try {
@@ -619,9 +628,9 @@ public final class NFVORequestor {
   /**
    * Return the project id for a given project name.
    *
-   * @param projectName
+   * @param projectName the name of the project
    * @return the project id for the given project name
-   * @throws SDKException
+   * @throws SDKException in case of exception
    */
   private String getProjectIdForProjectName(String projectName) throws SDKException {
     for (Project project : this.getProjectAgent().findAll()) {

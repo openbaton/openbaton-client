@@ -17,14 +17,14 @@
 
 package org.openbaton.sdk.api.rest;
 
-import org.openbaton.catalogue.nfvo.VimInstance;
+import org.openbaton.catalogue.nfvo.viminstances.BaseVimInstance;
 import org.openbaton.sdk.api.util.AbstractRestAgent;
 
 /**
  * This class is a Rest Request Agent for sending requests regarding VimInstance objects to the NFVO
  * API. It is thread safe.
  */
-public class VimInstanceAgent extends AbstractRestAgent<VimInstance> {
+public class VimInstanceAgent extends AbstractRestAgent<BaseVimInstance> {
 
   /**
    * @param username the username used for sending requests
@@ -43,7 +43,15 @@ public class VimInstanceAgent extends AbstractRestAgent<VimInstance> {
       String nfvoIp,
       String nfvoPort,
       String version) {
-    super(username, password, projectId, sslEnabled, nfvoIp, nfvoPort, version, VimInstance.class);
+    super(
+        username,
+        password,
+        projectId,
+        sslEnabled,
+        nfvoIp,
+        nfvoPort,
+        version,
+        BaseVimInstance.class);
   }
 
   /**
@@ -73,6 +81,6 @@ public class VimInstanceAgent extends AbstractRestAgent<VimInstance> {
         nfvoPort,
         version,
         serviceKey,
-        VimInstance.class);
+        BaseVimInstance.class);
   }
 }

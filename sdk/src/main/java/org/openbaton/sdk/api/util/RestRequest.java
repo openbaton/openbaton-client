@@ -34,11 +34,11 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.net.ssl.SSLContext;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -63,7 +63,10 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.openbaton.catalogue.nfvo.VNFPackage;
+import org.openbaton.catalogue.nfvo.viminstances.BaseVimInstance;
 import org.openbaton.exceptions.NotFoundException;
+import org.openbaton.nfvo.common.configuration.NfvoGsonDeserializerVimInstance;
+import org.openbaton.nfvo.common.configuration.NfvoGsonSerializerVimInstance;
 import org.openbaton.nfvo.common.utils.key.KeyHelper;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.slf4j.Logger;
@@ -151,8 +154,8 @@ public abstract class RestRequest {
     this.projectId = projectId;
 
     GsonBuilder builder = new GsonBuilder();
-    //    builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
-    //    builder.registerTypeAdapter(Date.class, new GsonDeserializerDate());
+    builder.registerTypeAdapter(BaseVimInstance.class, new NfvoGsonDeserializerVimInstance());
+    builder.registerTypeAdapter(BaseVimInstance.class, new NfvoGsonSerializerVimInstance());
     this.mapper = builder.setPrettyPrinting().create();
   }
 
@@ -584,19 +587,13 @@ public abstract class RestRequest {
       checkToken();
       log.debug("Executing post on " + pathUrl);
       httpPost = new HttpPost(this.pathUrl);
-      preparePostHeader(httpPost, "multipart/form-data", null);
+      preparePostHeader(httpPost, "application/json", null);
 
       MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
       multipartEntityBuilder.addBinaryBody("file", f);
       httpPost.setEntity(multipartEntityBuilder.build());
 
       response = httpClient.execute(httpPost);
-    } catch (ClientProtocolException e) {
-      httpPost.releaseConnection();
-      throw new SDKException(
-          "Could not create VNFPackage from file " + f.getName(),
-          e.getStackTrace(),
-          e.getMessage());
     } catch (IOException e) {
       httpPost.releaseConnection();
       throw new SDKException(
@@ -767,29 +764,23 @@ public abstract class RestRequest {
       Class<?> aClass = Array.newInstance(type, 3).getClass();
       log.trace("class is: " + aClass);
       Object[] o = (Object[]) this.mapper.fromJson(result, aClass);
-      log.trace("deserialized is: " + o);
+      log.trace("deserialized is: " + Arrays.toString(o));
 
       return o;
     } catch (IOException e) {
       // catch request exceptions here
       log.error(e.getMessage(), e);
-      if (httpGet != null) {
-        httpGet.releaseConnection();
-      }
+      httpGet.releaseConnection();
       throw new SDKException("Could not http-get", e.getStackTrace(), e.getMessage());
     } catch (SDKException e) {
       if (response != null) {
         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
           token = null;
-          if (httpGet != null) {
-            httpGet.releaseConnection();
-          }
+          httpGet.releaseConnection();
           return requestGetAll(url, type, httpStatus);
         } else {
           log.error(e.getMessage(), e);
-          if (httpGet != null) {
-            httpGet.releaseConnection();
-          }
+          httpGet.releaseConnection();
           throw new SDKException("Could not authorize", e.getStackTrace(), e.getMessage());
         }
       } else {
@@ -808,7 +799,7 @@ public abstract class RestRequest {
    *
    * @param url the id path used for the api request
    * @param httpStatus the http status to be checked.
-   * @param type
+   * @param type the class
    * @return a string containing the response content
    */
   private Object requestGetWithStatus(final String url, final Integer httpStatus, Class type)
@@ -854,23 +845,17 @@ public abstract class RestRequest {
     } catch (IOException e) {
       // catch request exceptions here
       log.error(e.getMessage(), e);
-      if (httpGet != null) {
-        httpGet.releaseConnection();
-      }
+      httpGet.releaseConnection();
       throw new SDKException("Could not http-get", e.getStackTrace(), e.getMessage());
     } catch (SDKException e) {
       if (response != null) {
         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
           token = null;
-          if (httpGet != null) {
-            httpGet.releaseConnection();
-          }
+          httpGet.releaseConnection();
           return requestGetWithStatus(url, httpStatus, type);
         } else {
           log.error(e.getMessage(), e);
-          if (httpGet != null) {
-            httpGet.releaseConnection();
-          }
+          httpGet.releaseConnection();
           throw new SDKException("Could not authorize", e.getStackTrace(), e.getMessage());
         }
       } else {
@@ -898,7 +883,7 @@ public abstract class RestRequest {
    */
   public Object requestGetWithStatusAccepted(String url, Class type) throws SDKException {
     url = this.pathUrl + "/" + url;
-    return requestGetWithStatus(url, new Integer(HttpURLConnection.HTTP_ACCEPTED), type);
+    return requestGetWithStatus(url, HttpURLConnection.HTTP_ACCEPTED, type);
   }
 
   /**

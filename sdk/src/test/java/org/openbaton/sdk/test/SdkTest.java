@@ -17,8 +17,6 @@
 
 package org.openbaton.sdk.test;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.io.FileNotFoundException;
 import java.util.HashSet;
 import org.junit.Ignore;
@@ -30,63 +28,51 @@ import org.openbaton.catalogue.mano.record.PhysicalNetworkFunctionRecord;
 import org.openbaton.catalogue.mano.record.VNFRecordDependency;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 import org.openbaton.catalogue.nfvo.Location;
-import org.openbaton.catalogue.nfvo.VimInstance;
-import org.openbaton.catalogue.security.Project;
+import org.openbaton.catalogue.nfvo.viminstances.BaseVimInstance;
+import org.openbaton.catalogue.nfvo.viminstances.OpenstackVimInstance;
 import org.openbaton.sdk.NFVORequestor;
+import org.openbaton.sdk.NfvoRequestorBuilder;
 import org.openbaton.sdk.api.exception.SDKException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-/** Created by lto on 03/07/15. */
 public class SdkTest {
-
-  private Logger log = LoggerFactory.getLogger(this.getClass());
-  private VimInstance vimInstance;
-  private VimInstance res;
-  private static final String descriptorFileName =
-      "/opt/fokus-repo/descriptors/network_service_descriptors/NetworkServiceDescriptor-iperf-single.json";
 
   @Test
   @Ignore
-  public void createTest() throws FileNotFoundException {
-    GsonBuilder gsonBuilder = new GsonBuilder().setPrettyPrinting();
-    Gson gson = gsonBuilder.create();
-    NFVORequestor requestor = null;
-    try {
-      requestor =
-          new NFVORequestor(
-              "autoscaling-engine",
-              "017175e7-807c-41e5-b5bd-8b5d4871a909",
-              "localhost",
-              "8080",
-              "1",
-              false,
-              "c_oVfU`iWZftbmbP");
-    } catch (SDKException e) {
-      e.printStackTrace();
-    }
+  public void createTest() throws FileNotFoundException, SDKException {
 
-    String projectId = null;
-    try {
-      for (Project project : requestor.getProjectAgent().findAll()) {
-        if (project.getName().equals("default")) {
-          projectId = project.getId();
-        }
-      }
+    /*
+    This is how you create a NFVO requestor
+     */
+    NFVORequestor requestor =
+        NfvoRequestorBuilder.create()
+            .nfvoIp("localhost")
+            .nfvoPort(8080)
+            .username("admin")
+            .password("openbaton")
+            .projectName("default")
+            .sslEnabled(false)
+            .version("1")
+            .build();
 
-      //      EventAgent eventAgent = requestor.getEventAgent();
-      //      EventEndpoint eventEndpoint = new EventEndpoint();
-      //      eventEndpoint.setEvent(Action.INSTANTIATE_FINISH);
-      //      eventEndpoint.setName("name");
-      //      eventEndpoint.setType(EndpointType.REST);
-      //      eventEndpoint.setEndpoint("http://localhost:8080/event");
-      //      eventAgent.create(eventEndpoint);
+    /*
+    The default values are the same so you can do something like this
+     */
+    requestor = NfvoRequestorBuilder.create().build();
 
-    } catch (SDKException e) {
-      e.printStackTrace();
-    }
+    /*
+    Or change only one field
+     */
+    requestor = NfvoRequestorBuilder.create().nfvoPort(8080).build();
 
-    //    requestor = new NFVORequestor("admin", "openbaton", projectId, false, "localhost", "8080", "1");
+    /*
+    Use it the old way
+     */
+
+    requestor.getProjectAgent().findAll().forEach(System.out::println);
+    requestor.getVimInstanceAgent().findAll().forEach(System.out::println);
+    requestor
+        .getVNFPackageAgent()
+        .create("/Users/lorenzo/Projects/Work/OpenBaton/packages/iperf/server.tar");
     //
     //    /** VimInsance */
     //    vimInstance = createVimInstance();
@@ -130,7 +116,7 @@ public class SdkTest {
     //      System.err.println("Reason: " + e.getReason());
     //      System.exit(2);
     //    }
-    /** Event */
+    /* Event */
 
     //    EventAgent eventAgent = requestor.getEventAgent();
     //    EventEndpoint eventEndpoint = new EventEndpoint();
@@ -243,8 +229,8 @@ public class SdkTest {
     return new VNFRecordDependency();
   }
 
-  private VimInstance createVimInstance() {
-    VimInstance vimInstance = new VimInstance();
+  private BaseVimInstance createVimInstance() {
+    OpenstackVimInstance vimInstance = new OpenstackVimInstance();
     vimInstance.setName("vim-instance-test");
     vimInstance.setType("test");
     vimInstance.setAuthUrl("test.de");
@@ -260,7 +246,7 @@ public class SdkTest {
     return vimInstance;
   }
 
-  private NetworkServiceDescriptor createNetworkServiceDescriptor() {
+  private NetworkServiceDescriptor createNetworkServiceDescriptor(String vimInstanceName) {
     NetworkServiceDescriptor networkServiceDescriptor = new NetworkServiceDescriptor();
     VirtualNetworkFunctionDescriptor vnfd = new VirtualNetworkFunctionDescriptor();
 
@@ -270,10 +256,9 @@ public class SdkTest {
     VirtualDeploymentUnit vdu = new VirtualDeploymentUnit();
     vdu.setVirtual_memory_resource_element("1024");
     vdu.setVirtual_network_bandwidth_resource("1000000");
-    VimInstance instance = new VimInstance();
+    BaseVimInstance instance = createVimInstance();
     instance.setId(null);
-    instance.setName(vimInstance.getName());
-    //vdu.setVimInstance(instance);
+    instance.setName(vimInstanceName);
 
     vdu.setVm_image(
         new HashSet<String>() {
@@ -288,10 +273,10 @@ public class SdkTest {
             add("cpu_utilization");
           }
         });
-    vnfd.setVdu(new HashSet<VirtualDeploymentUnit>());
+    vnfd.setVdu(new HashSet<>());
     vnfd.getVdu().add(vdu);
 
-    networkServiceDescriptor.setVnfd(new HashSet<VirtualNetworkFunctionDescriptor>());
+    networkServiceDescriptor.setVnfd(new HashSet<>());
     networkServiceDescriptor.getVnfd().add(vnfd);
 
     networkServiceDescriptor.setVendor("fokus");
