@@ -739,7 +739,9 @@ public abstract class RestRequest {
       // call the api here
       log.debug("Executing get on: " + url);
       httpGet = new HttpGet(url);
-      httpGet.setHeader(new BasicHeader("project-id", projectId));
+      if (projectId != null) {
+        httpGet.setHeader(new BasicHeader("project-id", projectId));
+      }
       if (token != null) {
         httpGet.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
       }
@@ -812,7 +814,9 @@ public abstract class RestRequest {
       // call the api here
       log.debug("Executing get on: " + url);
       httpGet = new HttpGet(url);
-      httpGet.setHeader(new BasicHeader("project-id", projectId));
+      if (projectId != null) {
+        httpGet.setHeader(new BasicHeader("project-id", projectId));
+      }
       if (token != null) {
         httpGet.setHeader(new BasicHeader("authorization", bearerToken.replaceAll("\"", "")));
       }
