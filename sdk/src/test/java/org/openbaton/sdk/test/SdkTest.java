@@ -70,9 +70,9 @@ public class SdkTest {
 
     requestor.getProjectAgent().findAll().forEach(System.out::println);
     requestor.getVimInstanceAgent().findAll().forEach(System.out::println);
-    requestor
-        .getVNFPackageAgent()
-        .create("/Users/lorenzo/Projects/Work/OpenBaton/packages/iperf/server.tar");
+//    requestor
+//        .getVNFPackageAgent()
+//        .create("/Users/lorenzo/Projects/Work/OpenBaton/packages/iperf/server.tar");
     //
     //    /** VimInsance */
     //    vimInstance = createVimInstance();
