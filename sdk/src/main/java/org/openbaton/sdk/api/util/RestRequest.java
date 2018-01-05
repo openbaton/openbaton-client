@@ -203,8 +203,8 @@ public abstract class RestRequest {
     this.serviceKey = serviceKey.trim();
 
     GsonBuilder builder = new GsonBuilder();
-    //    builder.registerTypeAdapter(Date.class, new GsonSerializerDate());
-    //    builder.registerTypeAdapter(Date.class, new GsonDeserializerDate());
+    builder.registerTypeAdapter(BaseVimInstance.class, new NfvoGsonDeserializerVimInstance());
+    builder.registerTypeAdapter(BaseVimInstance.class, new NfvoGsonSerializerVimInstance());
     this.mapper = builder.setPrettyPrinting().create();
   }
 
