@@ -188,12 +188,12 @@ public final class NFVORequestor {
       throws SDKException {
     this.serviceName = serviceName;
     this.isService = true;
-    this.projectId = getProjectIdForProjectName(projectName);
     this.sslEnabled = sslEnabled;
+    this.serviceKey = serviceKey;
     this.nfvoIp = nfvoIp;
     this.nfvoPort = nfvoPort;
     this.version = version;
-    this.serviceKey = serviceKey;
+    this.projectId = getProjectIdForProjectName(projectName);
   }
 
   /**
