@@ -163,6 +163,40 @@ public final class NFVORequestor {
   }
 
   /**
+   * Constructor for the NFVORequestor in service mode.
+   *
+   * @deprecated Please use NfvoRequestorBuilder
+   * @see NfvoRequestorBuilder
+   * @param serviceName the name of the service to use for requests
+   * @param projectName the NFVO Project's Name that will be used in the requests to the NFVO
+   * @param sslEnabled true if the NFVO uses SSL
+   * @param nfvoIp the IP address of the NFVO to which the requests are sent
+   * @param nfvoPort the port on which the NFVO runs
+   * @param version the API version
+   * @param serviceKey the key for authenticating the service
+   * @throws SDKException in case of exception
+   */
+  @Deprecated
+  public NFVORequestor(
+      String serviceName,
+      String nfvoIp,
+      String nfvoPort,
+      String version,
+      boolean sslEnabled,
+      String projectName,
+      String serviceKey)
+      throws SDKException {
+    this.serviceName = serviceName;
+    this.isService = true;
+    this.projectId = getProjectIdForProjectName(projectName);
+    this.sslEnabled = sslEnabled;
+    this.nfvoIp = nfvoIp;
+    this.nfvoPort = nfvoPort;
+    this.version = version;
+    this.serviceKey = serviceKey;
+  }
+
+  /**
    * Returns a ConfigurationAgent with which requests regarding Configurations can be sent to the
    * NFVO.
    *

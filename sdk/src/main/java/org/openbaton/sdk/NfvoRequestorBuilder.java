@@ -85,14 +85,25 @@ public class NfvoRequestorBuilder {
         && !serviceKey.equalsIgnoreCase("")
         && serviceName != null
         && !serviceName.equalsIgnoreCase("")) {
-      return new NFVORequestor(
-          serviceName,
-          projectId,
-          nfvoIp,
-          String.format("%d", nfvoPort),
-          version,
-          sslEnabled,
-          serviceKey);
+      if (projectName != null && !projectName.equals("")){
+        return new NFVORequestor(
+            serviceName,
+            nfvoIp,
+            String.format("%d", nfvoPort),
+            version,
+            sslEnabled,
+            projectName,
+            serviceKey);
+      } else {
+        return new NFVORequestor(
+            serviceName,
+            projectId,
+            nfvoIp,
+            String.format("%d", nfvoPort),
+            version,
+            sslEnabled,
+            serviceKey);
+      }
     } else {
       if (projectName != null && !projectName.equalsIgnoreCase("")) {
         return new NFVORequestor(
