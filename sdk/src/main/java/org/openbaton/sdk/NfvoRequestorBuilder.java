@@ -85,7 +85,7 @@ public class NfvoRequestorBuilder {
         && !serviceKey.equalsIgnoreCase("")
         && serviceName != null
         && !serviceName.equalsIgnoreCase("")) {
-      if (projectName != null && !projectName.equals("")){
+      if (projectName != null && !projectName.equals("")) {
         return new NFVORequestor(
             serviceName,
             nfvoIp,
