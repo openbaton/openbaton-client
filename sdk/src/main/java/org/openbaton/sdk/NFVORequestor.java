@@ -17,7 +17,6 @@
 
 package org.openbaton.sdk;
 
-import org.openbaton.catalogue.security.Project;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.openbaton.sdk.api.rest.*;
 
@@ -58,8 +57,6 @@ public final class NFVORequestor {
   /**
    * Constructor for the NFVORequestor.
    *
-   * @deprecated Please use NfvoRequestorBuilder
-   * @see NfvoRequestorBuilder
    * @param username the username used for sending requests
    * @param password the password used for sending requests
    * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
@@ -67,6 +64,8 @@ public final class NFVORequestor {
    * @param nfvoIp the IP address of the NFVO to which the requests are sent
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
+   * @see NfvoRequestorBuilder
+   * @deprecated Please use NfvoRequestorBuilder
    */
   @Deprecated
   public NFVORequestor(
@@ -92,8 +91,6 @@ public final class NFVORequestor {
    * This constructor sends a request to the NFVO and checks if a Project with the given name
    * exists.
    *
-   * @deprecated Please use NfvoRequestorBuilder
-   * @see NfvoRequestorBuilder
    * @param username the username used for sending requests
    * @param password the password used for sending requests
    * @param sslEnabled true if the NFVO uses SSL
@@ -102,6 +99,8 @@ public final class NFVORequestor {
    * @param nfvoPort the port on which the NFVO runs
    * @param version the API version
    * @throws SDKException in case of exception
+   * @see NfvoRequestorBuilder
+   * @deprecated Please use NfvoRequestorBuilder
    */
   @Deprecated
   public NFVORequestor(
@@ -131,8 +130,6 @@ public final class NFVORequestor {
   /**
    * Constructor for the NFVORequestor in service mode.
    *
-   * @deprecated Please use NfvoRequestorBuilder
-   * @see NfvoRequestorBuilder
    * @param serviceName the name of the service to use for requests
    * @param projectId the NFVO Project's ID that will be used in the requests to the NFVO
    * @param sslEnabled true if the NFVO uses SSL
@@ -141,6 +138,8 @@ public final class NFVORequestor {
    * @param version the API version
    * @param serviceKey the key for authenticating the service
    * @throws SDKException in case of exception
+   * @see NfvoRequestorBuilder
+   * @deprecated Please use NfvoRequestorBuilder
    */
   @Deprecated
   public NFVORequestor(
@@ -165,8 +164,6 @@ public final class NFVORequestor {
   /**
    * Constructor for the NFVORequestor in service mode.
    *
-   * @deprecated Please use NfvoRequestorBuilder
-   * @see NfvoRequestorBuilder
    * @param serviceName the name of the service to use for requests
    * @param projectName the NFVO Project's Name that will be used in the requests to the NFVO
    * @param sslEnabled true if the NFVO uses SSL
@@ -175,6 +172,8 @@ public final class NFVORequestor {
    * @param version the API version
    * @param serviceKey the key for authenticating the service
    * @throws SDKException in case of exception
+   * @see NfvoRequestorBuilder
+   * @deprecated Please use NfvoRequestorBuilder
    */
   @Deprecated
   public NFVORequestor(
@@ -667,15 +666,21 @@ public final class NFVORequestor {
    * @throws SDKException in case of exception
    */
   private String getProjectIdForProjectName(String projectName) throws SDKException {
-    for (Project project : this.getProjectAgent().findAll()) {
-      if (project.getName().equals(projectName)) {
-        return project.getId();
-      }
-    }
-    throw new SDKException(
-        "Did not find a Project named " + projectName,
-        null,
-        "Did not find a Project named " + projectName);
+    String projectId =
+        this.getProjectAgent()
+            .findAll()
+            .stream()
+            .filter(p -> p.getName().equals(projectName))
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new SDKException(
+                        "Did not find a Project named " + projectName,
+                        null,
+                        "Did not find a Project named " + projectName))
+            .getId();
+    this.projectAgent = null;
+    return projectId;
   }
 
   /** Set all the agent objects to null. */
