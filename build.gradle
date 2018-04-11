@@ -23,7 +23,7 @@ buildscript {
     }
 }
 plugins {
-    id 'net.researchgate.release' version '2.1.2'
+    id 'net.researchgate.release' version '2.6.0'
     id "com.github.sherter.google-java-format" version "0.5"
 }
 apply from: 'gradle/gradle/nexus.upload.plugin.gradle'
@@ -45,16 +45,6 @@ allprojects {
         }
     }
 
-}
-project.ext {
-    //------------------------------------------------//
-    /**
-     * Spring Related Variables
-     */
-    springVersion = '4.2.0.RELEASE'
-    springBootVersion = '1.2.5.RELEASE'
-    //------------------------------------------------//
-    //------------------------------------------------//
 }
 
 apply plugin: 'java'

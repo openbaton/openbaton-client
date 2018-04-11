@@ -121,7 +121,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
     jsonBody.put("keys", keys);
     jsonBody.put("vduVimInstances", vduVimInstances);
     jsonBody.put("configurations", configurations);
-    return (NetworkServiceRecord) this.requestPost("/" + id, jsonBody, NetworkServiceRecord.class);
+    return (NetworkServiceRecord) this.requestPost(id, jsonBody, NetworkServiceRecord.class);
   }
 
   /**
