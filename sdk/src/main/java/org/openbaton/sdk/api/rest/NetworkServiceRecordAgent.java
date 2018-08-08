@@ -106,7 +106,8 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param id ID of the NetworkServiceDescriptor
    * @param vduVimInstances a HashMap assigning VimInstance names to VirtualDeploymentUnits
    * @param keys an ArrayList of Key names that shall be passed to the NetworkServiceRecord
-   * @param configurations a HashMap assigning Configuration objects to VirtualNetworkServiceRecords
+   * @param configurations a HashMap assigning Configuration objects to VirtualNetworkServiceRecord
+   * @param monitoringIp the IP of the monitoring system
    * @return the created NetworkServiceRecord
    * @throws SDKException
    */
@@ -115,12 +116,14 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
       final String id,
       HashMap<String, ArrayList<String>> vduVimInstances,
       ArrayList<String> keys,
-      HashMap<String, Configuration> configurations)
+      HashMap<String, Configuration> configurations,
+      String monitoringIp)
       throws SDKException {
     HashMap<String, Serializable> jsonBody = new HashMap<>();
     jsonBody.put("keys", keys);
     jsonBody.put("vduVimInstances", vduVimInstances);
     jsonBody.put("configurations", configurations);
+    jsonBody.put("monitoringIp", monitoringIp);
     return (NetworkServiceRecord) this.requestPost(id, jsonBody, NetworkServiceRecord.class);
   }
 
@@ -630,5 +633,116 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
       throws SDKException {
     String url = idNsr + "/pnfrecords" + "/" + idPnfr;
     return (PhysicalNetworkFunctionRecord) requestPut(url, physicalNetworkFunctionRecord);
+  }
+
+  /**
+   * Scales out/add a VNF to a running NSR.
+   *
+   * @param idNsr the ID of the NetworkServiceRecord
+   * @param idVnfd the ID of the VNFD to add
+   * @param vduVimInstances a HashMap assigning VimInstance names to VirtualDeploymentUnits
+   * @param keys an ArrayList of Key names that shall be passed to the NetworkServiceRecord
+   * @param configurations a HashMap assigning Configuration objects to VirtualNetworkServiceRecords
+   * @param monitoringIp the IP of the monitoring system
+   * @return the updated NetworkFunctionRecord
+   * @throws SDKException
+   */
+  @Help(help = "Scales out/add a VNF to a running NetworkServiceRecord with specific id")
+  public NetworkServiceRecord scaleOut(
+      final String idNsr,
+      final String idVnfd,
+      HashMap<String, ArrayList<String>> vduVimInstances,
+      ArrayList<String> keys,
+      HashMap<String, Configuration> configurations,
+      String monitoringIp)
+      throws SDKException {
+    HashMap<String, Serializable> jsonBody = new HashMap<>();
+    jsonBody.put("keys", keys);
+    jsonBody.put("vduVimInstances", vduVimInstances);
+    jsonBody.put("configurations", configurations);
+    jsonBody.put("monitoringIp", monitoringIp);
+    String url = idNsr + "/vnfd" + "/" + idVnfd;
+    return (NetworkServiceRecord) requestPut(url, jsonBody);
+  }
+
+  /**
+   * Restarts a VNFR in a running NSR.
+   *
+   * @param idNsr the ID of the NetworkServiceRecord
+   * @param idVnfr the ID of the VNFR to restart
+   * @param imageName rebuilding the VNFR with a different image if defined
+   * @throws SDKException
+   */
+  @Help(help = "Scales out/add a VNF to a running NetworkServiceRecord with specific id")
+  public void restartVnfr(final String idNsr, final String idVnfr, String imageName)
+      throws SDKException {
+    HashMap<String, Serializable> jsonBody = new HashMap<>();
+    jsonBody.put("imageName", imageName);
+    String url = idNsr + "/vnfrecords" + "/" + idVnfr + "/restart";
+    requestPost(url, jsonBody);
+  }
+
+  /**
+   * Upgrades a VNFR of a defined VNFD in a running NSR.
+   *
+   * @param idNsr the ID of the NetworkServiceRecord
+   * @param idVnfr the ID of the VNFR to be upgraded
+   * @param idVnfd the VNFD ID to which the VNFR shall be upgraded
+   * @throws SDKException
+   */
+  @Help(help = "Upgrades a VNFR to a defined VNFD in a running NSR with specific id")
+  public void upgradeVnfr(final String idNsr, final String idVnfr, final String idVnfd)
+      throws SDKException {
+    HashMap<String, Serializable> jsonBody = new HashMap<>();
+    jsonBody.put("vnfdId", idVnfd);
+    String url = idNsr + "/vnfrecords" + "/" + idVnfr + "/upgrade";
+    requestPost(url, jsonBody);
+  }
+
+  /**
+   * Updates a VNFR of a defined VNFD in a running NSR.
+   *
+   * @param idNsr the ID of the NetworkServiceRecord
+   * @param idVnfr the ID of the VNFR to be upgraded
+   * @throws SDKException
+   */
+  @Help(help = "Updates a VNFR to a defined VNFD in a running NSR with specific id")
+  public void updateVnfr(final String idNsr, final String idVnfr) throws SDKException {
+    String url = idNsr + "/vnfrecords" + "/" + idVnfr + "/update";
+    requestPost(url);
+  }
+
+  /**
+   * Executes a script at runtime for a VNFR of a defined VNFD in a running NSR.
+   *
+   * @param idNsr the ID of the NetworkServiceRecord
+   * @param idVnfr the ID of the VNFR to be upgraded
+   * @param script the script to execute
+   * @throws SDKException
+   */
+  @Help(
+    help =
+        "Executes a script at runtime for a VNFR of a defined VNFD in a running NSR with specific id"
+  )
+  public void executeScript(final String idNsr, final String idVnfr, String script)
+      throws SDKException {
+    String url = idNsr + "/vnfrecords" + "/" + idVnfr + "/execute-script";
+    requestPost(url, script);
+  }
+
+  /**
+   * Resumes a NSR that failed while executing a script in a VNFR. The id in the URL specifies the
+   * Network Service Record that will be resumed..
+   *
+   * @param idNsr the ID of the NetworkServiceRecord
+   * @throws SDKException
+   */
+  @Help(
+    help =
+        "Resumes a NSR that failed while executing a script in a VNFR. The id in the URL specifies the Network Service Record that will be resumed."
+  )
+  public void resume(final String idNsr) throws SDKException {
+    String url = idNsr + "/resume";
+    requestPost(url);
   }
 }
