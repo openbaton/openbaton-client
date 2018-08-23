@@ -52,6 +52,7 @@ public final class NFVORequestor {
   private ProjectAgent projectAgent;
   private UserAgent userAgent;
   private KeyAgent keyAgent;
+  private ServiceAgent serviceAgent;
   // if a new agent is added please keep in mind to update the resetAgents method
 
   /**
@@ -619,6 +620,38 @@ public final class NFVORequestor {
   }
 
   /**
+   * Returns a KeyAgent with which requests regarding Keys can be sent to the NFVO.
+   *
+   * @return a KeyAgent
+   */
+  public synchronized ServiceAgent getServiceAgent() {
+    if (this.keyAgent == null) {
+      if (isService) {
+        this.serviceAgent =
+            new ServiceAgent(
+                this.serviceName,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version,
+                this.serviceKey);
+      } else {
+        this.serviceAgent =
+            new ServiceAgent(
+                this.username,
+                this.password,
+                this.projectId,
+                this.sslEnabled,
+                this.nfvoIp,
+                this.nfvoPort,
+                this.version);
+      }
+    }
+    return this.serviceAgent;
+  }
+
+  /**
    * Set the NFVORequestor's project id. See the {@link #switchProject(String) switchProject} method
    * for a more convenient alternative.
    *
@@ -697,5 +730,6 @@ public final class NFVORequestor {
     this.vimInstanceAgent = null;
     this.networkServiceDescriptorAgent = null;
     this.networkServiceRecordAgent = null;
+    this.serviceAgent = null;
   }
 }
