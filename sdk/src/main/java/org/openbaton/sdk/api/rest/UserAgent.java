@@ -18,7 +18,6 @@
 package org.openbaton.sdk.api.rest;
 
 import java.util.HashMap;
-import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.security.User;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
@@ -28,7 +27,6 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
  * This class is a Rest Request Agent for sending requests regarding User objects to the NFVO API.
  * It is thread safe.
  */
-@ThreadSafe
 public class UserAgent extends AbstractRestAgent<User> {
 
   /**
@@ -76,7 +74,7 @@ public class UserAgent extends AbstractRestAgent<User> {
   /**
    * Use findByName instead.
    *
-   * @param id
+   * @param id not used anymore
    * @return null
    */
   @Override
@@ -90,7 +88,7 @@ public class UserAgent extends AbstractRestAgent<User> {
    *
    * @param name the username
    * @return the User
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Find a User by his name")
   public User findByName(String name) throws SDKException {
@@ -102,7 +100,7 @@ public class UserAgent extends AbstractRestAgent<User> {
    *
    * @param oldPassword the User's old password
    * @param newPassword the User's new password
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Change a user's password")
   public void changePassword(String oldPassword, String newPassword) throws SDKException {

@@ -58,6 +58,8 @@ public class SDKException extends Exception {
    * Creates an SDKException with an Exception message as String.
    *
    * @param message custom message
+   * @param stackTraceElements stack trace
+   * @param reason reason for the exception
    */
   public SDKException(String message, StackTraceElement[] stackTraceElements, String reason) {
     super(message + ". The reason is: " + reason);

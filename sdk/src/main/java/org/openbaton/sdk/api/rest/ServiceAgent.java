@@ -21,7 +21,6 @@ package org.openbaton.sdk.api.rest;
 
 import java.util.HashMap;
 import java.util.List;
-import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.security.ServiceMetadata;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
@@ -32,7 +31,6 @@ import org.springframework.http.MediaType;
  * This class is a Rest Request Agent for sending requests regarding User objects to the NFVO API.
  * It is thread safe.
  */
-@ThreadSafe
 public class ServiceAgent extends AbstractRestAgent<ServiceMetadata> {
 
   /**
@@ -98,7 +96,7 @@ public class ServiceAgent extends AbstractRestAgent<ServiceMetadata> {
    *
    * @param serviceName Name of the service to create
    * @param roles projects to access
-   * @throws SDKException
+   * @throws SDKException if the request fails
    * @return key for the service to authenticate
    */
   @Help(help = "Creates a new service")

@@ -79,6 +79,7 @@ public class NfvoRequestorBuilder {
     return this;
   }
 
+  @SuppressWarnings("deprecation")
   public NFVORequestor build() throws SDKException {
     // Is service
     if (serviceKey != null

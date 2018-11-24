@@ -18,7 +18,6 @@
 package org.openbaton.sdk.api.rest;
 
 import java.io.File;
-import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.nfvo.VNFPackage;
 import org.openbaton.sdk.api.annotations.Help;
 import org.openbaton.sdk.api.exception.SDKException;
@@ -30,7 +29,6 @@ import org.slf4j.LoggerFactory;
  * This class is a Rest Request Agent for sending requests regarding VNFPackage objects to the NFVO
  * API. It is thread safe.
  */
-@ThreadSafe
 public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
 
   private Logger log = LoggerFactory.getLogger(this.getClass());
@@ -88,7 +86,7 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
   /**
    * Use the create(String filePath) method instead.
    *
-   * @param vnfPackage
+   * @param vnfPackage not used anymore
    * @return null
    */
   @Override
@@ -104,7 +102,7 @@ public class VNFPackageAgent extends AbstractRestAgent<VNFPackage> {
    *
    * @param filePath the path to the tar file representing the VNFPackage
    * @return the uploaded VNFPackage
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Create a VNFPackage by uploading a tar file")
   public VNFPackage create(String filePath) throws SDKException {

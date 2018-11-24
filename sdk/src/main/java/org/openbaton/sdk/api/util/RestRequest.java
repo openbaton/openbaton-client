@@ -115,14 +115,14 @@ public abstract class RestRequest {
   /**
    * RestRequest constructor for normal users.
    *
-   * @param username
-   * @param password
-   * @param projectId
-   * @param sslEnabled
-   * @param nfvoIp
-   * @param nfvoPort
-   * @param path
-   * @param version
+   * @param username the username
+   * @param password the password
+   * @param projectId the project ID
+   * @param sslEnabled true if the NFVO uses TLS
+   * @param nfvoIp IP of the host running the NFVO
+   * @param nfvoPort port on which the NFVO runs
+   * @param path API part that comes after https://ip:port/api/v1
+   * @param version API version
    */
   public RestRequest(
       String username,
@@ -162,14 +162,14 @@ public abstract class RestRequest {
   /**
    * RestRequest constructor for services.
    *
-   * @param serviceName
-   * @param projectId
-   * @param sslEnabled
-   * @param nfvoIp
-   * @param nfvoPort
-   * @param path
-   * @param version
-   * @param serviceKey
+   * @param serviceName name of the service
+   * @param projectId project ID
+   * @param sslEnabled true if the NFVO uses TLS
+   * @param nfvoIp the IP of the host running the NFVO
+   * @param nfvoPort the port on which the NFVO runs
+   * @param path API part that comes after https://ip:port/api/v1
+   * @param version API version
+   * @param serviceKey the service key
    * @throws IllegalArgumentException if the service key is null
    */
   public RestRequest(
