@@ -15,6 +15,7 @@ public class RestUtils {
    *
    * @param httpResponse the http response
    * @param httpStatus the (desired) http status of the repsonse
+   * @throws SDKException if the request fails
    */
   public static void checkStatus(CloseableHttpResponse httpResponse, final int httpStatus)
       throws SDKException {

@@ -19,7 +19,6 @@ package org.openbaton.sdk.api.rest;
 
 import java.util.Arrays;
 import java.util.List;
-import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.mano.common.Security;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
 import org.openbaton.catalogue.mano.descriptor.PhysicalNetworkFunctionDescriptor;
@@ -33,7 +32,6 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
  * This class is a Rest Request Agent for sending requests regarding NetworkServiceDescriptor
  * objects to the NFVO API. It is thread safe.
  */
-@ThreadSafe
 public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServiceDescriptor> {
 
   /**
@@ -162,6 +160,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param idNSD : The id of the networkServiceDescriptor the vnfd shall be created at
    * @param virtualNetworkFunctionDescriptor : : the Network Service Descriptor to be updated
    * @throws SDKException if the request fails
+   * @return the created VNFD
    */
   @Help(
     help =
@@ -223,7 +222,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param idNSD the ID of the NetworkServiceDescriptor
    * @param idVnfd the VNFDependencies' ID
    * @return the VNFDependency
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -257,7 +256,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    * @param idNSD the ID of the NetworkServiceDescriptor
    * @param vnfDependency the new VNFDependency
    * @return the new VNFDependency
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -295,7 +294,7 @@ public class NetworkServiceDescriptorAgent extends AbstractRestAgent<NetworkServ
    *
    * @param idNSD the ID of the NetworkServiceDescriptor
    * @return the List of PhysicalNetworkFunctionDescriptors
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =

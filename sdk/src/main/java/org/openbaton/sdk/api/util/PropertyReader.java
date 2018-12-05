@@ -29,14 +29,14 @@ public class PropertyReader {
   /**
    * Creates a property reader that deserializes the property file from a jar
    *
-   * @param sdkPropertiesPath
+   * @param sdkPropertiesPath path to the properties file
    */
   public PropertyReader(final String sdkPropertiesPath) {
     sdkProperties = readProperties(sdkPropertiesPath);
   }
 
   /**
-   * @param propertiesPath
+   * @param propertiesPath path to the properties file
    * @return Properties
    */
   private Properties readProperties(final String propertiesPath) {
@@ -65,7 +65,7 @@ public class PropertyReader {
   /**
    * Get the URL for the given class name.
    *
-   * @param className
+   * @param className the class name
    * @return the URL path property
    */
   public String getRestUrl(String className) {

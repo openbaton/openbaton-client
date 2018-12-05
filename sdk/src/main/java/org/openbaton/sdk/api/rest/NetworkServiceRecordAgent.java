@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import org.apache.http.annotation.ThreadSafe;
 import org.openbaton.catalogue.mano.descriptor.VNFComponent;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
 import org.openbaton.catalogue.mano.record.PhysicalNetworkFunctionRecord;
@@ -39,7 +38,6 @@ import org.openbaton.sdk.api.util.AbstractRestAgent;
  * This class is a Rest Request Agent for sending requests regarding NetworkServiceRecord objects to
  * the NFVO API. It is thread safe.
  */
-@ThreadSafe
 public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceRecord> {
 
   /**
@@ -109,7 +107,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param configurations a HashMap assigning Configuration objects to VirtualNetworkServiceRecord
    * @param monitoringIp the IP of the monitoring system
    * @return the created NetworkServiceRecord
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Create NetworkServiceRecord from NetworkServiceDescriptor id")
   public NetworkServiceRecord create(
@@ -133,7 +131,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    *
    * @param id ID of the NetworkServiceRecord
    * @return the List of VirtualNetworkFunctionRecords
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Get all the VirtualNetworkFunctionRecords of NetworkServiceRecord with specific id")
   public List<VirtualNetworkFunctionRecord> getVirtualNetworkFunctionRecords(final String id)
@@ -149,7 +147,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param id the ID of the NetworkServiceRecord
    * @param idVnfr the ID of the VirtualNetworkFunctionRecord
    * @return the VirtualNetworkFunctionRecord
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Get the VirtualNetworkFunctionRecord of NetworkServiceRecord with specific id")
   public VirtualNetworkFunctionRecord getVirtualNetworkFunctionRecord(
@@ -163,7 +161,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    *
    * @param id the ID of the NetworkServiceRecord containing the VirtualNetworkFunctionRecord
    * @param idVnfr the ID of the VirtualNetworkFunctionRecord to delete
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Delete the VirtualNetworkFunctionRecord of NetworkServiceRecord with specific id")
   public void deleteVirtualNetworkFunctionRecord(final String id, final String idVnfr)
@@ -182,7 +180,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param vnfComponent the VNFComponent from which the VNFCInstance shall be created
    * @param vimInstanceNames the list of vimInstanceNames where you want to deploy the new vnf
    *     component
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Create VNFCInstance in standby")
   public void createVNFCInstanceInStandby(
@@ -206,8 +204,8 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idVnfr the ID of the VirtualNetworkFunctionRecord containing the VNFCInstance
    * @param idVdu the ID of the VirtualDeploymentUnit containing the VNFCInstance
    * @param idVnfc the ID on the VNFCInstance that shall switch into standby mode
-   * @param failedVnfcInstance
-   * @throws SDKException
+   * @param failedVnfcInstance the failed VNFCInstance
+   * @throws SDKException if the request fails
    */
   @Help(help = "Switch to standby")
   public void switchToStandby(
@@ -238,7 +236,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idVdu the ID of the VirtualDeploymentUnit containing the VNFCInstance
    * @param idVnfc the ID on the VNFCInstance on which a LifecycleEvent shall be executed
    * @param nfvMessage the NFVMessage describing the LifecyceEvent to execute
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Execute a specific action specified in the nfvMessage")
   public void postAction(
@@ -268,7 +266,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    *     be added
    * @param virtualNetworkFunctionRecord the new VirtualNetworkFunctionRecord
    * @return the VirtualNetworkFunctionRecord
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "create VirtualNetworkFunctionRecord")
   public VirtualNetworkFunctionRecord createVNFR(
@@ -288,7 +286,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param vnfComponent the VNFComponent from which the new VNFCInstance shall be created
    * @param vimInstanceNames the list of vimInstanceNames where you want to deploy the new vnf
    *     component
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "create VNFCInstance. Aka SCALE OUT")
   public void createVNFCInstance(
@@ -315,7 +313,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param vnfComponent the VNFComponent from which the new VNFCInstance shall be created
    * @param vimInstanceNames the list of vimInstanceNames where you want to deploy the new vnf
    *     component
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "create VNFCInstance. Aka SCALE OUT")
   public void createVNFCInstance(
@@ -340,7 +338,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idNsr the ID of the NetworkServiceRecord from which a VNFCInstance shall be deleted
    * @param idVnfr the ID of the VirtualNetworkFunctionRecord from which a VNFCInstance shall be
    *     deleted
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "remove VNFCInstance. Aka SCALE IN")
   public void deleteVNFCInstance(final String idNsr, final String idVnfr) throws SDKException {
@@ -357,7 +355,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idVnfr the ID of the VirtualNetworkFunctionRecord from which a VNFCInstance shall be
    *     deleted
    * @param idVdu the ID of the VirtualDeploymentUnit from which a VNFCInstance shall be deleted
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "remove VNFCInstance. Aka SCALE IN")
   public void deleteVNFCInstance(final String idNsr, final String idVnfr, final String idVdu)
@@ -376,7 +374,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    *     deleted
    * @param idVdu the ID of the VirtualDeploymentUnit from which the VNFCInstance shall be deleted
    * @param idVnfcInstance the ID of the VNFCInstance that shall be deleted
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "remove VNFCInstance. Aka SCALE IN")
   public void deleteVNFCInstance(
@@ -395,7 +393,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idVnfr the ID of the VirtualNetworkFunctionRecord to update
    * @param virtualNetworkFunctionRecord the updated version of the VirtualNetworkFunctionRecord
    * @return the updated VirtualNetworkFunctionRecord
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "update VirtualNetworkFunctionRecord")
   public String updateVNFR(
@@ -412,7 +410,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    *
    * @param idNsr the ID of the NetworkServiceRecord
    * @return a List of VNFRecordDependencies
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -429,7 +427,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idNsr the ID of the NetworkServiceRecord
    * @param idVnfrDep the ID of the requested VNFRecordDependency
    * @return the VNFRecordDependency
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -446,7 +444,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    *
    * @param idNsr the ID of the NetworkServiceRecord
    * @param idVnfrDep the ID of the VNFRecordDependency to delete
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -464,7 +462,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idNsr the ID of the NetworkServiceRecord
    * @param vnfRecordDependency the new VNFRecordDependency
    * @return the created VNFRecordDependency
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -483,7 +481,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idVnfrDep the ID of the VNFRecordDependency to update
    * @param vnfRecordDependency the updated version of the VNFRecordDependency
    * @return the updated VNFRecordDependency
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -503,7 +501,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param vnfrId the ID of the VirtualNetworkFunctionRecord containing the VNFCInstance
    * @param vduId the ID of the VirtualDeploymentUnit containing the VNFCInstance
    * @param vnfcInstanceId the ID on the VNFCInstance that shall be started
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Start the specified VNFC Instance")
   public void startVNFCInstance(
@@ -528,7 +526,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param vnfrId the ID of the VirtualNetworkFunctionRecord containing the VNFCInstance
    * @param vduId the ID of the VirtualDeploymentUnit containing the VNFCInstance
    * @param vnfcInstanceId the ID on the VNFCInstance that shall be stopped
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Stop the specified VNFC Instance")
   public void stopVNFCInstance(
@@ -552,7 +550,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    *
    * @param idNsr the ID of the NetworkServiceRecord
    * @return a List of PhysicalNetworkFunctionRecords
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help = "Get all the PhysicalNetworkFunctionRecords of a specific NetworkServiceRecord with id"
@@ -570,7 +568,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idNsr the ID of the NetworkFunctionRecord containing the PhysicalNetworkFunctionRecord
    * @param idPnfr the ID of the requested PhysicalNetworkFunctionRecord
    * @return the PhysicalNetworkFunctionRecord
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Get the PhysicalNetworkFunctionRecord of a NetworkServiceRecord with specific id")
   public PhysicalNetworkFunctionRecord getPhysicalNetworkFunctionRecord(
@@ -585,7 +583,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    *
    * @param idNsr the ID of the NetworkFunctionRecord containing the PhysicalNetworkFunctionRecord
    * @param idPnfr the ID of the PhysicalNetworkFunctionRecord to delete
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help = "Delete the PhysicalNetworkFunctionRecord of a NetworkServiceRecord with specific id"
@@ -602,7 +600,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idNsr the ID of the NetworkServiceRecord
    * @param physicalNetworkFunctionRecord the new PhysicalNetworkFunctionRecord
    * @return the new PhysicalNetworkFunctionRecord
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help = "Create the PhysicalNetworkFunctionRecord of a NetworkServiceRecord with specific id"
@@ -621,7 +619,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idPnfr the ID of the PhysicalNetworkFunctionRecord to update
    * @param physicalNetworkFunctionRecord the updated version of the PhysicalNetworkFunctionRecord
    * @return the updated PhysicalNetworkFunctionRecord
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help = "Update the PhysicalNetworkFunctionRecord of a NetworkServiceRecord with specific id"
@@ -645,7 +643,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param configurations a HashMap assigning Configuration objects to VirtualNetworkServiceRecords
    * @param monitoringIp the IP of the monitoring system
    * @return the updated NetworkFunctionRecord
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Scales out/add a VNF to a running NetworkServiceRecord with specific id")
   public NetworkServiceRecord scaleOut(
@@ -671,7 +669,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idNsr the ID of the NetworkServiceRecord
    * @param idVnfr the ID of the VNFR to restart
    * @param imageName rebuilding the VNFR with a different image if defined
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Scales out/add a VNF to a running NetworkServiceRecord with specific id")
   public void restartVnfr(final String idNsr, final String idVnfr, String imageName)
@@ -688,7 +686,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idNsr the ID of the NetworkServiceRecord
    * @param idVnfr the ID of the VNFR to be upgraded
    * @param idVnfd the VNFD ID to which the VNFR shall be upgraded
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Upgrades a VNFR to a defined VNFD in a running NSR with specific id")
   public void upgradeVnfr(final String idNsr, final String idVnfr, final String idVnfd)
@@ -704,7 +702,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    *
    * @param idNsr the ID of the NetworkServiceRecord
    * @param idVnfr the ID of the VNFR to be upgraded
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(help = "Updates a VNFR to a defined VNFD in a running NSR with specific id")
   public void updateVnfr(final String idNsr, final String idVnfr) throws SDKException {
@@ -718,7 +716,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * @param idNsr the ID of the NetworkServiceRecord
    * @param idVnfr the ID of the VNFR to be upgraded
    * @param script the script to execute
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
@@ -735,7 +733,7 @@ public class NetworkServiceRecordAgent extends AbstractRestAgent<NetworkServiceR
    * Network Service Record that will be resumed..
    *
    * @param idNsr the ID of the NetworkServiceRecord
-   * @throws SDKException
+   * @throws SDKException if the request fails
    */
   @Help(
     help =
